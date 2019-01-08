@@ -9,7 +9,7 @@ import requests
 
 
 def reverseGeoCall(latitude, longitude):
-    apiKey = 'AIzaSyCwugFdGLz6QUtcYqD1z0PKKsYJhay3vIg'
+    apiKey = ''
     apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=' + str(latitude) + ',' + str(longitude) + '&key=' + apiKey
     apiCall = requests.get(apiUrl)
 
