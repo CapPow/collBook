@@ -76,6 +76,12 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def columnCount(self, parent=QtCore.QModelIndex()):
         return len(self.datatable.columns.values)
     
+    def columnIndex(self, colName):
+        """ given a column name, returns the index of it's location. Called
+        by updateTableView to get the index of "specimen#" for sorting."""
+        result = self.datatable.columns.get_loc(colName)
+        return result
+    
     def retrieveRowData(self, i):
         """ given a row index number returns the data as a series """
         df = self.datatable
@@ -117,7 +123,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         called from mainWindow's updateTableView() following 
         tree_widget selection changes."""
         df = self.datatable
-        allRows = df[df['specimen#'] != '#'].index.values.tolist()
+        allRows = df.index.values.tolist()
+        df = df[~df['specimen#'].str.contains('#')]
         if selType == 'allRec':
             rowsToKeep = allRows
         elif selType == 'site':

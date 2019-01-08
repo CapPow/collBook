@@ -26,6 +26,7 @@ from PyQt5.QtNetwork import QNetworkAccessManager, \
      QNetworkReply, QNetworkRequest
 
 from popplerqt5 import Poppler
+import Resources_rc
 
 
 # Poppler gives page sizes in points, so 72 DPI.
@@ -46,7 +47,7 @@ class PDFViewer(QLabel):
     subsequent widgets you create) or use a ScrolledPDFViewer.
     '''
 
-    def __init__(self, parent, pdfData= "ui/resources/label_Preview.pdf", 
+    def __init__(self, parent, pdfData= None, 
                  document=None, pageno=1, dpi=72,load_cb=None):
         '''
            load_cb: will be called when the document is loaded.
@@ -61,8 +62,8 @@ class PDFViewer(QLabel):
         
         if not document:
             self.document = None
-            if pdfData:
-                self.load_preview(pdfData)
+            #if pdfData:
+            self.load_preview(pdfData)
         else:
             self.document = document
         self.page = None
@@ -87,8 +88,12 @@ class PDFViewer(QLabel):
             self.document = Poppler.Document.loadFromData(pdfBytes)
         except TypeError:
             self.document = Poppler.Document.load(pdfBytes)
-        pdfPage = self.document.page(0)
-        img = pdfPage.renderToImage()
+        try:
+            pdfPage = self.document.page(0)
+            img = pdfPage.renderToImage()
+        except AttributeError:
+            img = QImage(":/rc_/label_Preview.png")
+            img = img.scaled(400, 400, Qt.KeepAspectRatio)
         self.setPixmap(QPixmap.fromImage(img))
 
 

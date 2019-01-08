@@ -9,6 +9,8 @@ from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem
 from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
 
+from PyQt5.QtCore import Qt
+
 
 #import uiFunctions
 
@@ -79,14 +81,17 @@ class MyWindow(QMainWindow):
         rowsToHide = self.m.getRowsToHide(selType, siteNum, specimenNum)
         for row in rowsToHide:
             self.table_view.hideRow(row)
+        specimenColumnIndex = self.m.columnIndex('specimen#')
+        #TODO this sort currently does an alphanumeric sort (ie: 100, 2, 30)
+        self.table_view.sortByColumn(specimenColumnIndex, Qt.AscendingOrder)
+            
 
 #TODO Fix the selection of the top row
-#        if selType != 'allRec':
-#            topVisible = [x for x in rowNums if x not in rowsToHide]
-#            topVisible.remove(0)
-#            topVisible = min(topVisible)
-#            self.table_view.selectRow(topVisible)
-#            self.updatePreview()
+        if selType != 'allRec':
+            topVisible = [x for x in rowNums if x not in rowsToHide]
+            topVisible = min(topVisible)
+            self.table_view.selectRow(topVisible)
+            self.updatePreview()
 
     def updatePreview(self):
         """ updates the pdf preview window after the vertical header is clicked"""
@@ -97,6 +102,7 @@ class MyWindow(QMainWindow):
         tableSelection = self.w.table_view.selectionModel().selectedRows()
         if tableSelection:
             index = tableSelection[0].row()
+            print(index)
             rowData = self.m.retrieveRowData(index)
             rowData = self.m.dataToDict(rowData)
             pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
