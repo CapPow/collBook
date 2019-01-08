@@ -1,2 +1,0 @@
-# pdDesk
-pdProject desktop rewrite
