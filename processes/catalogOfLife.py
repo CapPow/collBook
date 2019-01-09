@@ -7,8 +7,9 @@ from urllib.error import HTTPError
 import re
 import xml.etree.ElementTree as ET
 import html
-import sys
 import datetime
+
+
 try:
     from tkinter import messagebox
 except:

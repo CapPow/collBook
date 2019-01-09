@@ -48,11 +48,11 @@ class PDFViewer(QLabel):
     '''
 
     def __init__(self, parent, pdfData= None, 
-                 document=None, pageno=1, dpi=72,load_cb=None):
+                 document=None, pageno=1, dpi=150,load_cb=None):
         '''
            load_cb: will be called when the document is loaded.
         '''
-        
+        #dpi - 72
         super(PDFViewer, self).__init__(parent)        
         self.filename = pdfData
         self.load_cb = load_cb
@@ -62,7 +62,6 @@ class PDFViewer(QLabel):
         
         if not document:
             self.document = None
-            #if pdfData:
             self.load_preview(pdfData)
         else:
             self.document = document

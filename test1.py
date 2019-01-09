@@ -5,6 +5,7 @@ import os
 
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem
+from PyQt5.QtWidgets import QAbstractItemView
 
 from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
@@ -89,8 +90,11 @@ class MyWindow(QMainWindow):
 #TODO Fix the selection of the top row
         if selType != 'allRec':
             topVisible = [x for x in rowNums if x not in rowsToHide]
-            topVisible = min(topVisible)
-            self.table_view.selectRow(topVisible)
+            try:
+                topVisible = min(topVisible)
+                self.table_view.selectRow(topVisible)
+            except ValueError:
+                self.table_view.QAbstractItemView.clearSelection()
             self.updatePreview()
 
     def updatePreview(self):
@@ -102,11 +106,12 @@ class MyWindow(QMainWindow):
         tableSelection = self.w.table_view.selectionModel().selectedRows()
         if tableSelection:
             index = tableSelection[0].row()
-            print(index)
             rowData = self.m.retrieveRowData(index)
             rowData = self.m.dataToDict(rowData)
             pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
-            self.pdf_preview.load_preview(pdfBytes)  # starts the loading display process        
+        else:
+            pdfBytes = None
+        self.pdf_preview.load_preview(pdfBytes)  # starts the loading display process        
         
 
     def populateTreeWidget(self):
