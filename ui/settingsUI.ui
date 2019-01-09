@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>settingsWindow</class>
+ <widget class="QMainWindow" name="settingsWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>539</width>
+    <height>483</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Preferences</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>2</number>
+      </property>
+      <property name="rightMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="upperHorizontalLayout">
+        <item>
+         <widget class="QListWidget" name="selectionWidget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>Label preferences</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Taxanomic preferences</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QStackedWidget" name="stackedWidget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="labelPrefPage">
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="0">
+             <widget class="QGroupBox" name="labelDimentionsGroup">
+              <property name="title">
+               <string>Label dimensions (mm)</string>
+              </property>
+              <layout class="QFormLayout" name="formLayout_4">
+               <item row="1" column="0">
+                <widget class="QLabel" name="xLabel">
+                 <property name="text">
+                  <string>width (mm)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QSpinBox" name="value_X"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="yLabel">
+                 <property name="text">
+                  <string>height (mm)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QSpinBox" name="value_Y"/>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QGroupBox" name="labelIncludeGroup">
+              <property name="title">
+               <string>Include</string>
+              </property>
+              <layout class="QFormLayout" name="formLayout_3">
+               <item row="2" column="0">
+                <widget class="QCheckBox" name="value_inc_Associated">
+                 <property name="text">
+                  <string>Include associated taxa</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QCheckBox" name="value_inc_VerifiedBy">
+                 <property name="text">
+                  <string>Include verified by</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0" colspan="2">
+                <widget class="QLineEdit" name="value_VerifiedBy"/>
+               </item>
+               <item row="6" column="0">
+                <widget class="QCheckBox" name="value_inc_CollectionName">
+                 <property name="text">
+                  <string>Include collection name</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0" colspan="2">
+                <widget class="QPlainTextEdit" name="value_CollectionName">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="0">
+                <widget class="QCheckBox" name="value_inc_Barcode">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>Include catalogNumber barcode</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="TaxPrefPage">
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>Taxanomic alignment</string>
+              </property>
+              <layout class="QFormLayout" name="formLayout_5">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_TaxAlignSource">
+                 <property name="text">
+                  <string>Source</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="value_TaxAlignSource">
+                 <item>
+                  <property name="text">
+                   <string>ITIS (local)</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Catalog of Life (web api)</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_NameChangePolicy">
+                 <property name="text">
+                  <string>Name change policy</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="value_NameChangePolicy">
+                 <item>
+                  <property name="text">
+                   <string>Always ask</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Accept all suggestions</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Fill all blanks</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_AuthChangePolicy">
+                 <property name="text">
+                  <string>Authority change policy</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QComboBox" name="value_AuthChangePolicy">
+                 <item>
+                  <property name="text">
+                   <string>Fill in blanks</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Accept all suggestions</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Always ask</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="lowerHorizontalLayout">
+        <item>
+         <spacer name="lowerHorizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="button_Cancel">
+          <property name="text">
+           <string>Cancel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="button_SaveExit">
+          <property name="text">
+           <string>Save and exit</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>539</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="defaultUp">
+    <bool>false</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="resources/Resources.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>selectionWidget</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>126</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>432</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_inc_VerifiedBy</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>value_VerifiedBy</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>282</x>
+     <y>223</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>365</x>
+     <y>258</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_inc_VerifiedBy</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>value_VerifiedBy</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>308</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>314</x>
+     <y>262</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_inc_CollectionName</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>value_CollectionName</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>240</x>
+     <y>297</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>243</x>
+     <y>331</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_inc_CollectionName</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>value_CollectionName</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>269</x>
+     <y>295</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>274</x>
+     <y>324</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <signal>currentRegionNum(int)</signal>
+  <slot>addRegexPattern()</slot>
+  <slot>addRegexPatternByBarcode()</slot>
+  <slot>setColorchipRegion(int)</slot>
+ </slots>
+</ui>

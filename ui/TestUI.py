@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/TestUI.ui'
+# Form implementation generated from reading ui file 'TestUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
@@ -154,6 +154,11 @@ class Ui_MainWindow(object):
         icon7.addPixmap(QtGui.QPixmap(":/icons/corner-down-left.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.action_Redo.setIcon(icon7)
         self.action_Redo.setObjectName("action_Redo")
+        self.action_Settings = QtWidgets.QAction(MainWindow)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(":/rc_/settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.action_Settings.setIcon(icon8)
+        self.action_Settings.setObjectName("action_Settings")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_New_Records)
         self.menu_File.addAction(self.action_Save_As)
@@ -169,6 +174,7 @@ class Ui_MainWindow(object):
         self.left_toolBar.addSeparator()
         self.left_toolBar.addAction(self.action_Verify_Taxonomy)
         self.left_toolBar.addAction(self.action_Reverse_Geolocate)
+        self.left_toolBar.addAction(self.action_Settings)
         self.right_toolBar.addSeparator()
         self.right_toolBar.addAction(self.action_Exit)
 
@@ -205,6 +211,8 @@ class Ui_MainWindow(object):
         self.action_undo.setToolTip(_translate("MainWindow", "undo last major action"))
         self.action_Redo.setText(_translate("MainWindow", "&Redo"))
         self.action_Redo.setToolTip(_translate("MainWindow", "undo last major action"))
+        self.action_Settings.setText(_translate("MainWindow", "&Settings"))
+        self.action_Settings.setToolTip(_translate("MainWindow", "Settings and preferences"))
 
 from ui.pdfviewer import PDFViewer
 import Resources_rc

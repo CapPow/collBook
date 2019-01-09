@@ -228,6 +228,7 @@
    <addaction name="separator"/>
    <addaction name="action_Verify_Taxonomy"/>
    <addaction name="action_Reverse_Geolocate"/>
+   <addaction name="action_Settings"/>
   </widget>
   <widget class="QToolBar" name="right_toolBar">
    <property name="sizePolicy">
@@ -345,6 +346,18 @@
    </property>
    <property name="toolTip">
     <string>undo last major action</string>
+   </property>
+  </action>
+  <action name="action_Settings">
+   <property name="icon">
+    <iconset resource="resources/Resources.qrc">
+     <normaloff>:/rc_/settings.svg</normaloff>:/rc_/settings.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Settings and preferences</string>
    </property>
   </action>
  </widget>

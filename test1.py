@@ -20,7 +20,8 @@ from PyQt5.QtCore import Qt
 
 import qdarkstyle
 from ui.TestUI import Ui_MainWindow
-
+from ui.settingsdialog import settingsWindow
+        
 class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -37,16 +38,16 @@ class MyWindow(QMainWindow):
         m.new_Records(True)
         # apply the custom model class to the existing QTableView object
         w.table_view.setModel(m)
+        # generate an instance of the settingsWindow 
+        self.settingsDialog = settingsWindow()
         # Linking functions to buttons in the UI
-        # functions which are being connected are (**NOT**) found in 'uiFunctions.py'
         w.action_Open.triggered.connect(m.open_CSV)
         w.action_New_Records.triggered.connect(m.new_Records)
-        w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))
-        
+        w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))     
+        w.action_Settings.triggered.connect(self.toggleSettings)        
         m.dataChanged.connect(self.populateTreeWidget)
-
         p = LabelPDF()  # construct the label maker
-        
+        #todo clean up the self definitions        
         self.w = w  # make the mainWindow accessible
         self.p = p  # make the pdfViewer accessible
         self.m = m  # make the PandasTableModel accessible
@@ -56,6 +57,12 @@ class MyWindow(QMainWindow):
         self.tree_widget = w.tree_widget# make the tree_widget accessible
         
         self.populateTreeWidget()
+
+    def toggleSettings(self):
+        if self.settingsDialog.isHidden():
+            self.settingsDialog.show()
+        else:
+            self.settingsDialog.hide()
 
     def updateTableView(self):
         """ updates the table_view after tree_widget's selection change """
