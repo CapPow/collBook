@@ -3,11 +3,15 @@ from reportlab.platypus import Image, Table, TableStyle, Flowable, SimpleDocTemp
 from reportlab.platypus import Frame as platypusFrame   #NOTE SEE Special case import here to avoid namespace conflict with "Frame"
 from reportlab.platypus.flowables import Spacer
 from reportlab.platypus.paragraph import Paragraph
+from reportlab.platypus.doctemplate import LayoutError
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
 from reportlab.graphics.barcode import code39 #Note, overriding a function from this import in barcode section
 from reportlab.lib.units import inch, mm
 from reportlab.lib import pagesizes
+
+
+
 
 import os
 import sys
@@ -15,6 +19,9 @@ import io
 
 # TODO with the conversion to pyqt5, popplerqt5 should allow us to display & open 
 # print dialogs for the pdfs without relying on system installed pdf viewer
+
+# TODO investigate stringWidth function to simplify the width checking options.
+# see: https://stackoverflow.com/questions/27732213/how-to-add-bold-and-normal-text-in-one-line-using-drawstring-method-in-reportlab
 
 import subprocess
 
@@ -44,19 +51,26 @@ class LabelPDF():
         # decent default values 140, 90
         self.xPaperSize = int(self.settings.get('value_X', 140)) * mm
         self.yPaperSize = int(self.settings.get('value_Y', 90)) * mm
+        self.relFont = int(self.settings.get('value_RelFont', 12))
+         # TODO explore adding font options which are already bundled with reportlab
          
-        # Here is where preferences will be read into initalized
-        # There are going to be lots of options for what goes on labels
-        # additionally, there are some bundled font options with reportlab,
-        # which could become a select from list or something
-
-        self.relFont = 12
+        self.allowSplitting = 0
         self.xMarginProportion = 0
         self.yMarginProportion = 0   #Padding on tables are functionally the margins in our use. (We're claiming most of paper)
         self.xMargin = self.xMarginProportion * self.xPaperSize        #Margin set up (dynamically depending on paper sizes.
         self.yMargin = self.xMarginProportion * self.yPaperSize
         self.customPageSize = (self.xPaperSize, self.yPaperSize)
         
+        # check some of the optional label settings
+        additionalData = {}
+        if self.settings.get('value_inc_VerifiedBy'):
+            additionalData['verifiedBy'] = self.settings.get('value_VerifiedBy')
+        if self.settings.get('value_inc_CollectionName'):
+            additionalData['collectionName'] = self.settings.get('value_CollectionName')
+            
+        for rowData in labelDataInput:
+            for key, value in additionalData.items():
+                rowData[key] = value
     
         tableSty = [                                    #Default table style
                 ('LEFTPADDING',(0,0),(-1,-1), 0),
@@ -361,7 +375,7 @@ class LabelPDF():
          rightMargin=self.xMargin,
          topMargin=self.yMargin,
          bottomMargin=self.yMargin,
-         allowSplitting=1,           
+         allowSplitting= self.allowSplitting,           
          title=None,
          author=None,
          _pageBreakQuick=1,
@@ -387,9 +401,16 @@ class LabelPDF():
                     ),
                 ]
             )
-            doc.build(flowables)
-        #Actually build the pdf
-        build_pdf(elements)
+            try:
+                doc.build(flowables)
+            except LayoutError:
+                raise LayoutError
+        
+        try:
+            build_pdf(elements)
+        except LayoutError:
+            # if there is a layout error, raise it
+            raise LayoutError
         
         if returnBytes:  # If a preview is being generated just return the bytes
             # calling the byte stream "labelFileName" is a fast and dirty 
@@ -449,8 +470,10 @@ class LabelPDF():
         styles['collectionNameSTY'] = ParagraphStyle(
             'collectionNameSTY',
             parent=styles['title'],
-            fontName='Times',
-            fontSize= self.relFont * .8,
+            #fontName='Times',
+            fontName='Times-Bold',
+            #fontSize= self.relFont * .8,
+            fontSize= self.relFont,
             alignment=TA_CENTER,
         )
         styles['samplingEffortSTY'] = ParagraphStyle(

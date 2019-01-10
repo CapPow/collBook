@@ -72,7 +72,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="labelPrefPage">
            <layout class="QGridLayout" name="gridLayout">
@@ -119,7 +119,7 @@
               </layout>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="2" column="0">
              <widget class="QGroupBox" name="labelIncludeGroup">
               <property name="title">
                <string>Include</string>
@@ -166,6 +166,29 @@
                  </property>
                  <property name="text">
                   <string>Include catalogNumber barcode</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="title">
+               <string>Label formatting</string>
+              </property>
+              <layout class="QFormLayout" name="formLayout">
+               <item row="0" column="0">
+                <widget class="QLabel" name="relFontLabell">
+                 <property name="text">
+                  <string>Base font side</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="value_RelFont">
+                 <property name="value">
+                  <number>12</number>
                  </property>
                 </widget>
                </item>

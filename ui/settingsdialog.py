@@ -68,7 +68,12 @@ class settingsWindow(QMainWindow):
         return self.settings.setValue(key, value)
 
     def get(self, key, altValue = ""):
-        return self.settings.value(key, altValue)
+        result = self.settings.value(key, altValue)
+        if result == 'true':
+            result = True
+        elif result == 'false':
+            result = False
+        return result
     
     def populateQComboBoxSettings(self, obj, value):
         """ sets a QComboBox based on a string value. Presumed to be a  more
@@ -90,8 +95,7 @@ class settingsWindow(QMainWindow):
          
         #QComboBox
         value_AuthChangePolicy = self.get('value_AuthChangePolicy')
-        print(value_AuthChangePolicy)
-        self.populateQComboBoxSettings( parent.value_NameChangePolicy, value_AuthChangePolicy)        
+        self.populateQComboBoxSettings( parent.value_AuthChangePolicy, value_AuthChangePolicy)        
         value_NameChangePolicy = self.get('value_NameChangePolicy')
         self.populateQComboBoxSettings( parent.value_NameChangePolicy, value_NameChangePolicy)
         value_TaxAlignSource = self.get('value_TaxAlignSource')
@@ -105,7 +109,7 @@ class settingsWindow(QMainWindow):
         value_CollectionName = self.get('value_CollectionName')
         parent.value_CollectionName.setPlainText(value_CollectionName)
         
-        #QCheckBox .checkStateSet (?)
+        #QCheckBox .checkStateSet
         value_inc_Associated = self.convertCheckState(self.get('value_inc_Associated'))
         parent.value_inc_Associated.setCheckState(value_inc_Associated)
         value_inc_Barcode =  self.convertCheckState(self.get('value_inc_Barcode'))
@@ -120,6 +124,8 @@ class settingsWindow(QMainWindow):
         parent.value_X.setValue(value_X)
         value_Y = int(self.get('value_Y', 90))
         parent.value_Y.setValue(value_Y)
+        value_RelFont = int(self.get('value_RelFont',12))
+        parent.value_RelFont.setValue(value_RelFont)
     
     def saveSettings(self):
         """ stores the preferences widget's selections to self.settings"""
@@ -144,10 +150,13 @@ class settingsWindow(QMainWindow):
         #QCheckBox
         value_inc_Associated = parent.value_inc_Associated.isChecked()
         self.setValue('value_inc_Associated',value_inc_Associated)
+        
         value_inc_Barcode = parent.value_inc_Barcode.isChecked()
         self.setValue('value_inc_Barcode',value_inc_Barcode)
+        
         value_inc_CollectionName = parent.value_inc_CollectionName.isChecked()
         self.setValue('value_inc_CollectionName',value_inc_CollectionName)
+        
         value_inc_VerifiedBy = parent.value_inc_VerifiedBy.isChecked()
         self.setValue('value_inc_VerifiedBy',value_inc_VerifiedBy)
         
@@ -156,5 +165,7 @@ class settingsWindow(QMainWindow):
         self.setValue('value_X',value_X)
         value_Y = parent.value_Y.value()
         self.setValue('value_Y',value_Y)
+        value_RelFont = parent.value_RelFont.value()
+        self.setValue('value_RelFont', value_RelFont)
         
         

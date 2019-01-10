@@ -7,6 +7,8 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem
 from PyQt5.QtWidgets import QAbstractItemView
 
+from reportlab.platypus.doctemplate import LayoutError
+
 from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
 
@@ -108,15 +110,17 @@ class MyWindow(QMainWindow):
 
     def updatePreview(self):
         """ updates the pdf preview window after the vertical header is clicked"""
-    
-        # note the up then back down addressing here:
-            # up to parentof this object, then back down to table_view
+        #TODO modify this to be called from within the pdfviewer class
         tableSelection = self.w.table_view.selectionModel().selectedRows()
         if tableSelection:
             index = tableSelection[0].row()
             rowData = self.m.retrieveRowData(index)
             rowData = self.m.dataToDict(rowData)
-            pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
+            try:
+                pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
+            except LayoutError:
+                self.pdf_preview.load_label_OversizeWarning()
+                return
         else:
             pdfBytes = None
         self.pdf_preview.load_preview(pdfBytes)  # starts the loading display process        

@@ -80,18 +80,19 @@ class PDFViewer(QLabel):
 
         return self.pagesize
 
-
+    def load_label_OversizeWarning(self):
+        img = QImage(':/rc_/label_OversizeWarning.png')
+        img = img.scaled(400, 400, Qt.KeepAspectRatio)
+        self.document = None
+        self.setPixmap(QPixmap.fromImage(img))
 
     def load_preview(self, pdfBytes):
         try:
-            self.document = Poppler.Document.loadFromData(pdfBytes)
-        except TypeError:
-            self.document = Poppler.Document.load(pdfBytes)
-        try:
+            self.document = Poppler.Document.loadFromData(pdfBytes) #  Try loading from bytes
             pdfPage = self.document.page(0)
-            img = pdfPage.renderToImage()
-        except AttributeError:
-            img = QImage(":/rc_/label_Preview.png")
+            img = pdfPage.renderToImage() #  See if it needs rendered to an image
+        except (AttributeError, TypeError):
+            img = QImage(':/rc_/label_Preview.png')
             img = img.scaled(400, 400, Qt.KeepAspectRatio)
         self.setPixmap(QPixmap.fromImage(img))
 
