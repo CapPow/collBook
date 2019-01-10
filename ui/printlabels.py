@@ -25,22 +25,9 @@ from PyQt5.QtWidgets import QFileDialog
 # before size options are added.
 class LabelPDF():
     
-    def __init__(self, xPaperSize = 140, yPaperSize = 90, parent=None):
+    def __init__(self, settings):
         """ xPaperSize, & self.yPaperSize are each assumed to be in mm """
-        self.xPaperSize = xPaperSize * mm
-        self.yPaperSize = yPaperSize * mm
-        
-        # Here is where preferences will be read into initalized
-        # There are going to be lots of options for what goes on labels
-        # additionally, there are some bundled font options with reportlab,
-        # which could become a select from list or something
-
-        self.relFont = 12
-        self.xMarginProportion = 0
-        self.yMarginProportion = 0   #Padding on tables are functionally the margins in our use. (We're claiming most of paper)
-        self.xMargin = self.xMarginProportion * self.xPaperSize        #Margin set up (dynamically depending on paper sizes.
-        self.yMargin = self.xMarginProportion * self.yPaperSize
-        self.customPageSize = (self.xPaperSize, self.yPaperSize)
+        self.settings = settings
  
     """ Since this was ported, for now it is faster to just write helper 
     functions to call genPrintLabelsPDFs with appropriate args """
@@ -54,25 +41,21 @@ class LabelPDF():
         """labelDataInput = list of dictionaries formatted as: {DWC Column:'field value'}
            defaultFileName = the filename to use as the default when saving the pdf file."""
         
-        # 5.50in ~=140mm
-        # 3.50in ~-89mm
-        
-#        
-#        labelData = labelDataInput
-#    #    xPaperSize = 5.50 * inch   #These values should be user preferences! (But it'll be a PITA to do)
-#    #    yPaperSize = 3.50 * inch
-#        yPaperSize = 5.50 * inch
-#        xPaperSize = 3.50 * inch
-#        customPageSize = (xPaperSize,yPaperSize)        #set up Paper size for labels, this should be user selectable in time.
-#    
-#        self.relFont = 12                                    #a font size which everything else relates to. Base normal text font size.
-#    
-#        xMarginProportion = 0
-#        yMarginProportion = 0   #Padding on tables are functionally the margins in our use. (We're claiming most of paper)
-#        xMargin = xMarginProportion * xPaperSize        #Margin set up (dynamically depending on paper sizes. Hopefully logical stuff).
-#        yMargin = xMarginProportion * yPaperSize
-    
-        #Style sheets below (many lines.. for various styles)
+        # decent default values 140, 90
+        self.xPaperSize = int(self.settings.get('value_X', 140)) * mm
+        self.yPaperSize = int(self.settings.get('value_Y', 90)) * mm
+         
+        # Here is where preferences will be read into initalized
+        # There are going to be lots of options for what goes on labels
+        # additionally, there are some bundled font options with reportlab,
+        # which could become a select from list or something
+
+        self.relFont = 12
+        self.xMarginProportion = 0
+        self.yMarginProportion = 0   #Padding on tables are functionally the margins in our use. (We're claiming most of paper)
+        self.xMargin = self.xMarginProportion * self.xPaperSize        #Margin set up (dynamically depending on paper sizes.
+        self.yMargin = self.xMarginProportion * self.yPaperSize
+        self.customPageSize = (self.xPaperSize, self.yPaperSize)
         
     
         tableSty = [                                    #Default table style

@@ -40,6 +40,7 @@ def mergeITISCsvs(csvDir, kingdomID):
     kingdomIDs: 1 = Bacteria, 2 = Protozoa, 3 = Plantae, 4 = Fungi, 
                 5 = Animalia, 6 = Chromista, 7 = Archaea   
     """
+
     kingdomID = str(kingdomID)
     df = pd.DataFrame()
     colsOfInterest = ['tsn','complete_name', 'n_usage', 'kingdom_id', 'taxon_author_id', 'hybrid_author_id']
@@ -52,7 +53,7 @@ def mergeITISCsvs(csvDir, kingdomID):
     syn = pd.read_csv('{}/synonym_links.csv'.format(csvDir), usecols= ['tsn','tsn_accepted'], dtype='str')
     tax = pd.merge(tax, syn, on='tsn', how='left', sort=False)    
     tax['tsn_accepted'].fillna(tax['tsn'], inplace= True)
-    
+
     # used in lookupAuthor, keeping it outside the function to avoid loading it in every lookup
     #adf = pd.read_csv('../projectSupport/orig_results_county_Dist-master/itisSqlite102918/csvs/taxon_authors_lkp.csv',usecols= ['taxon_author_id','taxon_author'], dtype='str')
     adf = pd.read_csv('{}/taxon_authors_lkp.csv'.format(csvDir), dtype='str')

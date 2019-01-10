@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1013</width>
-    <height>700</height>
+    <width>858</width>
+    <height>572</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3">
     <item>
      <layout class="QHBoxLayout" name="upper_horizontalLayout">
       <item>
@@ -27,8 +27,8 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>70</width>
-          <height>70</height>
+          <width>30</width>
+          <height>30</height>
          </size>
         </property>
         <property name="text">
@@ -39,15 +39,15 @@
       <item>
        <widget class="QGroupBox" name="record_groupBox">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>100</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
         <property name="layoutDirection">
@@ -59,6 +59,12 @@
         <layout class="QFormLayout" name="formLayout_2">
          <item row="0" column="1">
           <widget class="QLabel" name="label">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>scientificName</string>
            </property>
@@ -122,8 +128,11 @@
           <height>0</height>
          </size>
         </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
         <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="frameShape">
          <enum>QFrame::Panel</enum>
@@ -133,6 +142,12 @@
         </property>
         <property name="editTriggers">
          <set>QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked</set>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="expandsOnDoubleClick">
+         <bool>true</bool>
         </property>
         <column>
          <property name="text">
@@ -192,7 +207,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1013</width>
+     <width>858</width>
      <height>22</height>
     </rect>
    </property>

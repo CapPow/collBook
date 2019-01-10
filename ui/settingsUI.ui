@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
-    <height>483</height>
+    <width>570</width>
+    <height>493</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -22,7 +22,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3">
       <property name="sizeConstraint">
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
@@ -90,7 +90,14 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QSpinBox" name="value_X"/>
+                <widget class="QSpinBox" name="value_X">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="yLabel">
@@ -100,7 +107,14 @@
                 </widget>
                </item>
                <item row="2" column="1">
-                <widget class="QSpinBox" name="value_Y"/>
+                <widget class="QSpinBox" name="value_Y">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>9999</number>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -179,12 +193,12 @@
                 <widget class="QComboBox" name="value_TaxAlignSource">
                  <item>
                   <property name="text">
-                   <string>ITIS (local)</string>
+                   <string>Catalog of Life (web api)</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>Catalog of Life (web api)</string>
+                   <string>ITIS (local)</string>
                   </property>
                  </item>
                 </widget>
@@ -226,17 +240,17 @@
                 <widget class="QComboBox" name="value_AuthChangePolicy">
                  <item>
                   <property name="text">
-                   <string>Fill in blanks</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
                    <string>Accept all suggestions</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
                    <string>Always ask</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Fill in blanks</string>
                   </property>
                  </item>
                 </widget>
@@ -293,7 +307,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>539</width>
+     <width>570</width>
      <height>22</height>
     </rect>
    </property>

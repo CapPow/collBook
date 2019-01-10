@@ -72,7 +72,7 @@ class PDFViewer(QLabel):
     def sizeHint(self):
         if not self.page:
             if not self.document:
-                return QSize(300, 400)
+                return QSize(100, 200)
             self.page = self.document.page(0)
 
         if not self.pagesize:

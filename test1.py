@@ -39,14 +39,19 @@ class MyWindow(QMainWindow):
         # apply the custom model class to the existing QTableView object
         w.table_view.setModel(m)
         # generate an instance of the settingsWindow 
-        self.settingsDialog = settingsWindow()
+        self.settings = settingsWindow(self)
         # Linking functions to buttons in the UI
         w.action_Open.triggered.connect(m.open_CSV)
         w.action_New_Records.triggered.connect(m.new_Records)
         w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))     
         w.action_Settings.triggered.connect(self.toggleSettings)        
         m.dataChanged.connect(self.populateTreeWidget)
-        p = LabelPDF()  # construct the label maker
+        
+        # send the settings object along with the pdf constructor
+        p = LabelPDF(self.settings)
+        #p = LabelPDF(int(self.settings.get('value_X')), 
+        #             int(self.settings.get('value_Y')))  # construct the label maker
+        
         #todo clean up the self definitions        
         self.w = w  # make the mainWindow accessible
         self.p = p  # make the pdfViewer accessible
@@ -55,14 +60,14 @@ class MyWindow(QMainWindow):
         self.tree_widget = w.tree_widget # make the treeWidget accessible
         self.table_view = w.table_view # make the table_view accessible
         self.tree_widget = w.tree_widget# make the tree_widget accessible
-        
         self.populateTreeWidget()
 
+   
     def toggleSettings(self):
-        if self.settingsDialog.isHidden():
-            self.settingsDialog.show()
+        if self.settings.isHidden():
+            self.settings.show()
         else:
-            self.settingsDialog.hide()
+            self.settings.hide()
 
     def updateTableView(self):
         """ updates the table_view after tree_widget's selection change """
@@ -92,21 +97,17 @@ class MyWindow(QMainWindow):
         specimenColumnIndex = self.m.columnIndex('specimen#')
         #TODO this sort currently does an alphanumeric sort (ie: 100, 2, 30)
         self.table_view.sortByColumn(specimenColumnIndex, Qt.AscendingOrder)
-            
-
-#TODO Fix the selection of the top row
         if selType != 'allRec':
             topVisible = [x for x in rowNums if x not in rowsToHide]
             try:
                 topVisible = min(topVisible)
                 self.table_view.selectRow(topVisible)
             except ValueError:
-                self.table_view.QAbstractItemView.clearSelection()
+                self.table_view.clearSelection()
             self.updatePreview()
 
     def updatePreview(self):
         """ updates the pdf preview window after the vertical header is clicked"""
-        #self.parent some way to get the dataframe data
     
         # note the up then back down addressing here:
             # up to parentof this object, then back down to table_view
@@ -119,7 +120,6 @@ class MyWindow(QMainWindow):
         else:
             pdfBytes = None
         self.pdf_preview.load_preview(pdfBytes)  # starts the loading display process        
-        
 
     def populateTreeWidget(self):
         """ given a list of tuples structured as(siteNum, specimenNum),
@@ -128,7 +128,10 @@ class MyWindow(QMainWindow):
         self.tree_widget.clear()
         fieldNumbers = self.m.getSiteSpecimens()
         siteNumbers = list(set([x[0] for x in fieldNumbers]))
-        siteNumbers.sort(key = int)
+        try:
+            siteNumbers.sort(key = int)
+        except ValueError:
+            pass
         #QTreeWidgetItem(["String AA", "String BB", "String CC"])
         self.tree_widget.addTopLevelItem(QTreeWidgetItem(["All Records"]))
 
