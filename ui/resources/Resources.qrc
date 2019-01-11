@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="rc_">
+    <file>itis_Taxonomy_Reference.csv</file>
     <file>label_OversizeWarning.png</file>
     <file>check-circle.svg</file>
     <file>circle.svg</file>

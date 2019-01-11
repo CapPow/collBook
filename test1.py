@@ -23,6 +23,7 @@ from PyQt5.QtCore import Qt
 import qdarkstyle
 from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
+from ui.taxonomy import taxonomicVerification
         
 
 class editorDelegate(QItemDelegate):
@@ -52,12 +53,15 @@ class MyWindow(QMainWindow):
         w.table_view.setItemDelegate(delegate(w.table_view)) # use flipped proxy delegate
         # generate an instance of the settingsWindow 
         self.settings = settingsWindow(self)
+        # generate an instance of the taxonomic verifier
+        self.tax = taxonomicVerification(self.settings)
         # Linking functions to buttons in the UI
         w.action_Open.triggered.connect(m.open_CSV)
         w.action_New_Records.triggered.connect(m.new_Records)
         w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))     
         w.action_Settings.triggered.connect(self.toggleSettings)    
         w.action_Reverse_Geolocate.triggered.connect(self.geoRef)
+        w.action_Verify_Taxonomy.triggered.connect(self.verifyTaxButton)
         m.dataChanged.connect(self.populateTreeWidget)
         # send the settings object along with the pdf constructor        
         p = LabelPDF(self.settings)
@@ -78,14 +82,19 @@ class MyWindow(QMainWindow):
             self.settings.hide()
 
     def geoRef(self):
-        """ applies a function over each row among those selected by the
-        treeSelectionType """
-        
+        """ applies genLocality over each row among those selected."""
         selType, siteNum, specimenNum = self.getTreeSelectionType()
         rowsToProcess = self.m.getRowsToProcess(selType, siteNum, specimenNum)
         self.m.processViewableRecords(rowsToProcess, self.locality.genLocality)        
         
-
+    def verifyTaxButton(self):
+        """ applies verifyTaxonomy over each row among those selected."""
+        # refresh tax settings
+        self.tax.readTaxonomicSettings()
+        selType, siteNum, specimenNum = self.getTreeSelectionType()
+        rowsToProcess = self.m.getRowsToProcess(selType, siteNum, specimenNum)
+        self.m.processViewableRecords(rowsToProcess, self.tax.verifyTaxonomy)
+        
     def getTreeSelectionType(self):
         """ checks the tree_widget's type of selection """
         try:

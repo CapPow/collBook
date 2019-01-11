@@ -1,0 +1,3 @@
+pyrcc5 -o Resources_rc.py ui/resources/Resources.qrc
+pyuic5 -o ui/TestUI.py ui/TestUI.ui
+pyuic5 -o ui/settingsUI.py ui/settingsUI.ui

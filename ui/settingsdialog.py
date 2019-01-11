@@ -30,7 +30,7 @@ class settingsWindow(QMainWindow):
         self.init_ui(parent)
         #TODO add a consideration for if the config file has never been created... fill in default values
         # can use the get() argument for alt values and just code it into the populateSettings() function
-        
+           
     def init_ui(self, parent):
         self.parent = parent # this is the master window
         w = Ui_settingsWindow()
@@ -89,16 +89,25 @@ class settingsWindow(QMainWindow):
         else:
             return Qt.Checked
 
+    def toggleTNRSSettings(self, QString):
+        """ called when value_TaxAlignSource changes text. Decides if the 
+        groupbox_TNRS should be enabled or not"""
+        if str(QString) == 'Taxonomic Name Resolution Service (web API)':
+            b = True
+        else:
+            b = False    
+        self.w.groupbox_TNRS.setEnabled(b)
+
     def populateSettings(self):
         """ uses self.settings to populate the preferences widget's selections"""
         parent = self.w
          
         #QComboBox
-        value_AuthChangePolicy = self.get('value_AuthChangePolicy')
+        value_AuthChangePolicy = self.get('value_AuthChangePolicy', 'Fill blanks')
         self.populateQComboBoxSettings( parent.value_AuthChangePolicy, value_AuthChangePolicy)        
-        value_NameChangePolicy = self.get('value_NameChangePolicy')
+        value_NameChangePolicy = self.get('value_NameChangePolicy', 'Always ask')
         self.populateQComboBoxSettings( parent.value_NameChangePolicy, value_NameChangePolicy)
-        value_TaxAlignSource = self.get('value_TaxAlignSource')
+        value_TaxAlignSource = self.get('value_TaxAlignSource', 'ITIS (local)')
         self.populateQComboBoxSettings( parent.value_TaxAlignSource, value_TaxAlignSource)
         
         #QLineEdit  .setText
@@ -126,6 +135,8 @@ class settingsWindow(QMainWindow):
         parent.value_Y.setValue(value_Y)
         value_RelFont = int(self.get('value_RelFont',12))
         parent.value_RelFont.setValue(value_RelFont)
+        value_TNRS_Threshold = int(self.get('value_TNRS_Threshold', 85))
+        parent.value_TNRS_Threshold.setValue(value_TNRS_Threshold)
     
     def saveSettings(self):
         """ stores the preferences widget's selections to self.settings"""
@@ -150,13 +161,10 @@ class settingsWindow(QMainWindow):
         #QCheckBox
         value_inc_Associated = parent.value_inc_Associated.isChecked()
         self.setValue('value_inc_Associated',value_inc_Associated)
-        
         value_inc_Barcode = parent.value_inc_Barcode.isChecked()
         self.setValue('value_inc_Barcode',value_inc_Barcode)
-        
         value_inc_CollectionName = parent.value_inc_CollectionName.isChecked()
         self.setValue('value_inc_CollectionName',value_inc_CollectionName)
-        
         value_inc_VerifiedBy = parent.value_inc_VerifiedBy.isChecked()
         self.setValue('value_inc_VerifiedBy',value_inc_VerifiedBy)
         
@@ -167,5 +175,6 @@ class settingsWindow(QMainWindow):
         self.setValue('value_Y',value_Y)
         value_RelFont = parent.value_RelFont.value()
         self.setValue('value_RelFont', value_RelFont)
-        
+        value_TNRS_Threshold = parent.value_TNRS_Threshold.value()
+        self.setValue('value_TNRS_Threshold', value_TNRS_Threshold)       
         

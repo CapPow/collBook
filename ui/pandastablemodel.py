@@ -51,8 +51,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df = self.datatable.iloc[rowsToProcess, ]
         try:
             df.apply(func, 1)
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
         self.datatable.update(df)
         self.update(self.datatable)
     
