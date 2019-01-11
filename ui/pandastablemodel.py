@@ -20,6 +20,8 @@ https://github.com/Beugeny/python_test/blob/d3e21dc075d9cef8dca323d281cbbdb47652
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox
+
+#from ui.locality import genLocalityNoAPI, genLocality
 import pandas as pd
 
 # NOTE see set_data function for the method to notify the table of changes
@@ -43,6 +45,17 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         self.undoActive = False  # is an undo available?
         self.redoActive = False  # is a redo available?
 
+    def processViewableRecords(self, rowsToProcess, func):
+        """ applies a function over each row among those selected by the
+        treeSelectionType """
+        df = self.datatable.iloc[rowsToProcess, ]
+        try:
+            df.apply(func, 1)
+        except Exception:
+            pass
+        self.datatable.update(df)
+        self.update(self.datatable)
+    
     def add_to_undo_stack(self, description = 'the last major action'):
         """ to be called just before a change is made to the underlaying df """
         undoStack = self.undoStack  # establish a shorthand
@@ -118,10 +131,12 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                     record['associatedTaxa'] = ', '.join(associatedTaxaItems[:10])+' ...'   
         return records
     
-    def getRowsToHide(self, selType, siteNum = None, specimenNum = None):
-        """ Returns all rows not associated with input options
-        called from mainWindow's updateTableView() following 
-        tree_widget selection changes."""
+    def getRowsToProcess(self, selType, siteNum = None, specimenNum = None):
+        """ defined for clarity, calls getRowsToKeep with the same args."""
+        return self.getRowsToKeep(selType, siteNum, specimenNum)
+
+    def getRowsToKeep(self, selType, siteNum = None, specimenNum = None):
+        """ Returns list of row indices associated with inputs """
         df = self.datatable
         allRows = df.index.values.tolist()
         df = df[~df['specimen#'].str.contains('#')]
@@ -131,8 +146,16 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             rowsToKeep = df[df['site#'] == siteNum].index.values.tolist()
         elif selType == 'specimen':
             rowsToKeep = df[(df['site#'] == siteNum) & (df['specimen#'] == specimenNum)].index.values.tolist()
+        return rowsToKeep
+    
+    def getRowsToHide(self, selType, siteNum = None, specimenNum = None):
+        """ Returns list of row indicies NOT associated with input options
+        called from mainWindow's updateTableView() following 
+        tree_widget selection changes."""
+        df = self.datatable
+        allRows = df.index.values.tolist()
+        rowsToKeep = self.getRowsToKeep(selType, siteNum, specimenNum)
         rowsToHide = [x for x in allRows if x not in rowsToKeep]
-        
         return rowsToHide
     
     def getSiteSpecimens(self):
@@ -232,7 +255,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             ret = QMessageBox.Yes
         else:    
             ret = qm.question(self.parent(),'', 'Load a blank data set? (any unsaved progress will be lost)', qm.Yes | qm.No)
-
         if ret == qm.Yes:
             newDFDict = {
             'site#':['0','1'],
