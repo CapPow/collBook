@@ -23,9 +23,7 @@ class locality():
         with open('key.txt', 'r') as keyRing:
             gAPIkey=keyRing.read()
         self.gAPIkey = gAPIkey
-        print(self.gAPIkey)
-   
-    
+
     def userNotice(self, text):
         msg = QMessageBox()
         msg.setIcon(MessageBox.Warning)
@@ -62,52 +60,7 @@ class locality():
         else:  # some error occured
             status = str(status)
             return status
-    
-    def genLocalityNoAPI(self, currentRowArg):
-        """ Attempts to improve the locality string using existing geography data.
-        This function complains more than the inlaws."""
-    # both locality functions would benefit from some systemic method of determining when to add italics to binomial (scientific) names.
-    # such the italic tags "<i> and </i>" would need to be stripped before exporting for database submission.
-        currentRow = currentRowArg
-        pathColumn = self.findColumnIndex('path')
-        localityColumn = self.findColumnIndex('locality')
-        municipalityColumn = self.findColumnIndex('municipality')
-        countyColumn = self.findColumnIndex('county')
-        stateColumn = self.findColumnIndex('stateProvince')
-        countryColumn = self.findColumnIndex('country')
-        try:
-            currentLocality = self.model.getValueAt(currentRow, localityColumn)
-            #Gen list of locality value locations
-            localityFields = [self.model.getValueAt(currentRow,x) for x in [countryColumn, stateColumn, countyColumn, municipalityColumn, pathColumn, localityColumn]]
-            #Clean nans and empty fields out of the list
-            localityFields = [x for x in localityFields if str(x) not in['','nan']]
-            #combine values from each item remaining in localityFields
-            newLocality = [x for x in localityFields if x.lower() not in currentLocality.lower()]
-            #join the list into a single string
-            newLocality = ', '.join(newLocality)
-            userWarnedAboutGeo = False # set a trigger to restrict the amount of times we complain about their slack gps data.
-            for geoGeographyField in [stateColumn, countyColumn]:
-                if self.model.getValueAt(currentRow, geoGeographyField) in['','nan']:
-                    message = f'Row {currentRow+1} is missing important geographic data!\nYou may need to manually enter data into location fields (such as State, and County).'
-                    self.userNotice(message)
-                    userWarnedAboutGeo = True
-                    break
-            if not userWarnedAboutGeo:
-                if newLocality != currentLocality: # if we actually changed something give the user a heads up the methods were sub-par.
-                    newLocality = '{}, {}'.format(newLocality,currentLocality).rstrip(', ').lstrip(', ')
-                    message = f'Locality at row {currentRow+1} was generated using limited methods'
-                    self.userNotice(message)
-                else:# if we could infer nothing from existing geographic fields, AND we have no GPS values then they have work to do!
-                    message = f'Row {currentRow+1} is missing important geographic data!\nYou may need to manually enter data into location fields (such as State, and County).'
-                    self.userNotice(message)
-                    return newLocality
-            return newLocality
-    
-        except ValueError:
-            #if some lookup fails, toss value error and return empty
-            message = f'Offline Locality generation requires atleast a column named locality. None found at row {currentRow+1}'
-            self.userNotice(message)
-            return
+
    
     def genLocality(self, currentRowArg):
         """ Generate locality fields, uses API call to get
@@ -174,11 +127,55 @@ class locality():
         else:   # if the Google API call returned error/status string
             apiErrorMessage = address
             message = f'MISSING GPS at row {currentRow+1}. Location lookup error at row {currentRow+1}: Google reverse Geolocate service responded with: "{str(apiErrorMessage)}". This may be internet connection problems, or invalid GPS values.'
-            self.userNotice( message)
+            self.userNotice( message )
             # could consider a retry option here
             raise Exception
-#        else:
-#            message = f'Location ERROR at row {currentRow+1}. Locality generation requires GPS coordinates, and a column named locality.'
-#            userNotice(message)
-#            return
+
         return currentRowArg
+
+
+#    def genLocalityNoAPI(self, currentRowArg):
+#        """ Attempts to improve the locality string using existing geography data.
+#        This function complains more than the inlaws."""
+#    # both locality functions would benefit from some systemic method of determining when to add italics to binomial (scientific) names.
+#    # such the italic tags "<i> and </i>" would need to be stripped before exporting for database submission.
+#        
+#        currentRow = f"{currentRowArg['site#']}-{currentRowArg['specimen#']}"
+#        currentLocality = currentRowArg['locality']
+#        latitude = currentRowArg['decimalLatitude']
+#        longitude = currentRowArg['decimalLongitude']
+#        stateProvince = currentRowArg['stateProvince']
+#        county = currentRowArg['county']
+#        municipality = currentRowArg['municipality']
+#        country = currentRowArg['country']
+#        
+#        try:
+#            currentLocality = self.model.getValueAt(currentRow, localityColumn)
+#            localityFields = [x for x in [country, stateProvince, county, municipality, path, locality] if str(x) not in['','nan']]
+#            #combine values from each item remaining in localityFields
+#            newLocality = [x for x in localityFields if x.lower() not in currentLocality.lower()]
+#            #join the list into a single string
+#            newLocality = ', '.join(newLocality)
+#            userWarnedAboutGeo = False # set a trigger to restrict the amount of times we complain about their slack gps data.
+#            for geoGeographyField in [stateColumn, countyColumn]:
+#                if self.model.getValueAt(currentRow, geoGeographyField) in['','nan']:
+#                    message = f'Row {currentRow+1} is missing important geographic data!\nYou may need to manually enter data into location fields (such as State, and County).'
+#                    self.userNotice(message)
+#                    userWarnedAboutGeo = True
+#                    break
+#            if not userWarnedAboutGeo:
+#                if newLocality != currentLocality: # if we actually changed something give the user a heads up the methods were sub-par.
+#                    newLocality = '{}, {}'.format(newLocality,currentLocality).rstrip(', ').lstrip(', ')
+#                    message = f'Locality at row {currentRow+1} was generated using limited methods'
+#                    self.userNotice(message)
+#                else:# if we could infer nothing from existing geographic fields, AND we have no GPS values then they have work to do!
+#                    message = f'Row {currentRow+1} is missing important geographic data!\nYou may need to manually enter data into location fields (such as State, and County).'
+#                    self.userNotice(message)
+#                    return newLocality
+#            return newLocality
+#    
+#        except ValueError:
+#            #if some lookup fails, toss value error and return empty
+#            message = f'Offline Locality generation requires atleast a column named locality. None found at row {currentRow+1}'
+#            self.userNotice(message)
+#            return

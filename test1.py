@@ -4,7 +4,7 @@ import sys
 import os
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator
+from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator, QItemDelegate
 from PyQt5.QtWidgets import QAbstractItemView
 
 from reportlab.platypus.doctemplate import LayoutError
@@ -24,6 +24,14 @@ import qdarkstyle
 from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
         
+
+class editorDelegate(QItemDelegate):
+    """solution to the table_view editor clearing pre-existing cell values
+    ref: https://stackoverflow.com/questions/39387842/not-displaying-old-value-when-editing-cell-in-a-qtablewidget"""
+    def setEditorData(self,editor,index):
+        editor.setAutoFillBackground(True)
+        editor.setText(str(index.data()))
+
 class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -40,6 +48,8 @@ class MyWindow(QMainWindow):
         m.new_Records(True)
         # apply the custom model class to the existing QTableView object
         w.table_view.setModel(m)
+        delegate = editorDelegate
+        w.table_view.setItemDelegate(delegate(w.table_view)) # use flipped proxy delegate
         # generate an instance of the settingsWindow 
         self.settings = settingsWindow(self)
         # Linking functions to buttons in the UI
@@ -113,6 +123,7 @@ class MyWindow(QMainWindow):
         if selType != 'allRec':
             topVisible = [x for x in rowNums if x not in rowsToHide]
             try:
+                #TODO make consideration for avoiding this if the last action was an edit.
                 topVisible = min(topVisible)
                 self.table_view.selectRow(topVisible)
             except ValueError:
@@ -120,12 +131,10 @@ class MyWindow(QMainWindow):
             self.updatePreview()
 
     def selectTreeWidgetItemByName(self, name):
-        print(name)
         iterator = QTreeWidgetItemIterator(self.tree_widget, QTreeWidgetItemIterator.All)
         while iterator.value():
             item = iterator.value()
             if item.text(0) == name:
-                #TODO currently it updates properly IF it has a site-specimen value not for site values
                 self.tree_widget.setCurrentItem(item,1)
                 break
             iterator +=1
@@ -156,7 +165,7 @@ class MyWindow(QMainWindow):
         # store the current selection
         itemSelected = self.tree_widget.currentItem()
         try:
-            text = itemSelected.text(0).split('(')[0].strip()
+            text = itemSelected.text(0)
         except AttributeError:
             text = 'All Records'
         self.tree_widget.clear()
