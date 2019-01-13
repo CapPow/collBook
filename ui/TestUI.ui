@@ -247,6 +247,7 @@
    <addaction name="action_Verify_Taxonomy"/>
    <addaction name="action_Reverse_Geolocate"/>
    <addaction name="action_Settings"/>
+   <addaction name="action_Export_Labels"/>
   </widget>
   <widget class="QToolBar" name="right_toolBar">
    <property name="sizePolicy">
@@ -376,6 +377,15 @@
    </property>
    <property name="toolTip">
     <string>Settings and preferences</string>
+   </property>
+  </action>
+  <action name="action_Export_Labels">
+   <property name="icon">
+    <iconset resource="resources/Resources.qrc">
+     <normaloff>:/rc_/tag.svg</normaloff>:/rc_/tag.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Export_Labels</string>
    </property>
   </action>
  </widget>

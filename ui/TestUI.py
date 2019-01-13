@@ -169,6 +169,11 @@ class Ui_MainWindow(object):
         icon8.addPixmap(QtGui.QPixmap(":/rc_/settings.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_Settings.setIcon(icon8)
         self.action_Settings.setObjectName("action_Settings")
+        self.action_Export_Labels = QtWidgets.QAction(MainWindow)
+        icon9 = QtGui.QIcon()
+        icon9.addPixmap(QtGui.QPixmap(":/rc_/tag.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.action_Export_Labels.setIcon(icon9)
+        self.action_Export_Labels.setObjectName("action_Export_Labels")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_New_Records)
         self.menu_File.addAction(self.action_Save_As)
@@ -185,6 +190,7 @@ class Ui_MainWindow(object):
         self.left_toolBar.addAction(self.action_Verify_Taxonomy)
         self.left_toolBar.addAction(self.action_Reverse_Geolocate)
         self.left_toolBar.addAction(self.action_Settings)
+        self.left_toolBar.addAction(self.action_Export_Labels)
         self.right_toolBar.addSeparator()
         self.right_toolBar.addAction(self.action_Exit)
 
@@ -223,6 +229,7 @@ class Ui_MainWindow(object):
         self.action_Redo.setToolTip(_translate("MainWindow", "undo last major action"))
         self.action_Settings.setText(_translate("MainWindow", "&Settings"))
         self.action_Settings.setToolTip(_translate("MainWindow", "Settings and preferences"))
+        self.action_Export_Labels.setText(_translate("MainWindow", "&Export_Labels"))
 
 from ui.pdfviewer import PDFViewer
 import Resources_rc

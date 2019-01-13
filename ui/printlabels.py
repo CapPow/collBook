@@ -362,9 +362,9 @@ class LabelPDF():
             labelFileName = byteStream
 
         elif defaultFileName:
-            labelFileName = QFileDialog.getSaveFileName(self, 'Save Label PDF', defaultFileName, 'PDF(*.pdf)')
+            labelFileName, _ = QFileDialog.getSaveFileName(None, 'Save Label PDF', defaultFileName, 'PDF(*.pdf)')
         else:
-            labelFileName = QFileDialog.getSaveFileName(self, 'Save Label PDF', os.getenv('HOME'), 'PDF(*.pdf)')
+            labelFileName, _ = QFileDialog.getSaveFileName(None, 'Save Label PDF', os.getenv('HOME'), 'PDF(*.pdf)')
         #if labelFileName[0] == '':  # option to check if the user actually used the dialog
                 
         doc = BaseDocTemplate(labelFileName,

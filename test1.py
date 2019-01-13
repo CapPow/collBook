@@ -57,17 +57,20 @@ class MyWindow(QMainWindow):
         self.tax = taxonomicVerification(self.settings)
         # Linking functions to buttons in the UI
         w.action_Open.triggered.connect(m.open_CSV)
+        w.action_Save_As.triggered.connect(m.save_CSV)
         w.action_New_Records.triggered.connect(m.new_Records)
         w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))     
         w.action_Settings.triggered.connect(self.toggleSettings)    
         w.action_Reverse_Geolocate.triggered.connect(self.geoRef)
         w.action_Verify_Taxonomy.triggered.connect(self.verifyTaxButton)
+        w.action_Export_Labels.triggered.connect(self.exportLabels)
+
         m.dataChanged.connect(self.populateTreeWidget)
         # send the settings object along with the pdf constructor        
         p = LabelPDF(self.settings)
         #todo clean up the self definitions        
         self.w = w  # make the mainWindow accessible
-        self.p = p  # make the pdfViewer accessible
+        self.p = p  # make the label Maker accessible
         self.m = m  # make the PandasTableModel accessible
         self.pdf_preview = w.pdf_preview  # make the pdfViewer accessible
         self.table_view = w.table_view # make the table_view accessible
@@ -95,6 +98,15 @@ class MyWindow(QMainWindow):
         selType, siteNum, specimenNum = self.getTreeSelectionType()
         rowsToProcess = self.m.getRowsToProcess(selType, siteNum, specimenNum)
         self.m.processViewableRecords(rowsToProcess, self.tax.verifyTaxonomy)
+
+    def exportLabels(self):
+        """ bundles records up and passes them to printlabels.genPrintLabelPDFs() """
+        selType, siteNum, specimenNum = self.getTreeSelectionType()
+        rowsToProcess = self.m.getRowsToProcess(selType, siteNum, specimenNum)
+        outDF = self.m.datatable.iloc[rowsToProcess, ]
+        outDict = self.m.dataToDict(outDF)
+        self.p.genPrintLabelPDFs(outDict)
+                
         
     def getTreeSelectionType(self):
         """ checks the tree_widget's type of selection """
@@ -149,7 +161,7 @@ class MyWindow(QMainWindow):
                 break
             iterator +=1
         #self.updateTableView()
-
+        
     def updatePreview(self):
         """ updates the pdf preview window after the vertical header is clicked"""
         #TODO modify this to be called from within the pdfviewer class

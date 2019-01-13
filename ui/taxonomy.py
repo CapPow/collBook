@@ -60,6 +60,9 @@ class taxonomicVerification():
             self.onFirstRow = False
             return rowData
 
+        if rowData['scientificName'] in ['', None]:
+            return rowData
+        
         rowNum = f"{rowData['site#']}-{rowData['specimen#']}"     
         scientificName = rowData['scientificName']
         scientificNameAuthorship = rowData['scientificNameAuthorship']

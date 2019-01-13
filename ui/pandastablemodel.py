@@ -49,10 +49,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         """ applies a function over each row among those selected by the
         treeSelectionType """
         df = self.datatable.iloc[rowsToProcess, ]
-        #try:
-        #    df.apply(func, 1)
-        #except Exception as e:
-        #    print(e)
         df.apply(func, 1)
         self.datatable.update(df)
         self.update(self.datatable)
@@ -108,7 +104,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if isinstance(df, pd.Series): # not sure if a series or df will be handed in
             data = [df.to_dict()]
         else:
-            data = df.to_dict(orient='dict')
+            data = df.to_dict(orient='records')
         labelDicts = []
         for datum in data:
             datum = {key: value.strip() for key, value in datum.items() if isinstance(value,str)} #dict comprehension!
@@ -217,6 +213,20 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.update(df)  # this function actually updates the visible dataframe
             return True
 
+    def save_CSV(self, fileName = None):
+        # is triggered by the action_Save:
+        df = self.datatable
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save CSV",
+                                                            QtCore.QDir.homePath(), "CSV (*.csv)")
+       
+        if fileName:  # if a csv was selected, start loading the data.
+            drop_col_Names = ['site#', 'specimen#']
+            keep_col_Names = [x for x in df.columns if x not in drop_col_Names]
+            df = df[keep_col_Names]
+            df.fillna('') # make any nans into empty strings.
+            df.to_csv(fileName, encoding = 'utf-8', index = False)
+            return True
+        
     def inferSiteSpecimenNumbers(self, df):
         """ attempts to infer a site# and specimen# of an incoming df """
 
