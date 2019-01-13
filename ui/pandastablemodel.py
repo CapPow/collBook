@@ -49,10 +49,11 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         """ applies a function over each row among those selected by the
         treeSelectionType """
         df = self.datatable.iloc[rowsToProcess, ]
-        try:
-            df.apply(func, 1)
-        except Exception as e:
-            print(e)
+        #try:
+        #    df.apply(func, 1)
+        #except Exception as e:
+        #    print(e)
+        df.apply(func, 1)
         self.datatable.update(df)
         self.update(self.datatable)
     

@@ -76,7 +76,7 @@ class settingsWindow(QMainWindow):
         return result
     
     def populateQComboBoxSettings(self, obj, value):
-        """ sets a QComboBox based on a string value. Presumed to be a  more
+        """ sets a QComboBox based on a string value. Presumed to be a more
         durable method. obj is the qComboBox object, and value is a string
         to search for"""
         index = obj.findText(value)
@@ -89,6 +89,28 @@ class settingsWindow(QMainWindow):
         else:
             return Qt.Checked
 
+    def populateSources(self, QString):
+        """ called when value_Kingdom changes text. Decides what the options
+        should be for value_TaxAlignSource (taxanomic alignment source)."""
+
+        kingdom = QString
+        source = self.w.value_TaxAlignSource
+        sourceValue = source.currentText()  # save initial selection
+        source.clear()  # clear existing options
+        # conditionally build a list of those which to add.
+        # NOTE: keeping Local options in index 0 position
+        if kingdom == 'Plantae':
+            toAdd = ['ITIS (local)', 'Catalog of Life (web API)', 'ITIS (web API)', 'Taxonomic Name Resolution Service (web API)']
+        elif kingdom == 'Fungi':
+            toAdd = ['MycoBank (local)', 'Catalog of Life (web API)', 'MycoBank (web API)']
+        source.addItems(toAdd)
+        newIndex = source.findText(sourceValue) # look for new index of initial selection
+        if newIndex == -1:  # if it is no longer in the list
+            newIndex = 0  # , settle for index 0 (the local option)
+        source.setCurrentIndex(newIndex)  # set the selection after the population change.
+        
+        
+    
     def toggleTNRSSettings(self, QString):
         """ called when value_TaxAlignSource changes text. Decides if the 
         groupbox_TNRS should be enabled or not"""
@@ -109,6 +131,8 @@ class settingsWindow(QMainWindow):
         self.populateQComboBoxSettings( parent.value_NameChangePolicy, value_NameChangePolicy)
         value_TaxAlignSource = self.get('value_TaxAlignSource', 'ITIS (local)')
         self.populateQComboBoxSettings( parent.value_TaxAlignSource, value_TaxAlignSource)
+        value_Kingdom = self.get('value_Kingdom', 'Plantae')
+        self.populateQComboBoxSettings( parent.value_Kingdom, value_Kingdom)
         
         #QLineEdit  .setText
         value_VerifiedBy = self.get('value_VerifiedBy')
@@ -149,7 +173,9 @@ class settingsWindow(QMainWindow):
         self.setValue('value_NameChangePolicy',value_NameChangePolicy)
         value_TaxAlignSource = parent.value_TaxAlignSource.currentText()
         self.setValue('value_TaxAlignSource', value_TaxAlignSource)
-        
+        value_Kingdom = parent.value_Kingdom.currentText()
+        self.setValue('value_Kingdom', value_Kingdom)
+
         #QLineEdit
         value_VerifiedBy = parent.value_VerifiedBy.text()
         self.setValue('value_VerifiedBy',value_VerifiedBy)

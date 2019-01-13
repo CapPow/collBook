@@ -120,4 +120,4 @@ itisAlignmentRef = mergeITISCsvs(csv_Loc, 3)
 strCleaningRegex = re.compile('[^a-zA-Z ]')
 itisAlignmentRef['normalized_name'] = itisAlignmentRef['complete_name'].transform(normalizeStrInput)
 # save it all
-itisAlignmentRef.to_csv('itis_Taxonomy_Reference.csv', index = False, encoding = 'utf-8')
+itisAlignmentRef.to_csv('Plantae_Reference.csv', index = False, encoding = 'utf-8')

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>661</width>
+    <width>514</width>
     <height>551</height>
    </rect>
   </property>
@@ -73,7 +73,7 @@
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>2</horstretch>
-            <verstretch>0</verstretch>
+            <verstretch>1</verstretch>
            </sizepolicy>
           </property>
           <property name="currentIndex">
@@ -205,28 +205,79 @@
           <widget class="QWidget" name="TaxPrefPage">
            <layout class="QGridLayout" name="gridLayout_3">
             <item row="0" column="0">
+             <widget class="QGroupBox" name="groupbox_Kingdom">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>2</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="title">
+               <string>Kingdom</string>
+              </property>
+              <layout class="QFormLayout" name="formLayout_6">
+               <item row="0" column="1">
+                <widget class="QComboBox" name="value_Kingdom">
+                 <property name="currentIndex">
+                  <number>1</number>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Fungi</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Plantae</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="0">
              <widget class="QGroupBox" name="groupBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>2</horstretch>
+                <verstretch>1</verstretch>
+               </sizepolicy>
+              </property>
               <property name="title">
                <string>Taxanomic alignment</string>
               </property>
               <layout class="QFormLayout" name="formLayout_5">
-               <item row="0" column="0">
+               <item row="1" column="0">
                 <widget class="QLabel" name="label_TaxAlignSource">
                  <property name="text">
                   <string>Source</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
+               <item row="1" column="1">
                 <widget class="QComboBox" name="value_TaxAlignSource">
                  <item>
                   <property name="text">
-                   <string>Catalog of Life (web API)</string>
+                   <string>ITIS (local)</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>ITIS (local)</string>
+                   <string>Catalog of Life (web API)</string>
                   </property>
                  </item>
                  <item>
@@ -236,14 +287,14 @@
                  </item>
                 </widget>
                </item>
-               <item row="8" column="0">
+               <item row="9" column="0">
                 <widget class="QLabel" name="label_NameChangePolicy">
                  <property name="text">
                   <string>Name change policy</string>
                  </property>
                 </widget>
                </item>
-               <item row="8" column="1">
+               <item row="9" column="1">
                 <widget class="QComboBox" name="value_NameChangePolicy">
                  <item>
                   <property name="text">
@@ -255,21 +306,16 @@
                    <string>Always ask</string>
                   </property>
                  </item>
-                 <item>
-                  <property name="text">
-                   <string>Fill blanks</string>
-                  </property>
-                 </item>
                 </widget>
                </item>
-               <item row="9" column="0">
+               <item row="10" column="0">
                 <widget class="QLabel" name="label_AuthChangePolicy">
                  <property name="text">
                   <string>Authority change policy</string>
                  </property>
                 </widget>
                </item>
-               <item row="9" column="1">
+               <item row="10" column="1">
                 <widget class="QComboBox" name="value_AuthChangePolicy">
                  <item>
                   <property name="text">
@@ -288,7 +334,7 @@
                  </item>
                 </widget>
                </item>
-               <item row="1" column="1">
+               <item row="2" column="1">
                 <widget class="QGroupBox" name="groupbox_TNRS">
                  <property name="enabled">
                   <bool>false</bool>
@@ -316,7 +362,7 @@
                      <number>100</number>
                     </property>
                     <property name="value">
-                     <number>85</number>
+                     <number>1</number>
                     </property>
                    </widget>
                   </item>
@@ -375,7 +421,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>661</width>
+     <width>514</width>
      <height>22</height>
     </rect>
    </property>
@@ -389,29 +435,13 @@
  </resources>
  <connections>
   <connection>
-   <sender>selectionWidget</sender>
-   <signal>currentRowChanged(int)</signal>
-   <receiver>stackedWidget</receiver>
-   <slot>setCurrentIndex(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>126</x>
-     <y>233</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>432</x>
-     <y>252</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>value_inc_VerifiedBy</sender>
    <signal>toggled(bool)</signal>
    <receiver>value_VerifiedBy</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
+     <x>259</x>
      <y>301</y>
     </hint>
     <hint type="destinationlabel">
@@ -427,7 +457,7 @@
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
+     <x>259</x>
      <y>301</y>
     </hint>
     <hint type="destinationlabel">
@@ -443,7 +473,7 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>350</x>
+     <x>290</x>
      <y>368</y>
     </hint>
     <hint type="destinationlabel">
@@ -459,7 +489,7 @@
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>350</x>
+     <x>290</x>
      <y>368</y>
     </hint>
     <hint type="destinationlabel">
@@ -475,17 +505,50 @@
    <slot>toggleTNRSSettings(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>379</x>
-     <y>81</y>
+     <x>483</x>
+     <y>163</y>
     </hint>
     <hint type="destinationlabel">
      <x>321</x>
-     <y>-10</y>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>selectionWidget</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>stackedWidget</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>92</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>432</x>
+     <y>252</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_Kingdom</sender>
+   <signal>currentIndexChanged(QString)</signal>
+   <receiver>settingsWindow</receiver>
+   <slot>populateSources(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>247</x>
+     <y>83</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>346</x>
+     <y>-7</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>toggleTNRSSettings(QString)</slot>
+  <slot>populateSources(QString)</slot>
  </slots>
 </ui>

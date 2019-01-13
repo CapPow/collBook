@@ -90,6 +90,7 @@ class MyWindow(QMainWindow):
     def verifyTaxButton(self):
         """ applies verifyTaxonomy over each row among those selected."""
         # refresh tax settings
+        self.tax.onFirstRow = True
         self.tax.readTaxonomicSettings()
         selType, siteNum, specimenNum = self.getTreeSelectionType()
         rowsToProcess = self.m.getRowsToProcess(selType, siteNum, specimenNum)
