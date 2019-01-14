@@ -26,6 +26,7 @@ import qdarkstyle
 from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
 from ui.taxonomy import taxonomicVerification
+from ui.associatedtaxa import associatedTaxaMainWindow
         
 
 class editorDelegate(QItemDelegate):
@@ -56,9 +57,12 @@ class MyWindow(QMainWindow):
         # generate an instance of the settingsWindow 
         settings = settingsWindow(self)
         self.settings = settings
+       # generate an instance of the associatedTaxaWindow
+        associatedTaxaWindow = associatedTaxaMainWindow(self)
+        self.associatedTaxaWindow = associatedTaxaWindow
         
-        sciNameLineEdit = w.sciNamelineEdit
-        self.sciNameLineEdit = sciNameLineEdit
+        lineEdit_sciName = w.lineEdit_sciName
+        self.lineEdit_sciName = lineEdit_sciName
         self.updateAutoComplete()
         
         # generate an instance of the taxonomic verifier
@@ -68,10 +72,13 @@ class MyWindow(QMainWindow):
         w.action_Save_As.triggered.connect(m.save_CSV)
         w.action_New_Records.triggered.connect(m.new_Records)
         w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))     
-        w.action_Settings.triggered.connect(self.toggleSettings)    
+        w.action_Settings.triggered.connect(self.toggleSettings)  
+        w.button_associatedTaxa.clicked.connect(self.toggleAssociated)
         w.action_Reverse_Geolocate.triggered.connect(self.geoRef)
         w.action_Verify_Taxonomy.triggered.connect(self.verifyTaxButton)
         w.action_Export_Labels.triggered.connect(self.exportLabels)
+        
+        
         m.dataChanged.connect(self.populateTreeWidget)
         
         p = LabelPDF(self.settings)
@@ -90,6 +97,14 @@ class MyWindow(QMainWindow):
             self.settings.show()
         else:
             self.settings.hide()
+    
+    def toggleAssociated(self):
+        if self.associatedTaxaWindow.isHidden():
+            self.associatedTaxaWindow.show()
+            self.associatedTaxaWindow.populateAssociatedTaxa()
+        else:
+            self.associatedTaxaWindow.associatedList.clear()
+            self.associatedTaxaWindow.hide()
 
     def geoRef(self):
         """ applies genLocality over each row among those selected."""
@@ -200,9 +215,12 @@ class MyWindow(QMainWindow):
             stream.close()
         wordList = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
         wordList = sorted(wordList[nameCol].tolist())      
-        completer = QCompleter(wordList, self.sciNameLineEdit)
-        self.sciNameLineEdit.setCompleter(completer)
         
+        completer = QCompleter(wordList, self.lineEdit_sciName)
+        self.lineEdit_sciName.setCompleter(completer)
+        
+        completerAssociated = QCompleter(wordList, self.associatedTaxaWindow.lineEdit_newAssociatedTaxa)
+        self.associatedTaxaWindow.associatedMainWin.lineEdit_newAssociatedTaxa.setCompleter(completer)
 
     def populateTreeWidget(self):
         """ given a list of tuples structured as(siteNum, specimenNum),

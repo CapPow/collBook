@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="rc_">
+    <file>plus-square.svg</file>
     <file>tag.svg</file>
     <file>label_OversizeWarning.png</file>
     <file>Plantae_Reference.csv</file>

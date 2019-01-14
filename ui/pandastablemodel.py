@@ -154,7 +154,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         rowsToKeep = self.getRowsToKeep(selType, siteNum, specimenNum)
         rowsToHide = [x for x in allRows if x not in rowsToKeep]
         return rowsToHide
-    
+
     def getSiteSpecimens(self):
         """ Returns a list of tuples for each site# specimen# combination
         called from mainWindow's populateTreeWidget"""

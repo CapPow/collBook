@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>858</width>
-    <height>572</height>
+    <width>972</width>
+    <height>699</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,3">
     <item>
-     <layout class="QHBoxLayout" name="upper_horizontalLayout">
+     <layout class="QHBoxLayout" name="upperhorizontalLayout">
       <item>
        <widget class="PDFViewer" name="pdf_preview">
         <property name="sizePolicy">
@@ -37,60 +37,333 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="record_groupBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="layoutDirection">
-         <enum>Qt::RightToLeft</enum>
-        </property>
-        <property name="title">
-         <string>GroupBox</string>
-        </property>
-        <layout class="QFormLayout" name="formLayout_2">
-         <item row="0" column="1">
-          <widget class="QLabel" name="label">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>scientificName</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="sciNamelineEdit">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>40</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QGroupBox" name="specimenGroupBox">
+          <property name="title">
+           <string>Specimen</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <widget class="QTabWidget" name="specimen_tabWidget">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="specimen_tabWidgetPage1" native="true">
+              <attribute name="title">
+               <string/>
+              </attribute>
+              <layout class="QVBoxLayout" name="verticalLayout_3">
+               <item>
+                <layout class="QFormLayout" name="formLayout">
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="lineEdit_sciName">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>40</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="layoutDirection">
+                    <enum>Qt::LeftToRight</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="lineEdit_sciNameAuthority">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QPlainTextEdit" name="plainTextEdit">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>45</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>16777215</width>
+                     <height>50</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_sciName">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Scientific Name</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_sciNameAuthority">
+                   <property name="text">
+                    <string>Authority</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label">
+                   <property name="text">
+                    <string>Locality</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="tab_2">
+              <attribute name="title">
+               <string>Page</string>
+              </attribute>
+             </widget>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="siteGroupBox">
+          <property name="title">
+           <string>Site</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <widget class="QTabWidget" name="site_tabWidget">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+               <horstretch>1</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <widget class="QWidget" name="site_Data">
+              <attribute name="title">
+               <string>Page</string>
+              </attribute>
+              <widget class="QWidget" name="horizontalLayoutWidget_3">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>445</width>
+                 <height>30</height>
+                </rect>
+               </property>
+               <layout class="QHBoxLayout" name="associatedTaxa_horizontalLayout">
+                <item>
+                 <widget class="QLabel" name="label_associatedTaxa">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Associated Taxa</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_associatedTaxa"/>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="button_associatedTaxa">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>70</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="resources/Resources.qrc">
+                    <normaloff>:/rc_/plus-square.svg</normaloff>:/rc_/plus-square.svg</iconset>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+             <widget class="QWidget" name="site_tabWidgetPage1" native="true">
+              <attribute name="title">
+               <string/>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout">
+               <item row="7" column="0">
+                <widget class="QLabel" name="label_stateProvince">
+                 <property name="text">
+                  <string> State/Province</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="label_recordedBy">
+                 <property name="text">
+                  <string>Primary Collector</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <widget class="QLabel" name="label_associatedCollectors">
+                 <property name="text">
+                  <string>Associated Collectors (comma seperated)</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="2">
+                <widget class="QLineEdit" name="lineEdit_coordinateUncertaintyInMeters"/>
+               </item>
+               <item row="7" column="2">
+                <widget class="QLabel" name="label_municipality">
+                 <property name="text">
+                  <string>Municipality</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_latitude">
+                 <property name="text">
+                  <string>Latitude (decimal)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Longitude (decimal)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="2">
+                <widget class="QLineEdit" name="lineEdit_associatedCollectors"/>
+               </item>
+               <item row="10" column="0">
+                <widget class="QLineEdit" name="lineEdit_stateProvince"/>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="lineEdit_recordedBy"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_eventDate">
+                 <property name="text">
+                  <string>Date (of collection)</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QDateEdit" name="dateEdit_eventDate">
+                 <property name="buttonSymbols">
+                  <enum>QAbstractSpinBox::UpDownArrows</enum>
+                 </property>
+                 <property name="accelerated">
+                  <bool>false</bool>
+                 </property>
+                 <property name="currentSection">
+                  <enum>QDateTimeEdit::MonthSection</enum>
+                 </property>
+                 <property name="displayFormat">
+                  <string>yyyy/MM/dd</string>
+                 </property>
+                 <property name="currentSectionIndex">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="2">
+                <widget class="QLineEdit" name="lineEdit_municipality"/>
+               </item>
+               <item row="10" column="1">
+                <widget class="QLineEdit" name="lineEdit_county"/>
+               </item>
+               <item row="6" column="0">
+                <widget class="QLineEdit" name="lineEdit_decimalLatitude"/>
+               </item>
+               <item row="6" column="1">
+                <widget class="QLineEdit" name="lineEdit_decimalLongitude"/>
+               </item>
+               <item row="4" column="2">
+                <widget class="QLabel" name="label_uncertainty">
+                 <property name="text">
+                  <string>Uncertainty (m)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="1">
+                <widget class="QLabel" name="label_county">
+                 <property name="text">
+                  <string>County</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -166,7 +439,7 @@
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
+          <verstretch>1</verstretch>
          </sizepolicy>
         </property>
         <property name="sizeAdjustPolicy">
@@ -210,7 +483,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>858</width>
+     <width>972</width>
      <height>22</height>
     </rect>
    </property>
@@ -399,6 +672,10 @@
    </slots>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>table_view</tabstop>
+  <tabstop>tree_widget</tabstop>
+ </tabstops>
  <resources>
   <include location="resources/Resources.qrc"/>
  </resources>
