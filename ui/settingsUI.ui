@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>514</width>
+    <width>595</width>
     <height>551</height>
    </rect>
   </property>
@@ -421,7 +421,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>514</width>
+     <width>595</width>
      <height>22</height>
     </rect>
    </property>
@@ -445,7 +445,7 @@
      <y>301</y>
     </hint>
     <hint type="destinationlabel">
-     <x>492</x>
+     <x>483</x>
      <y>341</y>
     </hint>
    </hints>
@@ -461,7 +461,7 @@
      <y>301</y>
     </hint>
     <hint type="destinationlabel">
-     <x>490</x>
+     <x>483</x>
      <y>341</y>
     </hint>
    </hints>
@@ -532,23 +532,23 @@
   </connection>
   <connection>
    <sender>value_Kingdom</sender>
-   <signal>currentIndexChanged(QString)</signal>
+   <signal>currentTextChanged(QString)</signal>
    <receiver>settingsWindow</receiver>
-   <slot>populateSources(QString)</slot>
+   <slot>kingdomChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>247</x>
-     <y>83</y>
+     <x>339</x>
+     <y>79</y>
     </hint>
     <hint type="destinationlabel">
-     <x>346</x>
-     <y>-7</y>
+     <x>361</x>
+     <y>-17</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>toggleTNRSSettings(QString)</slot>
-  <slot>populateSources(QString)</slot>
+  <slot>kingdomChanged(QString)</slot>
  </slots>
 </ui>

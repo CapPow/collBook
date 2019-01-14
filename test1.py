@@ -2,9 +2,11 @@
 
 import sys
 import os
+from io import StringIO
+import pandas as pd
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator, QItemDelegate
+from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator, QItemDelegate, QCompleter
 from PyQt5.QtWidgets import QAbstractItemView
 
 from reportlab.platypus.doctemplate import LayoutError
@@ -13,7 +15,7 @@ from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
 from ui.locality import locality
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QFile
 
 #import uiFunctions
 
@@ -52,7 +54,13 @@ class MyWindow(QMainWindow):
         delegate = editorDelegate
         w.table_view.setItemDelegate(delegate(w.table_view)) # use flipped proxy delegate
         # generate an instance of the settingsWindow 
-        self.settings = settingsWindow(self)
+        settings = settingsWindow(self)
+        self.settings = settings
+        
+        sciNameLineEdit = w.sciNamelineEdit
+        self.sciNameLineEdit = sciNameLineEdit
+        self.updateAutoComplete()
+        
         # generate an instance of the taxonomic verifier
         self.tax = taxonomicVerification(self.settings)
         # Linking functions to buttons in the UI
@@ -64,9 +72,8 @@ class MyWindow(QMainWindow):
         w.action_Reverse_Geolocate.triggered.connect(self.geoRef)
         w.action_Verify_Taxonomy.triggered.connect(self.verifyTaxButton)
         w.action_Export_Labels.triggered.connect(self.exportLabels)
-
         m.dataChanged.connect(self.populateTreeWidget)
-        # send the settings object along with the pdf constructor        
+        
         p = LabelPDF(self.settings)
         #todo clean up the self definitions        
         self.w = w  # make the mainWindow accessible
@@ -178,6 +185,24 @@ class MyWindow(QMainWindow):
         else:
             pdfBytes = None
         self.pdf_preview.load_preview(pdfBytes)  # starts the loading display process        
+
+    def updateAutoComplete(self):
+        """ updates the Completer's reference text based on the kingdom """
+        
+        value_Kingdom = self.settings.get('value_Kingdom', 'Plantae')
+        if value_Kingdom == 'Plantae':
+            nameCol = 'complete_name'
+        if value_Kingdom == 'Fungi':
+            nameCol = 'Taxon_name'
+        stream = QFile(f':/rc_/{value_Kingdom}_Reference.csv')
+        if stream.open(QFile.ReadOnly):
+            df = StringIO(str(stream.readAll(), 'utf-8'))
+            stream.close()
+        wordList = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
+        wordList = sorted(wordList[nameCol].tolist())      
+        completer = QCompleter(wordList, self.sciNameLineEdit)
+        self.sciNameLineEdit.setCompleter(completer)
+        
 
     def populateTreeWidget(self):
         """ given a list of tuples structured as(siteNum, specimenNum),

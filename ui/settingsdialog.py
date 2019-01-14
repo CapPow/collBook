@@ -53,6 +53,7 @@ class settingsWindow(QMainWindow):
         """ hides the preferences window and saves the user entries """
         self.saveSettings()
         self.parent.updatePreview()
+        self.parent.updateAutoComplete()
         self.hide()
     
     def cancelButtonClicked(self):
@@ -88,7 +89,12 @@ class settingsWindow(QMainWindow):
             return Qt.Unchecked
         else:
             return Qt.Checked
-
+    
+    def kingdomChanged(self, QString):
+        """ called when value_Kingdom changes text. Calls populateSources, and 
+        """
+        self.populateSources(QString)
+    
     def populateSources(self, QString):
         """ called when value_Kingdom changes text. Decides what the options
         should be for value_TaxAlignSource (taxanomic alignment source)."""
@@ -108,9 +114,7 @@ class settingsWindow(QMainWindow):
         if newIndex == -1:  # if it is no longer in the list
             newIndex = 0  # , settle for index 0 (the local option)
         source.setCurrentIndex(newIndex)  # set the selection after the population change.
-        
-        
-    
+
     def toggleTNRSSettings(self, QString):
         """ called when value_TaxAlignSource changes text. Decides if the 
         groupbox_TNRS should be enabled or not"""
@@ -123,7 +127,7 @@ class settingsWindow(QMainWindow):
     def populateSettings(self):
         """ uses self.settings to populate the preferences widget's selections"""
         parent = self.w
-         
+
         #QComboBox
         value_AuthChangePolicy = self.get('value_AuthChangePolicy', 'Fill blanks')
         self.populateQComboBoxSettings( parent.value_AuthChangePolicy, value_AuthChangePolicy)        

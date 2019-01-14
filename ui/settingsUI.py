@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_settingsWindow(object):
     def setupUi(self, settingsWindow):
         settingsWindow.setObjectName("settingsWindow")
-        settingsWindow.resize(514, 551)
+        settingsWindow.resize(595, 551)
         settingsWindow.setMinimumSize(QtCore.QSize(0, 0))
         self.centralwidget = QtWidgets.QWidget(settingsWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -178,7 +178,7 @@ class Ui_settingsWindow(object):
         self.value_TNRS_Threshold.setInputMethodHints(QtCore.Qt.ImhDigitsOnly)
         self.value_TNRS_Threshold.setMinimum(1)
         self.value_TNRS_Threshold.setMaximum(100)
-        self.value_TNRS_Threshold.setProperty("value", 85)
+        self.value_TNRS_Threshold.setProperty("value", 1)
         self.value_TNRS_Threshold.setObjectName("value_TNRS_Threshold")
         self.formLayout_2.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.value_TNRS_Threshold)
         self.formLayout_5.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.groupbox_TNRS)
@@ -202,7 +202,7 @@ class Ui_settingsWindow(object):
         self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
         settingsWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(settingsWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 514, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 595, 22))
         self.menubar.setDefaultUp(False)
         self.menubar.setObjectName("menubar")
         settingsWindow.setMenuBar(self.menubar)
@@ -216,7 +216,7 @@ class Ui_settingsWindow(object):
         self.value_inc_CollectionName.stateChanged['int'].connect(self.value_CollectionName.setFocus)
         self.value_TaxAlignSource.currentTextChanged['QString'].connect(settingsWindow.toggleTNRSSettings)
         self.selectionWidget.currentRowChanged['int'].connect(self.stackedWidget.setCurrentIndex)
-        self.value_Kingdom.currentIndexChanged['QString'].connect(settingsWindow.populateSources)
+        self.value_Kingdom.currentTextChanged['QString'].connect(settingsWindow.kingdomChanged)
         QtCore.QMetaObject.connectSlotsByName(settingsWindow)
 
     def retranslateUi(self, settingsWindow):
