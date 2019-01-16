@@ -27,6 +27,7 @@ from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
 from ui.taxonomy import taxonomicVerification
 from ui.associatedtaxa import associatedTaxaMainWindow
+from ui.formview import formView
         
 
 class editorDelegate(QItemDelegate):
@@ -65,6 +66,9 @@ class MyWindow(QMainWindow):
         self.lineEdit_sciName = lineEdit_sciName
         self.updateAutoComplete()
         
+        form_view = w.form_view_tabWidget
+        form_view.init_ui(w)
+        
         # generate an instance of the taxonomic verifier
         self.tax = taxonomicVerification(self.settings)
         # Linking functions to buttons in the UI
@@ -90,6 +94,7 @@ class MyWindow(QMainWindow):
         self.table_view = w.table_view # make the table_view accessible
         self.tree_widget = w.tree_widget# make the tree_widget accessible
         self.populateTreeWidget()
+        self.form_view = form_view #make self.form_view_tabWidget accessible
         self.locality = locality(self)
 
     def toggleSettings(self):
@@ -135,7 +140,7 @@ class MyWindow(QMainWindow):
         try:
             itemSelected = self.tree_widget.currentItem()
             text = itemSelected.text(0).split('(')[0].strip()
-        except AttributeError:  # if not force "All Records"
+        except AttributeError as e:  # if not force "All Records"
             text = "All Records"
         siteNum = None
         specimenNum = None
@@ -149,9 +154,10 @@ class MyWindow(QMainWindow):
             siteNum, specimenNum = text.split('-')
             
         return selType, siteNum, specimenNum
-    
+       
     def updateTableView(self):
-        """ updates the table_view after tree_widget's selection change """
+        """ updates the table_view, and form_view's current tab
+        called after tree_widget's selection change """
         # first reset the view
         rowNums = range(self.m.rowCount())
         for row in rowNums:
@@ -173,6 +179,33 @@ class MyWindow(QMainWindow):
             except ValueError:
                 self.table_view.clearSelection()
             self.updatePreview()
+        
+        #print( self.w.form_view_tabWidget.currentIndex())
+        if selType == 'site':
+            self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
+            self.w.form_view_tabWidget.setTabEnabled(1, True) #enable site data
+            self.w.form_view_tabWidget.setTabEnabled(2, False) #disable specimen data
+            self.w.form_view_tabWidget.setCurrentIndex(1) #swap to site tab
+        elif selType == 'specimen':
+            self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
+            self.w.form_view_tabWidget.setTabEnabled(1, True) #enable site data
+            if not self.w.form_view_tabWidget.isTabEnabled(2): # if specimen tab is not enabled
+                self.w.form_view_tabWidget.setTabEnabled(2, True) #enable specimen tab
+                self.w.form_view_tabWidget.setCurrentIndex(2) #swap to specimen tab
+            #if self.w.form_view_tabWidget.currentIndex() == 0:
+                
+        else: #  all records
+            self.w.form_view_tabWidget.setTabEnabled(0, True) #all records
+            self.w.form_view_tabWidget.setTabEnabled(1, False) #site data
+            self.w.form_view_tabWidget.setTabEnabled(2, False) #specimen data
+            self.w.form_view_tabWidget.setCurrentIndex(0) #all records
+
+    def selectTreeWidgetItemByIndex(self, i):
+        """ helper function called when form_view's tab index is clicked Is 
+        intended to change the user's view to all records when the all records
+        tab is clicked """
+        if i == 0:
+            self.selectTreeWidgetItemByName('All Records')
 
     def selectTreeWidgetItemByName(self, name):
         iterator = QTreeWidgetItemIterator(self.tree_widget, QTreeWidgetItemIterator.All)
@@ -185,13 +218,17 @@ class MyWindow(QMainWindow):
         #self.updateTableView()
         
     def updatePreview(self):
-        """ updates the pdf preview window after the vertical header is clicked"""
+        """ updates the pdf preview window and the form_view """
         #TODO modify this to be called from within the pdfviewer class
         tableSelection = self.w.table_view.selectionModel().selectedRows()
         if tableSelection:
             index = tableSelection[0].row()
             rowData = self.m.retrieveRowData(index)
             rowData = self.m.dataToDict(rowData)
+
+            # push data into form_view
+            self.form_view.fillFormFields(rowData)
+            
             try:
                 pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
             except LayoutError:
@@ -203,7 +240,7 @@ class MyWindow(QMainWindow):
 
     def updateAutoComplete(self):
         """ updates the Completer's reference text based on the kingdom """
-        
+
         value_Kingdom = self.settings.get('value_Kingdom', 'Plantae')
         if value_Kingdom == 'Plantae':
             nameCol = 'complete_name'
@@ -218,15 +255,14 @@ class MyWindow(QMainWindow):
         
         completer = QCompleter(wordList, self.lineEdit_sciName)
         self.lineEdit_sciName.setCompleter(completer)
-        
-        completerAssociated = QCompleter(wordList, self.associatedTaxaWindow.lineEdit_newAssociatedTaxa)
-        self.associatedTaxaWindow.associatedMainWin.lineEdit_newAssociatedTaxa.setCompleter(completer)
 
+        completerAssociated = QCompleter(wordList, self.associatedTaxaWindow.lineEdit_newAssociatedTaxa)
+        self.associatedTaxaWindow.associatedMainWin.lineEdit_newAssociatedTaxa.setCompleter(completerAssociated)
+       
     def populateTreeWidget(self):
         """ given a list of tuples structured as(siteNum, specimenNum),
         populates the TreeWidget with the records nested within the sites."""
-        # first clear the tree    
-        
+
         # store the current selection
         itemSelected = self.tree_widget.currentItem()
         try:

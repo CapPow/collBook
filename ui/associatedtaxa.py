@@ -45,6 +45,7 @@ class associatedTaxaMainWindow(QWidget):
         associatedList = associatedMainWin.listWidget_associatedTaxa
         self.associatedList = associatedList
 
+
     def saveAssociatedTaxa(self):
         """ Populates the mainwindow's lineEdit_associatedTaxa with the 
         checked taxa in associatedList and hides the associatedTaxaMainWindow"""
@@ -113,7 +114,8 @@ class associatedTaxaMainWindow(QWidget):
     
     def addAssociatedTaxa(self):
         """ adds item from the lineEdit_newAssociatedTaxa to the associatedList """
-        text = self.associatedMainWin.lineEdit_newAssociatedTaxa.text()
+        entryBar = self.associatedMainWin.lineEdit_newAssociatedTaxa
+        text = entryBar.text()
         item = QListWidgetItem(text, self.associatedList)
         item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
         item.setCheckState(Qt.Checked)
@@ -122,6 +124,7 @@ class associatedTaxaMainWindow(QWidget):
         item = self.associatedList.findItems(text, Qt.MatchRegExp)[0]
         item.setSelected(True)     
         self.associatedList.scrollToItem(item)
+        entryBar.clear()
 
     def selectNone(self):
         for i in range(self.associatedList.count()):
