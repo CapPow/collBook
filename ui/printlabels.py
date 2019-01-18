@@ -48,6 +48,12 @@ class LabelPDF():
         """labelDataInput = list of dictionaries formatted as: {DWC Column:'field value'}
            defaultFileName = the filename to use as the default when saving the pdf file."""
         
+        # strip out the site number rows
+        labelDataInput = [x for x in labelDataInput if "#" not in x.get('otherCatalogNumbers').split('-')[-1]]
+        if len(labelDataInput) < 1:  # exit early if nothing is left
+            return None
+                          
+        
         # decent default values 140, 90
         self.xPaperSize = int(self.settings.get('value_X', 140)) * mm
         self.yPaperSize = int(self.settings.get('value_Y', 90)) * mm
@@ -143,7 +149,7 @@ class LabelPDF():
             if len(dfl('catalogNumber')) > 0:
                 barcodeValue = dfl('catalogNumber')
                 code39._Code39Base._humanText = newHumanText  #Note, overriding the human text from this library to omit the stopcode ('+')
-                barcode39Std = code39.Standard39(barcodeValue,barHeight=(yPaperSize * .10  ), barWidth=((xPaperSize * 0.28)/(len(barcodeValue)*13+35)), humanReadable=True, quiet = False, checksum=0)
+                barcode39Std = code39.Standard39(barcodeValue,barHeight=(self.yPaperSize * .10  ), barWidth=((self.xPaperSize * 0.28)/(len(barcodeValue)*13+35)), humanReadable=True, quiet = False, checksum=0)
                                                  #^^^Note width is dynamic, but I don't know the significe of *13+35 beyond making it work.
                 return barcode39Std
             else:
@@ -162,7 +168,7 @@ class LabelPDF():
                     Para('collectionName','collectionNameSTY'),
                     createBarCodes()
                               ]],
-                colWidths = (xPaperSize * .67,xPaperSize * .29), rowHeights = None,
+                colWidths = (self.xPaperSize * .67,self.xPaperSize * .29), rowHeights = None,
     
                 style = [
                         ('VALIGN',(0,0),(0,-1),'TOP'),

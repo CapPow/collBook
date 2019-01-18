@@ -66,8 +66,11 @@ class MyWindow(QMainWindow):
         self.lineEdit_sciName = lineEdit_sciName
         self.updateAutoComplete()
         
-        form_view = w.form_view_tabWidget
-        form_view.init_ui(w)
+        #form_view_tabWidget = w.form_view_tabWidget.init_ui(w)
+        #form_view_tabWidget.init_ui(w)
+        #w.form_view_tabWidget.init_ui()
+        self.form_view = w.formView #make self.form_view_tabWidget accessible
+        self.form_view.init_ui(self, w)
         
         # generate an instance of the taxonomic verifier
         self.tax = taxonomicVerification(self.settings)
@@ -94,7 +97,7 @@ class MyWindow(QMainWindow):
         self.table_view = w.table_view # make the table_view accessible
         self.tree_widget = w.tree_widget# make the tree_widget accessible
         self.populateTreeWidget()
-        self.form_view = form_view #make self.form_view_tabWidget accessible
+        
         self.locality = locality(self)
 
     def toggleSettings(self):
@@ -155,9 +158,16 @@ class MyWindow(QMainWindow):
             
         return selType, siteNum, specimenNum
        
+    def getVisibleRows(self):
+        """ returns a list of indicies which are visible """
+        visibleRows = [x for x in range(0, self.m.rowCount()) if not self.table_view.isRowHidden(x)]
+        return visibleRows
+                
+
     def updateTableView(self):
         """ updates the table_view, and form_view's current tab
         called after tree_widget's selection change """
+        # TODO rename this, as it does more than upates tableview. Basically alters scope of user's view
         # first reset the view
         rowNums = range(self.m.rowCount())
         for row in rowNums:
@@ -179,26 +189,24 @@ class MyWindow(QMainWindow):
             except ValueError:
                 self.table_view.clearSelection()
             self.updatePreview()
-        
-        #print( self.w.form_view_tabWidget.currentIndex())
+
         if selType == 'site':
-            self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
-            self.w.form_view_tabWidget.setTabEnabled(1, True) #enable site data
-            self.w.form_view_tabWidget.setTabEnabled(2, False) #disable specimen data
-            self.w.form_view_tabWidget.setCurrentIndex(1) #swap to site tab
+            #self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
+            self.form_view.setTabEnabled(1, True) #enable site data
+            self.form_view.setTabEnabled(2, False) #disable specimen data
+            self.form_view.setCurrentIndex(1) #swap to site tab
         elif selType == 'specimen':
-            self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
-            self.w.form_view_tabWidget.setTabEnabled(1, True) #enable site data
-            if not self.w.form_view_tabWidget.isTabEnabled(2): # if specimen tab is not enabled
-                self.w.form_view_tabWidget.setTabEnabled(2, True) #enable specimen tab
-                self.w.form_view_tabWidget.setCurrentIndex(2) #swap to specimen tab
+            #self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
+            self.form_view.setTabEnabled(1, True) #enable site data
+            if not self.form_view.isTabEnabled(2): # if specimen tab is not enabled
+                self.form_view.setTabEnabled(2, True) #enable specimen tab
+                self.form_view.setCurrentIndex(2) #swap to specimen tab
             #if self.w.form_view_tabWidget.currentIndex() == 0:
-                
         else: #  all records
-            self.w.form_view_tabWidget.setTabEnabled(0, True) #all records
-            self.w.form_view_tabWidget.setTabEnabled(1, False) #site data
-            self.w.form_view_tabWidget.setTabEnabled(2, False) #specimen data
-            self.w.form_view_tabWidget.setCurrentIndex(0) #all records
+            self.form_view.setTabEnabled(0, True) #all records
+            self.form_view.setTabEnabled(1, False) #site data
+            self.form_view.setTabEnabled(2, False) #specimen data
+            self.form_view.setCurrentIndex(0) #all records
 
     def selectTreeWidgetItemByIndex(self, i):
         """ helper function called when form_view's tab index is clicked Is 
@@ -216,7 +224,7 @@ class MyWindow(QMainWindow):
                 break
             iterator +=1
         #self.updateTableView()
-        
+
     def updatePreview(self):
         """ updates the pdf preview window and the form_view """
         #TODO modify this to be called from within the pdfviewer class
@@ -225,10 +233,8 @@ class MyWindow(QMainWindow):
             index = tableSelection[0].row()
             rowData = self.m.retrieveRowData(index)
             rowData = self.m.dataToDict(rowData)
-
-            # push data into form_view
             self.form_view.fillFormFields(rowData)
-            
+
             try:
                 pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
             except LayoutError:

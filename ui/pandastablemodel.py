@@ -107,9 +107,10 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             data = df.to_dict(orient='records')
         labelDicts = []
         for datum in data:
-            datum = {key: value.strip() for key, value in datum.items() if isinstance(value,str)} #dict comprehension!
-            if datum.get('specimen#') not in ['#','!AddSITE']:   #keep out the site level records!
-                labelDicts.append(datum)
+            #datum = {key: value.strip() for key, value in datum.items() if isinstance(value,str)} #dict comprehension!
+            datum = {key: value for key, value in datum.items() if isinstance(value,str)} # strip command was preventing spaces from being entered
+            #if datum.get('specimen#') not in ['#','!AddSITE']:   #keep out the site level records!
+            labelDicts.append(datum)
         return labelDicts
 
     def dataToDict(self, df):
@@ -132,11 +133,12 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         """ defined for clarity, calls getRowsToKeep with the same args."""
         return self.getRowsToKeep(selType, siteNum, specimenNum)
 
+    
     def getRowsToKeep(self, selType, siteNum = None, specimenNum = None):
         """ Returns list of row indices associated with inputs """
         df = self.datatable
         allRows = df.index.values.tolist()
-        df = df[~df['specimen#'].str.contains('#')]
+        #df = df[~df['specimen#'].str.contains('#')]
         if selType == 'allRec':
             rowsToKeep = allRows
         elif selType == 'site':

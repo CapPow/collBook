@@ -94,7 +94,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item alignment="Qt::AlignTop">
-         <widget class="formView" name="form_view_tabWidget">
+         <widget class="formView" name="formView">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -108,7 +108,7 @@
            </size>
           </property>
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::StrongFocus</enum>
           </property>
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
@@ -120,7 +120,7 @@
            <enum>QTabWidget::Rounded</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <property name="usesScrollButtons">
            <bool>false</bool>
@@ -185,6 +185,9 @@
            </layout>
           </widget>
           <widget class="QWidget" name="SiteData">
+           <property name="focusPolicy">
+            <enum>Qt::StrongFocus</enum>
+           </property>
            <attribute name="title">
             <string>Site Data</string>
            </attribute>
@@ -256,7 +259,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>703</width>
-                 <height>382</height>
+                 <height>353</height>
                 </rect>
                </property>
                <property name="sizePolicy">
@@ -434,162 +437,12 @@
                    <property name="verticalSpacing">
                     <number>0</number>
                    </property>
-                   <item row="10" column="0">
-                    <widget class="QLineEdit" name="lineEdit_municipality"/>
-                   </item>
-                   <item row="10" column="1">
-                    <widget class="QLineEdit" name="lineEdit_path"/>
-                   </item>
-                   <item row="5" column="0">
-                    <widget class="QLabel" name="label_stateProvince">
-                     <property name="text">
-                      <string> State/Province</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="5" column="1">
                     <widget class="QLabel" name="label_county">
                      <property name="text">
                       <string>County</string>
                      </property>
                     </widget>
-                   </item>
-                   <item row="6" column="0">
-                    <widget class="QLineEdit" name="lineEdit_stateProvince"/>
-                   </item>
-                   <item row="6" column="1">
-                    <widget class="QLineEdit" name="lineEdit_county"/>
-                   </item>
-                   <item row="3" column="0" colspan="2">
-                    <layout class="QGridLayout" name="gridLayout_2">
-                     <property name="verticalSpacing">
-                      <number>0</number>
-                     </property>
-                     <item row="1" column="0">
-                      <widget class="QLineEdit" name="lineEdit_decimalLatitude">
-                       <property name="inputMask">
-                        <string>#099.9900000000</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="label_latitude">
-                       <property name="text">
-                        <string>Latitude (decimal deg)</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="2">
-                      <widget class="QLabel" name="label_uncertainty">
-                       <property name="text">
-                        <string>Uncertainty (m)</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QLabel" name="label_longitude">
-                       <property name="text">
-                        <string>Longitude (decimal deg)</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QLineEdit" name="lineEdit_decimalLongitude">
-                       <property name="inputMask">
-                        <string>#099.9900000000</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="1" column="2">
-                      <widget class="QLineEdit" name="lineEdit_coordinateUncertaintyInMeters">
-                       <property name="inputMask">
-                        <string>00009.000</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item row="2" column="0" colspan="2">
-                    <layout class="QHBoxLayout" name="horizontalLayout_6">
-                     <item>
-                      <widget class="QLabel" name="label_locality">
-                       <property name="text">
-                        <string>Locality</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPlainTextEdit" name="plainTextEdit_locality">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>45</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>16777215</width>
-                         <height>50</height>
-                        </size>
-                       </property>
-                       <property name="backgroundVisible">
-                        <bool>false</bool>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item row="9" column="1">
-                    <widget class="QLabel" name="label_path">
-                     <property name="text">
-                      <string>Path (road or trail name)</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="0" colspan="2">
-                    <layout class="QHBoxLayout" name="horizontalLayout_8">
-                     <item>
-                      <widget class="QLabel" name="label_habitat">
-                       <property name="text">
-                        <string>Habitat</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLineEdit" name="lineEdit_habitat"/>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_locationNotes">
-                       <property name="text">
-                        <string>Location Notes</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLineEdit" name="lineEdit_locationNotes"/>
-                     </item>
-                    </layout>
                    </item>
                    <item row="0" column="0" colspan="2">
                     <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,10">
@@ -643,12 +496,179 @@
                      </item>
                     </layout>
                    </item>
+                   <item row="10" column="1">
+                    <widget class="QLineEdit" name="lineEdit_path"/>
+                   </item>
+                   <item row="6" column="0">
+                    <widget class="QLineEdit" name="lineEdit_stateProvince"/>
+                   </item>
+                   <item row="1" column="0" colspan="2">
+                    <layout class="QHBoxLayout" name="horizontalLayout_8">
+                     <item>
+                      <widget class="QLabel" name="label_habitat">
+                       <property name="text">
+                        <string>Habitat</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="lineEdit_habitat"/>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_locationNotes">
+                       <property name="text">
+                        <string>Location Notes</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLineEdit" name="lineEdit_locationNotes"/>
+                     </item>
+                    </layout>
+                   </item>
                    <item row="9" column="0">
                     <widget class="QLabel" name="label_municipality">
                      <property name="text">
                       <string>Municipality</string>
                      </property>
                     </widget>
+                   </item>
+                   <item row="9" column="1">
+                    <widget class="QLabel" name="label_path">
+                     <property name="text">
+                      <string>Path (road or trail name)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0" colspan="2">
+                    <layout class="QGridLayout" name="gridLayout_2">
+                     <property name="verticalSpacing">
+                      <number>0</number>
+                     </property>
+                     <item row="1" column="1">
+                      <widget class="QLineEdit" name="lineEdit_decimalLongitude">
+                       <property name="inputMask">
+                        <string>#099.9900000000</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_latitude">
+                       <property name="text">
+                        <string>Latitude (decimal deg)</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="2">
+                      <widget class="QLineEdit" name="lineEdit_coordinateUncertaintyInMeters">
+                       <property name="inputMask">
+                        <string>00009.000</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="2">
+                      <widget class="QLabel" name="label_uncertainty">
+                       <property name="text">
+                        <string>Uncertainty (m)</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLineEdit" name="lineEdit_decimalLatitude">
+                       <property name="inputMask">
+                        <string>#099.9900000000</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QLabel" name="label_longitude">
+                       <property name="text">
+                        <string>Longitude (decimal deg)</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="0" column="3">
+                      <widget class="QLabel" name="label_elevation">
+                       <property name="text">
+                        <string>Elevation (m)</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="3">
+                      <widget class="QLineEdit" name="lineEdit_minimumElevationInMeters">
+                       <property name="inputMask">
+                        <string>0009.00</string>
+                       </property>
+                       <property name="text">
+                        <string>.</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="5" column="0">
+                    <widget class="QLabel" name="label_stateProvince">
+                     <property name="text">
+                      <string> State/Province</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="6" column="1">
+                    <widget class="QLineEdit" name="lineEdit_county"/>
+                   </item>
+                   <item row="2" column="0" colspan="2">
+                    <layout class="QHBoxLayout" name="horizontalLayout_6">
+                     <item>
+                      <widget class="QLabel" name="label_locality">
+                       <property name="text">
+                        <string>Locality</string>
+                       </property>
+                       <property name="alignment">
+                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPlainTextEdit" name="plainTextEdit_locality">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>45</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>50</height>
+                        </size>
+                       </property>
+                       <property name="backgroundVisible">
+                        <bool>false</bool>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item row="10" column="0">
+                    <widget class="QLineEdit" name="lineEdit_municipality"/>
                    </item>
                   </layout>
                  </widget>
@@ -722,7 +742,7 @@
               <property name="verticalSpacing">
                <number>3</number>
               </property>
-              <item row="0" column="0">
+              <item row="1" column="0">
                <widget class="QLabel" name="label_sciName">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -735,7 +755,7 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1">
+              <item row="1" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,1,2">
                 <item>
                  <widget class="QLineEdit" name="lineEdit_sciName">
@@ -775,14 +795,14 @@
                 </item>
                </layout>
               </item>
-              <item row="2" column="0">
+              <item row="3" column="0">
                <widget class="QLabel" name="occurrenceRemarksLabel">
                 <property name="text">
                  <string>Occurrence Remarks</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
+              <item row="3" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_4">
                 <item>
                  <widget class="QLineEdit" name="lineEdit_occurrenceRemarks"/>
@@ -799,14 +819,14 @@
                 </item>
                </layout>
               </item>
-              <item row="3" column="0">
+              <item row="4" column="0">
                <widget class="QLabel" name="label_reproductiveCondition">
                 <property name="text">
                  <string>Reproductive Condition</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="1">
+              <item row="4" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,1,0,1">
                 <item>
                  <widget class="QComboBox" name="comboBox_reproductiveCondition">
@@ -878,14 +898,14 @@
                 </item>
                </layout>
               </item>
-              <item row="5" column="0">
+              <item row="6" column="0">
                <widget class="QLabel" name="label_identificationRemarks">
                 <property name="text">
                  <string>Identification Remarks</string>
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
+              <item row="6" column="1">
                <widget class="QPlainTextEdit" name="plainTextEdit_identificationRemarks">
                 <property name="minimumSize">
                  <size>
@@ -901,7 +921,7 @@
                 </property>
                </widget>
               </item>
-              <item row="6" column="1">
+              <item row="7" column="1">
                <widget class="QPlainTextEdit" name="plainTextEdit_identificationReferences">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -923,40 +943,40 @@
                 </property>
                </widget>
               </item>
-              <item row="6" column="0">
+              <item row="7" column="0">
                <widget class="QLabel" name="label_identificationReferences">
                 <property name="text">
                  <string>Identification References </string>
                 </property>
                </widget>
               </item>
-              <item row="8" column="0">
-               <widget class="QLabel" name="label_catalogNumber">
-                <property name="text">
-                 <string>Catalog Number</string>
-                </property>
-               </widget>
-              </item>
-              <item row="8" column="1">
+              <item row="0" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_9">
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_catalogNumber"/>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_otherCatalogNumber">
-                  <property name="text">
-                   <string>Other Catalog Number</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLineEdit" name="lineEdit_otherCatalogNumber">
+                 <widget class="QLineEdit" name="lineEdit_otherCatalogNumbers">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
                  </widget>
                 </item>
+                <item>
+                 <widget class="QLabel" name="label_catalogNumber">
+                  <property name="text">
+                   <string>Catalog Number</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_catalogNumber"/>
+                </item>
                </layout>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_otherCatalogNumber">
+                <property name="text">
+                 <string>Field Number</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -1271,12 +1291,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>819</x>
-     <y>123</y>
+     <x>880</x>
+     <y>135</y>
     </hint>
     <hint type="destinationlabel">
-     <x>866</x>
-     <y>128</y>
+     <x>985</x>
+     <y>139</y>
     </hint>
    </hints>
   </connection>
@@ -1287,17 +1307,17 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>838</x>
-     <y>127</y>
+     <x>894</x>
+     <y>137</y>
     </hint>
     <hint type="destinationlabel">
-     <x>882</x>
-     <y>126</y>
+     <x>985</x>
+     <y>141</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>form_view_tabWidget</sender>
+   <sender>formView</sender>
    <signal>tabBarClicked(int)</signal>
    <receiver>MainWindow</receiver>
    <slot>selectTreeWidgetItemByIndex(int)</slot>
