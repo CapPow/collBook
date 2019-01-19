@@ -33,23 +33,19 @@ class MyWindow(QMainWindow):
         self.w = Ui_MainWindow()
         self.w.setupUi(self)
         self.m = PandasTableModel(self)
-        
         self.tree_widget = self.w.tree_widget
-        # generate an instance of the settingsWindow
-        self.settings = settingsWindow(self)
-        # generate an instance of the associatedTaxaWindow
-        self.associatedTaxaWindow = associatedTaxaMainWindow(self)
+        self.settings = settingsWindow(self)  # settingsWindow
+        self.associatedTaxaWindow = associatedTaxaMainWindow(self)  # associatedTaxaWindow
         self.lineEdit_sciName = self.w.lineEdit_sciName
         self.form_view = self.w.formView
         self.table_view = self.w.table_view
-        self.table_view.setItemDelegate(editorDelegate(self.table_view)) # use flipped proxy delegate
+        self.table_view.setItemDelegate(editorDelegate(self.table_view))  # use flipped proxy delegate
         self.form_view.init_ui(self, self.w)
-        # generate an instance of the taxonomic verifier
-        self.tax = taxonomicVerification(self.settings)
-        self.m.new_Records(True)
-        self.table_view.setModel(self.m)
+        self.tax = taxonomicVerification(self.settings)  # taxonomic verifier
         self.p = LabelPDF(self.settings)
         self.pdf_preview = self.w.pdf_preview
+        self.m.new_Records(True)
+        self.table_view.setModel(self.m)
         self.locality = locality(self)
         self.w.action_Open.triggered.connect(self.m.open_CSV)
         self.w.action_Save_As.triggered.connect(self.m.save_CSV)
@@ -57,9 +53,10 @@ class MyWindow(QMainWindow):
         self.w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))
         self.w.action_Settings.triggered.connect(self.toggleSettings)
         self.w.button_associatedTaxa.clicked.connect(self.toggleAssociated)
-        self.w.action_Reverse_Geolocate.triggered.connect(self.geoRef)
-        self.w.action_Verify_Taxonomy.triggered.connect(self.verifyTaxButton)
-        self.w.action_Export_Labels.triggered.connect(self.exportLabels)
+        self.w.action_Reverse_Geolocate.triggered.connect(self.m.geoRef)
+        self.w.action_Verify_Taxonomy.triggered.connect(self.m.verifyTaxButton)
+        self.w.action_Export_Labels.triggered.connect(self.m.exportLabels)
+        self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
         # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()
@@ -78,32 +75,9 @@ class MyWindow(QMainWindow):
             self.associatedTaxaWindow.associatedList.clear()
             self.associatedTaxaWindow.hide()
 
-    def geoRef(self):
-        """ applies genLocality over each row among those selected."""
-        selType, siteNum, specimenNum = self.getTreeSelectionType()
-        rowsToProcess = self.m.getRowsToProcess(selType, siteNum, specimenNum)
-        self.m.processViewableRecords(rowsToProcess, self.locality.genLocality)        
-        
-    def verifyTaxButton(self):
-        """ applies verifyTaxonomy over each row among those selected."""
-        # refresh tax settings
-        self.tax.onFirstRow = True
-        self.tax.readTaxonomicSettings()
-        selType, siteNum, specimenNum = self.getTreeSelectionType()
-        rowsToProcess = self.m.getRowsToProcess(selType, siteNum, specimenNum)
-        self.m.processViewableRecords(rowsToProcess, self.tax.verifyTaxonomy)
-
-    def exportLabels(self):
-        """ bundles records up and passes them to printlabels.genPrintLabelPDFs() """
-        selType, siteNum, specimenNum = self.getTreeSelectionType()
-        rowsToProcess = self.m.getRowsToProcess(selType, siteNum, specimenNum)
-        outDF = self.m.datatable.iloc[rowsToProcess, ]
-        outDict = self.m.dataToDict(outDF)
-        self.p.genPrintLabelPDFs(outDict)
-                
-        
     def getTreeSelectionType(self):
         """ checks the tree_widget's type of selection """
+        # TODO alter selType to become a custom attribute of mainWindow, setting it upon changes. This should reduce checks with this function
         try:
             itemSelected = self.tree_widget.currentItem()
             text = itemSelected.text(0).split('(')[0].strip()
@@ -121,11 +95,6 @@ class MyWindow(QMainWindow):
             siteNum, specimenNum = text.split('-')
             
         return selType, siteNum, specimenNum
-       
-    def getVisibleRows(self):
-        """ returns a list of indicies which are visible """
-        visibleRows = [x for x in range(0, self.m.rowCount()) if not self.table_view.isRowHidden(x)]
-        return visibleRows
 
     def updateTableView(self):
         """ updates the table_view, and form_view's current tab
@@ -140,9 +109,9 @@ class MyWindow(QMainWindow):
         rowsToHide = self.m.getRowsToHide(selType, siteNum, specimenNum)
         for row in rowsToHide:
             self.table_view.hideRow(row)
-        specimenColumnIndex = self.m.columnIndex('specimen#')
+        #specimenColumnIndex = self.m.columnIndex('specimen#')
         #TODO fix this sort, currently uses alphanumeric (ie: 100, 2, 30). Should be numeric Ascending
-        self.table_view.sortByColumn(specimenColumnIndex, Qt.AscendingOrder)
+        #self.table_view.sortByColumn(specimenColumnIndex, Qt.AscendingOrder)
         if selType != 'allRec':
             topVisible = [x for x in rowNums if x not in rowsToHide]
             try:
@@ -151,7 +120,7 @@ class MyWindow(QMainWindow):
                 self.table_view.selectRow(topVisible)
             except ValueError:
                 self.table_view.clearSelection()
-            self.updatePreview()
+        self.updatePreview()
 
         if selType == 'site':
             #self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
@@ -170,7 +139,7 @@ class MyWindow(QMainWindow):
             self.form_view.setTabEnabled(1, False) #site data
             self.form_view.setTabEnabled(2, False) #specimen data
             self.form_view.setCurrentIndex(0) #all records
-        self.updateFormView()
+        self.form_view.fillFormFields()
 
     def selectTreeWidgetItemByIndex(self, i):
         """ helper function called when form_view's tab index is clicked Is 
@@ -189,12 +158,31 @@ class MyWindow(QMainWindow):
             iterator +=1
         #self.updateTableView()
 
-    def updateFormView(self):
-        """ fills the form_view fields """
-        rowData = self.getVisibleRowData()
-        if rowData:
-            self.form_view.fillFormFields(rowData)
+    def timeitTest(self):
+        """ debugging / improving space for testing various functions or their timings """
 
+        from datetime import datetime
+        a = datetime.now()
+        iterCount = 10000
+        for i in range(iterCount):
+            listComp = [x for x in range(0, self.m.rowCount()) if not self.table_view.isRowHidden(x)]
+        b = datetime.now()
+        listCompTime = b - a
+        listCompTime = int((listCompTime.total_seconds() / iterCount) * 1000000) # microseconds
+        print(f'listComp = {listCompTime} (µs)')
+        a = datetime.now()
+        for i in range(iterCount):
+            treeSel = self.m.getRowsToProcess(*self.getTreeSelectionType())
+        b = datetime.now()
+        treeSelTime = b - a
+        treeSelTime = int((treeSelTime.total_seconds() / iterCount) * 1000000) # microseconds
+        print(f'treeSel = {treeSelTime} (µs)')
+
+    def getVisibleRows(self):
+        """ returns a list of indicies which are visible """
+        visibleRows = self.m.getRowsToProcess(*self.getTreeSelectionType())
+        return visibleRows
+    
     def getVisibleRowData(self):
         """ queries the table_view for selected rows 
         and returns associated rowData """
@@ -210,7 +198,8 @@ class MyWindow(QMainWindow):
         """ updates the pdf preview window """
         #TODO modify this to be called from within the pdfviewer class
         rowData = self.getVisibleRowData()
-        if rowData:
+        selType, siteNum, specimenNum = self.getTreeSelectionType()
+        if (isinstance(rowData, list)) & (selType != 'allRec'):
             try:
                 pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
             except LayoutError:

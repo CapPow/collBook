@@ -65,9 +65,8 @@ class locality():
     def genLocality(self, currentRowArg):
         """ Generate locality fields, uses API call to get
         country, state, city, etc. from GPS coordinates."""
-    # both locality functions would benefit from some systemic methid of determining when to add italics to binomial (scientific) names.
-    # such the italic tags "<i> and </i>" would need to be stripped before exporting for database submission.
-        
+        # both locality functions would benefit from some systemic methid of determining when to add italics to binomial (scientific) names.
+        # such the italic tags "<i> and </i>" would need to be stripped before exporting for database submission.
         currentRow = f"{currentRowArg['site#']}-{currentRowArg['specimen#']}"
         currentLocality = currentRowArg['locality']
         latitude = currentRowArg['decimalLatitude']

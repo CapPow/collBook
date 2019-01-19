@@ -109,7 +109,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 703, 353))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 560, 353))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -585,6 +585,11 @@ class Ui_MainWindow(object):
         icon10.addPixmap(QtGui.QPixmap(":/rc_/tag.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_Export_Labels.setIcon(icon10)
         self.action_Export_Labels.setObjectName("action_Export_Labels")
+        self.actionTestFunction = QtWidgets.QAction(MainWindow)
+        icon11 = QtGui.QIcon()
+        icon11.addPixmap(QtGui.QPixmap(":/rc_/circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionTestFunction.setIcon(icon11)
+        self.actionTestFunction.setObjectName("actionTestFunction")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_New_Records)
         self.menu_File.addAction(self.action_Save_As)
@@ -604,6 +609,7 @@ class Ui_MainWindow(object):
         self.left_toolBar.addAction(self.action_Export_Labels)
         self.right_toolBar.addSeparator()
         self.right_toolBar.addAction(self.action_Exit)
+        self.right_toolBar.addAction(self.actionTestFunction)
 
         self.retranslateUi(MainWindow)
         self.formView.setCurrentIndex(2)
@@ -700,6 +706,8 @@ class Ui_MainWindow(object):
         self.action_Settings.setText(_translate("MainWindow", "&Settings"))
         self.action_Settings.setToolTip(_translate("MainWindow", "Settings and preferences"))
         self.action_Export_Labels.setText(_translate("MainWindow", "&Export_Labels"))
+        self.actionTestFunction.setText(_translate("MainWindow", "&TestFunction"))
+        self.actionTestFunction.setToolTip(_translate("MainWindow", "Test a function"))
 
 from ui.formview import formView
 from ui.pdfviewer import PDFViewer

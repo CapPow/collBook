@@ -258,7 +258,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>703</width>
+                 <width>560</width>
                  <height>353</height>
                 </rect>
                </property>
@@ -1118,6 +1118,7 @@
    </attribute>
    <addaction name="separator"/>
    <addaction name="action_Exit"/>
+   <addaction name="actionTestFunction"/>
   </widget>
   <action name="action_Open">
    <property name="icon">
@@ -1234,6 +1235,18 @@
    </property>
    <property name="text">
     <string>&amp;Export_Labels</string>
+   </property>
+  </action>
+  <action name="actionTestFunction">
+   <property name="icon">
+    <iconset resource="resources/Resources.qrc">
+     <normaloff>:/rc_/circle.svg</normaloff>:/rc_/circle.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;TestFunction</string>
+   </property>
+   <property name="toolTip">
+    <string>Test a function</string>
    </property>
   </action>
  </widget>

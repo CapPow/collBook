@@ -28,14 +28,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         self.undoActive = False  # is an undo available?
         self.redoActive = False  # is a redo available?
 
-    def processViewableRecords(self, rowsToProcess, func):
-        """ applies a function over each row among those selected by the
-        treeSelectionType """
-        df = self.datatable.iloc[rowsToProcess, ]
-        df.apply(func, 1)
-        self.datatable.update(df)
-        self.update(self.datatable)
-    
     def add_to_undo_stack(self, description = 'the last major action'):
         """ to be called just before a change is made to the underlaying df """
         undoStack = self.undoStack  # establish a shorthand
@@ -79,7 +71,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         """ given a row index number returns the data as a series """
         df = self.datatable
         return df.iloc[i]
-    
+
     def getSelectedLabelDict(self, df):
         """Returns a list of dictionaries from given df
         organized as {column name: cell value}."""
@@ -111,23 +103,51 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 if len(associatedTaxaItems) > 10:   #if it is too large, trunicate it at 15, and append "..." to indicate trunication.
                     record['associatedTaxa'] = ', '.join(associatedTaxaItems[:10])+' ...'   
         return records
-    
+
+    def geoRef(self):
+        """ applies genLocality over each row among those selected."""
+        rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
+        self.processViewableRecords(rowsToProcess, self.parent.locality.genLocality)        
+        
+    def verifyTaxButton(self):
+        """ applies verifyTaxonomy over each row among those selected."""
+        # refresh tax settings
+        self.parent.tax.onFirstRow = True
+        self.parent.tax.readTaxonomicSettings()
+        rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
+        self.processViewableRecords(rowsToProcess, self.parent.tax.verifyTaxonomy)
+
+    def exportLabels(self):
+        """ bundles records up and passes them to printlabels.genPrintLabelPDFs() """
+        rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
+        outDF = self.datatable.iloc[rowsToProcess, ]
+        outDict = self.dataToDict(outDF)
+        self.parent.p.genPrintLabelPDFs(outDict)
+
+    def processViewableRecords(self, rowsToProcess, func):
+        """ applies a function over each row among rowsToProcess (by index)"""
+        df = self.datatable.iloc[rowsToProcess, ]
+        df.apply(func, 1)
+        self.datatable.update(df)
+        self.update(self.datatable)
+        self.parent.updateTableView()
+        self.parent.form_view.fillFormFields()
+
+
     def getRowsToProcess(self, selType, siteNum = None, specimenNum = None):
         """ defined for clarity, calls getRowsToKeep with the same args."""
         return self.getRowsToKeep(selType, siteNum, specimenNum)
 
-    
     def getRowsToKeep(self, selType, siteNum = None, specimenNum = None):
         """ Returns list of row indices associated with inputs """
         df = self.datatable
-        allRows = df.index.values.tolist()
         #df = df[~df['specimen#'].str.contains('#')]
-        if selType == 'allRec':
-            rowsToKeep = allRows
-        elif selType == 'site':
+        if selType == 'site':
             rowsToKeep = df[df['site#'] == siteNum].index.values.tolist()
         elif selType == 'specimen':
             rowsToKeep = df[(df['site#'] == siteNum) & (df['specimen#'] == specimenNum)].index.values.tolist()
+        else:  # otherwise, keep everything (usually "allRec")
+            rowsToKeep = df.index.values.tolist()
         return rowsToKeep
     
     def getRowsToHide(self, selType, siteNum = None, specimenNum = None):
@@ -171,6 +191,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             i = index.row()
             j = index.column()
             self.datatable.iloc[i, j] = value
+            # this emission causes real time edits to appear on previewPDF window
             self.dataChanged.emit(index, index, (QtCore.Qt.DisplayRole, ))
             return True
         return False
@@ -187,19 +208,16 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         # is triggered by the action_Open.
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open CSV",
                                                             QtCore.QDir.homePath(), "CSV (*.csv)")
-        from numpy import nan
         if fileName:  # if a csv was selected, start loading the data.
             df = pd.read_csv(fileName, encoding = 'utf-8',keep_default_na=False, dtype=str)
             df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1) # drop any "unnamed" cols
             if ~df.columns.isin(['site#']).any():  # if the site# does not exist:
                 df = self.inferSiteSpecimenNumbers(df)  # attempt to infer them
             df = self.sortDF(df)
-            #df['specimen#'].fillna('#', inplace = True)
             df.fillna('') # make any nans into empty strings.
             self.update(df)  # this function actually updates the visible dataframe 
             self.parent.populateTreeWidget()
-            self.parent.updateFormView()
-            
+            self.parent.form_view.fillFormFields()
             return True
 
     def save_CSV(self, fileName = None):
@@ -214,7 +232,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             df.fillna('') # make any nans into empty strings.
             df.to_csv(fileName, encoding = 'utf-8', index = False)
             return True
-        
+
     def sortDF(self, df):
         """ accepts a dataframe and returns it sorted in an ideal manner. 
         Expects the dataframe to have site# and specimen# columns """
@@ -223,7 +241,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df['sortSite'] = df['site#'].str.replace('','0').astype(int)
         df.sort_values(by=['sortSite', 'sortSpecimen'], inplace=True, ascending=True)
         df.drop(columns = ['sortSite', 'sortSpecimen'], inplace = True)
-        df.reset_index(inplace = True)
+        df.reset_index(drop = True, inplace = True)
         return df
 
     def inferSiteSpecimenNumbers(self, df):
@@ -263,7 +281,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if skipDialog:
             ret = QMessageBox.Yes
         else:    
-            ret = qm.question(self.parent(),'', 'Load a blank data set? (any unsaved progress will be lost)', qm.Yes | qm.No)
+            ret = qm.question(self.parent,'', 'Load a blank data set? (any unsaved progress will be lost)', qm.Yes | qm.No)
         if ret == qm.Yes:
             newDFDict = {
             'site#':['0','1'],
@@ -320,6 +338,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             df.fillna('') # make any nans into empty strings.
             self.update(df)  # this function actually updates the visible dataframe
             self.parent.populateTreeWidget()
-            self.parent.updateFormView()
+            self.parent.form_view.fillFormFields()
         return
 
