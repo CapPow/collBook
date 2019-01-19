@@ -10,10 +10,6 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QDate
 from PyQt5.QtCore import Qt
 
-# TODO Split up the table tree selection redraw functions from the df update functions
-# to prevent ongoing df saves from resetting the user's view (and generally being resource wasteful
-# Also, finish linking entry box types to their respective functions
-
 class formView(QtWidgets.QTabWidget):
 
     def __init__(self, parent = None):
@@ -52,7 +48,7 @@ class formView(QtWidgets.QTabWidget):
                 'catalogNumber': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_catalogNumber),
                 'otherCatalogNumbers': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_otherCatalogNumbers),
                 'scientificName': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_sciName),  # breaks naming convention
-                'scientificNameAuthority':(self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_sciNameAuthority),  # breaks naming convention
+                'scientificNameAuthorship':(self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_sciNameAuthority),  # breaks naming convention
                 }
         self.connectFields()
         
@@ -70,7 +66,14 @@ class formView(QtWidgets.QTabWidget):
             elif isinstance(qtObject, QtWidgets.QComboBox):
                 qtObject.currentTextChanged.connect(self.save_QComboBox)
             elif isinstance(qtObject, QtWidgets.QLineEdit):
-                qtObject.textEdited.connect(self.save_QLineEdit)
+                qtObject.textChanged.connect(self.save_QLineEdit)
+            elif isinstance(qtObject, QtWidgets.QCheckBox):
+                qtObject.toggled.connect(self.save_establishmentMeans) #  Note, if any other checkboxes are added this will be problematic
+            elif isinstance(qtObject, QtWidgets.QSpinBox):
+                qtObject.valueChanged.connect(self.save_QSpinBox)
+            elif isinstance(qtObject, QtWidgets.QPlainTextEdit):
+                qtObject.textChanged.connect(self.save_QPlainTextEdit)
+            
     
     def fillFormFields(self, rowData):
         """ Used to populate the form_View fields. Reads each key in
@@ -108,7 +111,7 @@ class formView(QtWidgets.QTabWidget):
         sender = self.sender()#.objectName()
         colName = sender.colName
         value = obj.toString("yyyy-MM-dd")
-        print(value)
+        self.saveChanges(colName, value)
 
     def read_QComboBox(self, obj, value):
         valuePosition = obj.findText(value)
@@ -120,7 +123,7 @@ class formView(QtWidgets.QTabWidget):
         sender = self.sender()
         colName = sender.colName
         value = obj.strip()
-        print(value)
+        self.saveChanges(colName, value)
 
     def read_QSpinBox(self, obj, value):
         try:
@@ -130,7 +133,10 @@ class formView(QtWidgets.QTabWidget):
             obj.clear()
 
     def save_QSpinBox(self, obj):
-        print(obj.value())
+        sender = self.sender()
+        colName = sender.colName
+        value = str(obj)
+        self.saveChanges(colName, value)
 
     def read_establishmentMeans(self, obj, value):
         """ establishmentMeans is forced into a binary condition
@@ -141,17 +147,20 @@ class formView(QtWidgets.QTabWidget):
             obj.setCheckState(Qt.Unchecked)
 
     def save_establishmentMeans(self, obj):
-        print(obj.isChecked())
-        if obj.isChecked():
+        sender = self.sender()
+        colName = sender.colName
+        if obj in ['cultivated', True, 1]:
             value = "cultivated"
-            print(value)
-            # set Value here
+            self.saveChanges(colName, value)
 
     def read_QPlainTextEdit(self, obj, value):
         obj.setPlainText(value)
 
-    def save_QPlainTextEdit(self, obj):
-        print(obj.toPlainText())
+    def save_QPlainTextEdit(self):
+        sender = self.sender()
+        colName = sender.colName
+        value = sender.toPlainText()
+        self.saveChanges(colName, value)
 
 #    def fillFormFields(self, rowData):
 #        """ accepts a dictionary of rowdata and populates the appropriate

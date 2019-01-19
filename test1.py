@@ -1,41 +1,28 @@
 # found at: https://github.com/Beugeny/python_test/blob/d3e21dc075d9cef8dca323d281cbbdb4765233c6/Test1.py
 
 import sys
-import os
 from io import StringIO
 import pandas as pd
-
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator, QItemDelegate, QCompleter
-from PyQt5.QtWidgets import QAbstractItemView
-
 from reportlab.platypus.doctemplate import LayoutError
-
 from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
 from ui.locality import locality
-
 from PyQt5.QtCore import Qt, QFile
-
-#import uiFunctions
-
-# nice idea to use the maintained spyder.widgets for dataframe viewing
-#from spyder.widgets.variableexplorer.dataframeeditor import DataFrameModel
-
 import qdarkstyle
 from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
 from ui.taxonomy import taxonomicVerification
 from ui.associatedtaxa import associatedTaxaMainWindow
-from ui.formview import formView
-        
 
 class editorDelegate(QItemDelegate):
     """solution to the table_view editor clearing pre-existing cell values
     ref: https://stackoverflow.com/questions/39387842/not-displaying-old-value-when-editing-cell-in-a-qtablewidget"""
-    def setEditorData(self,editor,index):
+    def setEditorData(self, editor, index):
         editor.setAutoFillBackground(True)
         editor.setText(str(index.data()))
+
 
 class MyWindow(QMainWindow):
     def __init__(self):
@@ -43,69 +30,46 @@ class MyWindow(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        w = Ui_MainWindow()
-        w.setupUi(self)
+        self.w = Ui_MainWindow()
+        self.w.setupUi(self)
+        self.m = PandasTableModel(self)
         
-        m = PandasTableModel()
-        #default empty
-        #m.update(pd.DataFrame())
-        #default blank sheet
-        m.new_Records(True)
-        # apply the custom model class to the existing QTableView object
-        w.table_view.setModel(m)
-        delegate = editorDelegate
-        w.table_view.setItemDelegate(delegate(w.table_view)) # use flipped proxy delegate
-        # generate an instance of the settingsWindow 
-        settings = settingsWindow(self)
-        self.settings = settings
-       # generate an instance of the associatedTaxaWindow
-        associatedTaxaWindow = associatedTaxaMainWindow(self)
-        self.associatedTaxaWindow = associatedTaxaWindow
-        
-        lineEdit_sciName = w.lineEdit_sciName
-        self.lineEdit_sciName = lineEdit_sciName
-        self.updateAutoComplete()
-        
-        #form_view_tabWidget = w.form_view_tabWidget.init_ui(w)
-        #form_view_tabWidget.init_ui(w)
-        #w.form_view_tabWidget.init_ui()
-        self.form_view = w.formView #make self.form_view_tabWidget accessible
-        self.form_view.init_ui(self, w)
-        
+        self.tree_widget = self.w.tree_widget
+        # generate an instance of the settingsWindow
+        self.settings = settingsWindow(self)
+        # generate an instance of the associatedTaxaWindow
+        self.associatedTaxaWindow = associatedTaxaMainWindow(self)
+        self.lineEdit_sciName = self.w.lineEdit_sciName
+        self.form_view = self.w.formView
+        self.table_view = self.w.table_view
+        self.table_view.setItemDelegate(editorDelegate(self.table_view)) # use flipped proxy delegate
+        self.form_view.init_ui(self, self.w)
         # generate an instance of the taxonomic verifier
         self.tax = taxonomicVerification(self.settings)
-        # Linking functions to buttons in the UI
-        w.action_Open.triggered.connect(m.open_CSV)
-        w.action_Save_As.triggered.connect(m.save_CSV)
-        w.action_New_Records.triggered.connect(m.new_Records)
-        w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))     
-        w.action_Settings.triggered.connect(self.toggleSettings)  
-        w.button_associatedTaxa.clicked.connect(self.toggleAssociated)
-        w.action_Reverse_Geolocate.triggered.connect(self.geoRef)
-        w.action_Verify_Taxonomy.triggered.connect(self.verifyTaxButton)
-        w.action_Export_Labels.triggered.connect(self.exportLabels)
-        
-        
-        m.dataChanged.connect(self.populateTreeWidget)
-        
-        p = LabelPDF(self.settings)
-        #todo clean up the self definitions        
-        self.w = w  # make the mainWindow accessible
-        self.p = p  # make the label Maker accessible
-        self.m = m  # make the PandasTableModel accessible
-        self.pdf_preview = w.pdf_preview  # make the pdfViewer accessible
-        self.table_view = w.table_view # make the table_view accessible
-        self.tree_widget = w.tree_widget# make the tree_widget accessible
-        self.populateTreeWidget()
-        
+        self.m.new_Records(True)
+        self.table_view.setModel(self.m)
+        self.p = LabelPDF(self.settings)
+        self.pdf_preview = self.w.pdf_preview
         self.locality = locality(self)
+        self.w.action_Open.triggered.connect(self.m.open_CSV)
+        self.w.action_Save_As.triggered.connect(self.m.save_CSV)
+        self.w.action_New_Records.triggered.connect(self.m.new_Records)
+        self.w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))
+        self.w.action_Settings.triggered.connect(self.toggleSettings)
+        self.w.button_associatedTaxa.clicked.connect(self.toggleAssociated)
+        self.w.action_Reverse_Geolocate.triggered.connect(self.geoRef)
+        self.w.action_Verify_Taxonomy.triggered.connect(self.verifyTaxButton)
+        self.w.action_Export_Labels.triggered.connect(self.exportLabels)
+        # update the preview window as dataframe changes
+        self.m.dataChanged.connect(self.updatePreview)
+        self.updateAutoComplete()
 
     def toggleSettings(self):
         if self.settings.isHidden():
             self.settings.show()
         else:
             self.settings.hide()
-    
+
     def toggleAssociated(self):
         if self.associatedTaxaWindow.isHidden():
             self.associatedTaxaWindow.show()
@@ -162,7 +126,6 @@ class MyWindow(QMainWindow):
         """ returns a list of indicies which are visible """
         visibleRows = [x for x in range(0, self.m.rowCount()) if not self.table_view.isRowHidden(x)]
         return visibleRows
-                
 
     def updateTableView(self):
         """ updates the table_view, and form_view's current tab
@@ -207,6 +170,7 @@ class MyWindow(QMainWindow):
             self.form_view.setTabEnabled(1, False) #site data
             self.form_view.setTabEnabled(2, False) #specimen data
             self.form_view.setCurrentIndex(0) #all records
+        self.updateFormView()
 
     def selectTreeWidgetItemByIndex(self, i):
         """ helper function called when form_view's tab index is clicked Is 
@@ -225,16 +189,28 @@ class MyWindow(QMainWindow):
             iterator +=1
         #self.updateTableView()
 
-    def updatePreview(self):
-        """ updates the pdf preview window and the form_view """
-        #TODO modify this to be called from within the pdfviewer class
-        tableSelection = self.w.table_view.selectionModel().selectedRows()
-        if tableSelection:
-            index = tableSelection[0].row()
-            rowData = self.m.retrieveRowData(index)
-            rowData = self.m.dataToDict(rowData)
+    def updateFormView(self):
+        """ fills the form_view fields """
+        rowData = self.getVisibleRowData()
+        if rowData:
             self.form_view.fillFormFields(rowData)
 
+    def getVisibleRowData(self):
+        """ queries the table_view for selected rows 
+        and returns associated rowData """
+        rowsVisible = self.getVisibleRows()
+        if rowsVisible:
+            rowData = self.m.retrieveRowData(rowsVisible)
+            rowData = self.m.dataToDict(rowData)
+        else:
+            rowData = None
+        return rowData
+
+    def updatePreview(self):
+        """ updates the pdf preview window """
+        #TODO modify this to be called from within the pdfviewer class
+        rowData = self.getVisibleRowData()
+        if rowData:
             try:
                 pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
             except LayoutError:
@@ -268,7 +244,6 @@ class MyWindow(QMainWindow):
     def populateTreeWidget(self):
         """ given a list of tuples structured as(siteNum, specimenNum),
         populates the TreeWidget with the records nested within the sites."""
-
         # store the current selection
         itemSelected = self.tree_widget.currentItem()
         try:

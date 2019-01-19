@@ -8,33 +8,16 @@ Created on Sun Jan  6 10:33:55 2019
 Based on work from github user Beugeny
 https://github.com/Beugeny/python_test/blob/d3e21dc075d9cef8dca323d281cbbdb4765233c6/Test1.py
 """
-#from PyQt5 import Qt
-#from PyQt5.QtCore import QAbstractTableModel
-#from PyQt5.QtCore import QDir
-#from PyQt5.QtCore import QStringListModel
-#from PyQt5.QtCore import QVariant
-#from PyQt5.QtGui import QColor
-#from PyQt5.QtGui import QIcon
-#from PyQt5.QtWidgets import QFileSystemModel
-
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox
 
-#from ui.locality import genLocalityNoAPI, genLocality
 import pandas as pd
-
-# NOTE see set_data function for the method to notify the table of changes
-# to the data
-# ie: self.dataChanged.emit(index, index, (QtCore.Qt.DisplayRole, ))
-
-# NOTE for code snippits see:
-# https://github.com/SanPen/GridCal/blob/master/UnderDevelopment/GridCal/Gui/GuiFunctions.py
 
 class PandasTableModel(QtCore.QAbstractTableModel):
     def __init__(self, parent=None, editable = True, *args):
         super(PandasTableModel, self).__init__(parent)
-        
+        self.parent = parent        
         self.datatable = None  # what the user is seeing & interacting with
         
         # custom undo implimentation, essentially storing copies of dataframes 
@@ -204,15 +187,19 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         # is triggered by the action_Open.
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open CSV",
                                                             QtCore.QDir.homePath(), "CSV (*.csv)")
+        from numpy import nan
         if fileName:  # if a csv was selected, start loading the data.
             df = pd.read_csv(fileName, encoding = 'utf-8',keep_default_na=False, dtype=str)
             df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1) # drop any "unnamed" cols
             if ~df.columns.isin(['site#']).any():  # if the site# does not exist:
                 df = self.inferSiteSpecimenNumbers(df)  # attempt to infer them
-            sort_col_Names = ['site#', 'specimen#']
+            df = self.sortDF(df)
+            #df['specimen#'].fillna('#', inplace = True)
             df.fillna('') # make any nans into empty strings.
-            df.sort_values(by=sort_col_Names, inplace=True, ascending=True)
-            self.update(df)  # this function actually updates the visible dataframe
+            self.update(df)  # this function actually updates the visible dataframe 
+            self.parent.populateTreeWidget()
+            self.parent.updateFormView()
+            
             return True
 
     def save_CSV(self, fileName = None):
@@ -220,7 +207,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df = self.datatable
         fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save CSV",
                                                             QtCore.QDir.homePath(), "CSV (*.csv)")
-       
         if fileName:  # if a csv was selected, start loading the data.
             drop_col_Names = ['site#', 'specimen#']
             keep_col_Names = [x for x in df.columns if x not in drop_col_Names]
@@ -229,9 +215,19 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             df.to_csv(fileName, encoding = 'utf-8', index = False)
             return True
         
+    def sortDF(self, df):
+        """ accepts a dataframe and returns it sorted in an ideal manner. 
+        Expects the dataframe to have site# and specimen# columns """
+
+        df['sortSpecimen'] = df['specimen#'].str.replace('#','0').astype(int)
+        df['sortSite'] = df['site#'].str.replace('','0').astype(int)
+        df.sort_values(by=['sortSite', 'sortSpecimen'], inplace=True, ascending=True)
+        df.drop(columns = ['sortSite', 'sortSpecimen'], inplace = True)
+        df.reset_index(inplace = True)
+        return df
+
     def inferSiteSpecimenNumbers(self, df):
         """ attempts to infer a site# and specimen# of an incoming df """
-
         def specimenNumExtract(catNum):
             try:
                 result = catNum.split('-')[1]
@@ -323,5 +319,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             df['-'] = '-' # add in the little "-" seperator.
             df.fillna('') # make any nans into empty strings.
             self.update(df)  # this function actually updates the visible dataframe
+            self.parent.populateTreeWidget()
+            self.parent.updateFormView()
         return
 

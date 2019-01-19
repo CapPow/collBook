@@ -33,21 +33,21 @@ class settingsWindow(QMainWindow):
            
     def init_ui(self, parent):
         self.parent = parent # this is the master window
-        w = Ui_settingsWindow()
-        w.setupUi(self)
-        self.w = w
+        settingsWindow = Ui_settingsWindow()
+        settingsWindow.setupUi(self)
+        self.settingsWindow = settingsWindow
         self.settings = QSettings()        
         # TODO fix the settings file being saved to " test1.py.conf " and ignoring the organization and application inputs
         #QApplication.setOrganizationName('Powell')
         QCoreApplication.setOrganizationName("pdProject");
         #QApplication.setOrganizationDomain()
         QApplication.setApplicationName('pdDesk')
-        w.value_CollectionName.setPlainText(self.get('value_CollectionName'))
+        self.settingsWindow.value_CollectionName.setPlainText(self.get('value_CollectionName'))
         #QApplication.setApplicationVersion()
         self.settings.setFallbacksEnabled(False)    # File only, no fallback to registry or or.
         self.populateSettings()
-        w.button_SaveExit.clicked.connect(self.saveButtonClicked)
-        w.button_Cancel.clicked.connect(self.cancelButtonClicked)
+        self.settingsWindow.button_SaveExit.clicked.connect(self.saveButtonClicked)
+        self.settingsWindow.button_Cancel.clicked.connect(self.cancelButtonClicked)
 
     def saveButtonClicked(self):
         """ hides the preferences window and saves the user entries """
@@ -100,7 +100,7 @@ class settingsWindow(QMainWindow):
         should be for value_TaxAlignSource (taxanomic alignment source)."""
 
         kingdom = QString
-        source = self.w.value_TaxAlignSource
+        source = self.settingsWindow.value_TaxAlignSource
         sourceValue = source.currentText()  # save initial selection
         source.clear()  # clear existing options
         # conditionally build a list of those which to add.
@@ -122,11 +122,11 @@ class settingsWindow(QMainWindow):
             b = True
         else:
             b = False    
-        self.w.groupbox_TNRS.setEnabled(b)
+        self.settingsWindow.groupbox_TNRS.setEnabled(b)
 
     def populateSettings(self):
         """ uses self.settings to populate the preferences widget's selections"""
-        parent = self.w
+        parent = self.settingsWindow
 
         #QComboBox
         value_AuthChangePolicy = self.get('value_AuthChangePolicy', 'Fill blanks')
@@ -168,7 +168,7 @@ class settingsWindow(QMainWindow):
     
     def saveSettings(self):
         """ stores the preferences widget's selections to self.settings"""
-        parent = self.w
+        parent = self.settingsWindow
         
         #QComboBox
         value_AuthChangePolicy = parent.value_AuthChangePolicy.currentText()
