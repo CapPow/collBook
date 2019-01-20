@@ -51,14 +51,73 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
     def update(self, dataIn):
         self.beginResetModel()
-#        if isinstance(self.datatable, pd.DataFrame):
-#            df = self.datatable
-#            dataIn.update(df)
         self.datatable = dataIn
         self.endResetModel()
         # let display elements know about the change (ie: qTreeWidget)
         self.dataChanged.emit(QtCore.QModelIndex(),QtCore.QModelIndex() , (QtCore.Qt.DisplayRole, ))
 
+    def addNewSite(self):
+        """ adds a new, nearly blank site record to the dataTable """
+        df = self.datatable
+        newSiteNum = max(pd.to_numeric(df['site#'], errors = 'coerce')) + 1
+        df = df.append({'otherCatalogNumbers':f'{newSiteNum}-#', 
+                   'site#':f'{newSiteNum}',
+                   'specimen#':'#'},  ignore_index=True, sort=False)
+        df.fillna('', inplace = True)
+        self.update(df)
+        self.parent.populateTreeWidget()
+        # change tree_widget's selection to the to new site.
+        self.parent.selectTreeWidgetItemByName(f'Site {newSiteNum}(0)')
+    
+    def addNewSpecimen(self):
+        """ adds a new specimen record to selected site """
+        df = self.datatable
+        selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
+        if selType == 'site':
+            try:  # try to make the new row data
+                spNums = df[(df['site#'] == siteNum) &
+                            (df['specimen#'] != '#')]['specimen#']
+                newSpNum = max(pd.to_numeric(spNums, errors='coerce')) + 1
+            except ValueError:
+                newSpNum = 1
+            newRowData = df[(df['site#'] == siteNum) &
+                            (df['specimen#'] == '#')].copy()
+            newRowData['specimen#'] = f'{newSpNum}'
+            catNum =  f'{siteNum}-{newSpNum}'
+            newRowData['otherCatalogNumbers'] = catNum
+            df = df.append(newRowData, ignore_index=True, sort=False)
+            df = self.sortDF(df)
+            df.fillna('', inplace=True)
+            self.update(df)
+            self.parent.populateTreeWidget()
+            # change tree_widget's selection to the to new specimen.
+            self.parent.selectTreeWidgetItemByName(catNum)
+
+    def duplicateSpecimen(self):
+        """ copies MOST fields from a specimen record into a new record in
+        the same site number """
+        df = self.datatable
+        selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
+        if selType == 'specimen':
+            try:  # try to make the new row data
+                spNums = df[(df['site#'] == siteNum) &
+                            (df['specimen#'] != '#')]['specimen#']
+                newSpNum = max(pd.to_numeric(spNums, errors='coerce')) + 1
+            except ValueError:
+                newSpNum = 2
+            newRowData = df[(df['site#'] == siteNum) &
+                            (df['specimen#'] == specimenNum)].copy()
+            newRowData['specimen#'] = f'{newSpNum}'
+            catNum =  f'{siteNum}-{newSpNum}'
+            newRowData['otherCatalogNumbers'] = catNum
+            df = df.append(newRowData, ignore_index=True, sort=False)
+            df = self.sortDF(df)
+            df.fillna('', inplace=True)
+            self.update(df)
+            self.parent.populateTreeWidget()
+            # change tree_widget's selection to the to new specimen.
+            self.parent.selectTreeWidgetItemByName(catNum)
+                
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.datatable.index)
 
@@ -121,37 +180,33 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
         self.processViewableRecords(rowsToProcess, self.parent.tax.verifyTaxonomy)
 
-    def exportLabels(self):
-        """ bundles records up and passes them to printlabels.genPrintLabelPDFs() """
-        rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
-        outDF = self.datatable.iloc[rowsToProcess, ]
-        outDict = self.dataToDict(outDF)
-        self.parent.p.genPrintLabelPDFs(outDict)
-
     def processViewableRecords(self, rowsToProcess, func):
         """ applies a function over each row among rowsToProcess (by index)"""
+        #self.parent.statusBar.label_status
+        xButton = self.parent.statusBar.pushButton_Cancel
+        xButton.setEnabled(True)
         df = self.datatable.loc[rowsToProcess]
         totRows = len(df)
-        self.progressBar = QtWidgets.QProgressBar()
-        self.progressBar.setMinimum(0)
-        self.progressBar.setMaximum(totRows)
-        self.parent.statusBar().addWidget(self.progressBar)
-        self.progressBar.show()
+        pb = self.parent.statusBar.progressBar
+        pb.setMinimum(0)
+        pb.setMaximum(totRows)
         for c,i in enumerate(rowsToProcess):
+            QApplication.processEvents()
+            if xButton.status:  # check for cancel button
+                break
             rowData = df.loc[[i]]
             rowData.apply(func,1)
-            #df.update(processedRowData)
-            self.progressBar.setValue(c + 1)
-            msg = (f'{c + 1} of {totRows}')
-            #self.parent.statusBar().showMessage(msg)
-            #self.update(df)
+            pb.setValue(c + 1)
+            #msg = (f'{c + 1} of {totRows}')
             df.update(rowData)
             self.datatable.update(df)
             self.update(self.datatable)
             self.parent.updateTableView()
-            QApplication.processEvents()
-        self.parent.statusBar().removeWidget(self.progressBar)
+        #self.parent.statusBar().removeWidget(self.progressBar)
+        xButton.setEnabled(False)
+        xButton.status = False
         self.parent.form_view.fillFormFields()
+        pb.setValue(0)
 
 
     def getRowsToProcess(self, selType, siteNum = None, specimenNum = None):

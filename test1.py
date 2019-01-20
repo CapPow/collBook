@@ -1,5 +1,3 @@
-# found at: https://github.com/Beugeny/python_test/blob/d3e21dc075d9cef8dca323d281cbbdb4765233c6/Test1.py
-
 import sys
 from io import StringIO
 import pandas as pd
@@ -9,12 +7,14 @@ from reportlab.platypus.doctemplate import LayoutError
 from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
 from ui.locality import locality
-from PyQt5.QtCore import Qt, QFile
+from PyQt5.QtCore import QFile
 import qdarkstyle
 from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
 from ui.taxonomy import taxonomicVerification
 from ui.associatedtaxa import associatedTaxaMainWindow
+
+from ui.progressbar import progressBar
 
 class editorDelegate(QItemDelegate):
     """solution to the table_view editor clearing pre-existing cell values
@@ -32,6 +32,10 @@ class MyWindow(QMainWindow):
     def init_ui(self):
         self.w = Ui_MainWindow()
         self.w.setupUi(self)
+        self.status_bar = self.statusBar()
+        self.statusBar = progressBar(self.status_bar)
+        self.statusBar.initProgressBar(self.status_bar)
+        self.progress_bar = self.statusBar.progressBar
         self.m = PandasTableModel(self)
         self.tree_widget = self.w.tree_widget
         self.settings = settingsWindow(self)  # settingsWindow
@@ -44,6 +48,7 @@ class MyWindow(QMainWindow):
         self.tax = taxonomicVerification(self.settings)  # taxonomic verifier
         self.p = LabelPDF(self.settings)
         self.pdf_preview = self.w.pdf_preview
+        self.pdf_preview.initViewer(self)
         self.m.new_Records(True)
         self.table_view.setModel(self.m)
         self.locality = locality(self)
@@ -55,14 +60,16 @@ class MyWindow(QMainWindow):
         self.w.button_associatedTaxa.clicked.connect(self.toggleAssociated)
         self.w.action_Reverse_Geolocate.triggered.connect(self.m.geoRef)
         self.w.action_Verify_Taxonomy.triggered.connect(self.m.verifyTaxButton)
-        self.w.action_Export_Labels.triggered.connect(self.m.exportLabels)
+        self.w.action_Export_Labels.triggered.connect(self.exportLabels)
+        self.w.pushButton_newSite.clicked.connect(self.m.addNewSite)
+        self.w.pushButton_newSpecimen.clicked.connect(self.m.addNewSpecimen)
+        self.w.pushButton_duplicateSpecimen.clicked.connect(self.m.duplicateSpecimen)
+
         self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
         # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()
         
-        self.statusBar().showMessage('Message in statusbar.')
-
     def toggleSettings(self):
         if self.settings.isHidden():
             self.settings.show()
@@ -102,18 +109,15 @@ class MyWindow(QMainWindow):
         """ updates the table_view, and form_view's current tab
         called after tree_widget's selection change """
         # TODO rename this, as it does more than upates tableview. Basically alters scope of user's view
-        # first reset the view
-        rowNums = range(self.m.rowCount())
-        for row in rowNums:
-            self.table_view.showRow(row)
-        # then get the tree's selection type
         selType, siteNum, specimenNum = self.getTreeSelectionType()
         rowsToHide = self.m.getRowsToHide(selType, siteNum, specimenNum)
-        for row in rowsToHide:
-            self.table_view.hideRow(row)
-        #specimenColumnIndex = self.m.columnIndex('specimen#')
-        #TODO fix this sort, currently uses alphanumeric (ie: 100, 2, 30). Should be numeric Ascending
-        #self.table_view.sortByColumn(specimenColumnIndex, Qt.AscendingOrder)
+        rowNums = range(self.m.rowCount())
+        for row in rowNums:
+            if row not in rowsToHide:
+                self.table_view.showRow(row)
+            else:
+                self.table_view.hideRow(row)
+
         if selType != 'allRec':
             topVisible = [x for x in rowNums if x not in rowsToHide]
             try:
@@ -125,11 +129,13 @@ class MyWindow(QMainWindow):
         self.updatePreview()
 
         if selType == 'site':
+            self.statusBar.label_status.setText("  Site View  ")
             #self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
             self.form_view.setTabEnabled(1, True) #enable site data
             self.form_view.setTabEnabled(2, False) #disable specimen data
             self.form_view.setCurrentIndex(1) #swap to site tab
         elif selType == 'specimen':
+            self.statusBar.label_status.setText("Specimen View")
             #self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
             self.form_view.setTabEnabled(1, True) #enable site data
             if not self.form_view.isTabEnabled(2): # if specimen tab is not enabled
@@ -137,6 +143,7 @@ class MyWindow(QMainWindow):
                 self.form_view.setCurrentIndex(2) #swap to specimen tab
             #if self.w.form_view_tabWidget.currentIndex() == 0:
         else: #  all records
+            self.statusBar.label_status.setText(" All Records  ")
             self.form_view.setTabEnabled(0, True) #all records
             self.form_view.setTabEnabled(1, False) #site data
             self.form_view.setTabEnabled(2, False) #specimen data
@@ -152,13 +159,14 @@ class MyWindow(QMainWindow):
 
     def selectTreeWidgetItemByName(self, name):
         iterator = QTreeWidgetItemIterator(self.tree_widget, QTreeWidgetItemIterator.All)
+        if name[:5] == 'Site ':  # handle changing record counts at set site#s
+            name = name.split('(')[0].strip()
         while iterator.value():
             item = iterator.value()
-            if item.text(0) == name:
+            if name in item.text(0):
                 self.tree_widget.setCurrentItem(item,1)
                 break
             iterator +=1
-        #self.updateTableView()
 
     def timeitTest(self):
         """ debugging / improving space for testing various functions or their timings """
@@ -195,6 +203,23 @@ class MyWindow(QMainWindow):
         else:
             rowData = None
         return rowData
+
+
+    def exportLabels(self):
+        """ bundles records up and passes them to printlabels.genPrintLabelPDFs() """
+        try:
+            rowsToProcess = self.m.getRowsToProcess(*self.getTreeSelectionType())
+            outDF = self.m.datatable.iloc[rowsToProcess, ]
+            outDict = self.m.dataToDict(outDF)
+            self.p.genPrintLabelPDFs(outDict)
+        except LayoutError:
+            from PyQt5.QtWidgets import QMessageBox
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("""The content of one or more of your labels is too large for the label dimentions. Alter your settings, and try again.""")
+            msg.setWindowTitle('Label Export Error')
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
 
     def updatePreview(self):
         """ updates the pdf preview window """

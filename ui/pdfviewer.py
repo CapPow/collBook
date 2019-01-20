@@ -20,11 +20,8 @@ import traceback
 
 from PyQt5.QtWidgets import QWidget, QApplication, QShortcut, \
      QLabel, QScrollArea, QSizePolicy, QVBoxLayout
-from PyQt5.QtGui import QPainter, QColor, QFont, QPixmap, QImage
-from PyQt5.QtCore import Qt, QPoint, QSize, QByteArray
-from PyQt5.QtNetwork import QNetworkAccessManager, \
-     QNetworkReply, QNetworkRequest
-
+from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtCore import Qt, QSize
 from popplerqt5 import Poppler
 import Resources_rc
 
@@ -33,7 +30,7 @@ import Resources_rc
 # If you want to use a DPI other than 72, you have to convert.
 POINTS_PER_INCH = 72
 
-""" the QLabel object from qt Designer UI files 
+""" the QLabel object from qt Designer UI files
 which to link this class to is called: pdf_preview """
 
 
@@ -48,26 +45,38 @@ class PDFViewer(QLabel):
     '''
 
     def __init__(self, parent, pdfData= None, 
-                 document=None, pageno=1, dpi=150,load_cb=None):
+                 document=None, pageno=1, dpi=110,load_cb=None):
         '''
            load_cb: will be called when the document is loaded.
         '''
         #dpi - 72
         super(PDFViewer, self).__init__(parent)        
+               
         self.filename = pdfData
         self.load_cb = load_cb
-        self.network_manager = None
         self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        
-        
         if not document:
             self.document = None
             self.load_preview(pdfData)
         else:
             self.document = document
+        
         self.page = None
-        self.pagesize = QSize(100, 200)
         self.dpi = dpi
+        # 25.4mm per inch. 
+        # ((n)mm / 25.5) * 
+    def initViewer(self, parent):
+        #print(parent.objectName())
+        self.parent = parent
+        self.settings = self.parent.settings
+        value_X = int(self.settings.get('value_X', 140))
+        value_Y = int(self.settings.get('value_Y', 90))
+        
+        self.dpi = (value_X * value_Y) / 24.5
+        
+        sizeToPass = min(value_X, value_Y)
+        self.pagesize = QSize(sizeToPass, sizeToPass)
+
 
     def sizeHint(self):
         if not self.page:
@@ -91,6 +100,7 @@ class PDFViewer(QLabel):
             self.document = Poppler.Document.loadFromData(pdfBytes) #  Try loading from bytes
             pdfPage = self.document.page(0)
             img = pdfPage.renderToImage() #  See if it needs rendered to an image
+            img = img.scaled(400, 400, Qt.KeepAspectRatio)
         except (AttributeError, TypeError):
             img = QImage(':/rc_/label_Preview.png')
             img = img.scaled(400, 400, Qt.KeepAspectRatio)
@@ -196,8 +206,6 @@ class PDFScrolledWidget(QScrollArea):   # inherit from QScrollArea?
 
         self.resize(width, height)
 
-    # def showEvent(self, event):
-
     def resizeEvent(self, event):
         '''On resizes after the initial resize,
            re-render the PDF to fit the new width.
@@ -225,35 +233,34 @@ class PDFScrolledWidget(QScrollArea):   # inherit from QScrollArea?
         self.zoom(frac)
 
 
-if __name__ == '__main__':
-    #
-    # PyQt is super crashy. Any little error, like an extra argument in a slot,
-    # causes it to kill Python with a core dump.
-    # Setting sys.excepthook works around this , and execution continues.
-    #
-    def excepthook(excType=None, excValue=None, tracebackobj=None, *,
-                   message=None, version_tag=None, parent=None):
-        # print("exception! excValue='%s'" % excValue)
-        # logging.critical(''.join(traceback.format_tb(tracebackobj)))
-        # logging.critical('{0}: {1}'.format(excType, excValue))
-        traceback.print_exception(excType, excValue, tracebackobj)
-
-    sys.excepthook = excepthook
-
-    app = QApplication(sys.argv)
-
-    # It's helpful to know screen size, to choose appropriate DPI.
-    # XXX It's currently ignored but will eventually be used.
-    desktops = QApplication.desktop()
-    geometry = desktops.screenGeometry(desktops.screenNumber())
-    # print("screen geometry is", geometry.width(), geometry.height())
-
-    w = PDFScrolledWidget(sys.argv[1])
-    # w = PDFViewer(sys.argv[1])
-
-    QShortcut("Ctrl+Q", w, activated=w.close)
-
-    w.show()
-
-    sys.exit(app.exec_())
-
+#if __name__ == '__main__':
+#    #
+#    # PyQt is super crashy. Any little error, like an extra argument in a slot,
+#    # causes it to kill Python with a core dump.
+#    # Setting sys.excepthook works around this , and execution continues.
+#    #
+#    def excepthook(excType=None, excValue=None, tracebackobj=None, *,
+#                   message=None, version_tag=None, parent=None):
+#        # print("exception! excValue='%s'" % excValue)
+#        # logging.critical(''.join(traceback.format_tb(tracebackobj)))
+#        # logging.critical('{0}: {1}'.format(excType, excValue))
+#        traceback.print_exception(excType, excValue, tracebackobj)
+#
+#    sys.excepthook = excepthook
+#
+#    app = QApplication(sys.argv)
+#
+#    # It's helpful to know screen size, to choose appropriate DPI.
+#    # It's currently ignored but will eventually be used.
+#    desktops = QApplication.desktop()
+#    geometry = desktops.screenGeometry(desktops.screenNumber())
+#    # print("screen geometry is", geometry.width(), geometry.height())
+#
+#    w = PDFScrolledWidget(sys.argv[1])
+#    # w = PDFViewer(sys.argv[1])
+#
+#    QShortcut("Ctrl+Q", w, activated=w.close)
+#
+#    w.show()
+#
+#    sys.exit(app.exec_())

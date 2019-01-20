@@ -161,7 +161,7 @@
             <item row="0" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
-               <widget class="QPushButton" name="pushButton_5">
+               <widget class="QPushButton" name="pushButton_newSite">
                 <property name="text">
                  <string>Add new site</string>
                 </property>
@@ -198,7 +198,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_12">
               <item>
-               <widget class="QPushButton" name="pushButton_4">
+               <widget class="QPushButton" name="pushButton_newSpecimen">
                 <property name="text">
                  <string>Add specimen</string>
                 </property>
@@ -225,7 +225,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_2">
+               <widget class="QPushButton" name="pushButton_deleteSite">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -517,7 +517,7 @@
                      <item>
                       <widget class="QLineEdit" name="lineEdit_habitat"/>
                      </item>
-                     <item>
+                     <item alignment="Qt::AlignRight">
                       <widget class="QLabel" name="label_locationNotes">
                        <property name="text">
                         <string>Location Notes</string>
@@ -696,7 +696,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_10">
               <item>
-               <widget class="QPushButton" name="pushButton_3">
+               <widget class="QPushButton" name="pushButton_duplicateSpecimen">
                 <property name="text">
                  <string>Duplicate record</string>
                 </property>
@@ -723,7 +723,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="pushButton_deleteRecord">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -776,7 +776,7 @@
                   </property>
                  </widget>
                 </item>
-                <item>
+                <item alignment="Qt::AlignRight">
                  <widget class="QLabel" name="label_sciNameAuthority">
                   <property name="text">
                    <string>Authority</string>
@@ -807,7 +807,7 @@
                 <item>
                  <widget class="QLineEdit" name="lineEdit_occurrenceRemarks"/>
                 </item>
-                <item>
+                <item alignment="Qt::AlignRight">
                  <widget class="QLabel" name="label_substrate">
                   <property name="text">
                    <string>Substrate</string>
@@ -959,7 +959,7 @@
                   </property>
                  </widget>
                 </item>
-                <item>
+                <item alignment="Qt::AlignRight">
                  <widget class="QLabel" name="label_catalogNumber">
                   <property name="text">
                    <string>Catalog Number</string>
@@ -1300,7 +1300,7 @@
   <connection>
    <sender>checkBox</sender>
    <signal>toggled(bool)</signal>
-   <receiver>pushButton</receiver>
+   <receiver>pushButton_deleteRecord</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1316,7 +1316,7 @@
   <connection>
    <sender>checkBox_2</sender>
    <signal>toggled(bool)</signal>
-   <receiver>pushButton_2</receiver>
+   <receiver>pushButton_deleteSite</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

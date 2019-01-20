@@ -26,7 +26,7 @@ class locality():
 
     def userNotice(self, text):
         msg = QMessageBox()
-        msg.setIcon(MessageBox.Warning)
+        msg.setIcon(QMessageBox.Warning)
         msg.setText(text)
         #msg.setInformativeText("This is additional information")
         msg.setWindowTitle('GeoLocation')
