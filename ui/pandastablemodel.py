@@ -11,6 +11,7 @@ https://github.com/Beugeny/python_test/blob/d3e21dc075d9cef8dca323d281cbbdb47652
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QApplication
 
 import pandas as pd
 
@@ -50,6 +51,9 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
     def update(self, dataIn):
         self.beginResetModel()
+#        if isinstance(self.datatable, pd.DataFrame):
+#            df = self.datatable
+#            dataIn.update(df)
         self.datatable = dataIn
         self.endResetModel()
         # let display elements know about the change (ie: qTreeWidget)
@@ -70,7 +74,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def retrieveRowData(self, i):
         """ given a row index number returns the data as a series """
         df = self.datatable
-        return df.iloc[i]
+        return df.loc[i]
 
     def getSelectedLabelDict(self, df):
         """Returns a list of dictionaries from given df
@@ -126,11 +130,27 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
     def processViewableRecords(self, rowsToProcess, func):
         """ applies a function over each row among rowsToProcess (by index)"""
-        df = self.datatable.iloc[rowsToProcess, ]
-        df.apply(func, 1)
-        self.datatable.update(df)
-        self.update(self.datatable)
-        self.parent.updateTableView()
+        df = self.datatable.loc[rowsToProcess]
+        totRows = len(df)
+        self.progressBar = QtWidgets.QProgressBar()
+        self.progressBar.setMinimum(0)
+        self.progressBar.setMaximum(totRows)
+        self.parent.statusBar().addWidget(self.progressBar)
+        self.progressBar.show()
+        for c,i in enumerate(rowsToProcess):
+            rowData = df.loc[[i]]
+            rowData.apply(func,1)
+            #df.update(processedRowData)
+            self.progressBar.setValue(c + 1)
+            msg = (f'{c + 1} of {totRows}')
+            #self.parent.statusBar().showMessage(msg)
+            #self.update(df)
+            df.update(rowData)
+            self.datatable.update(df)
+            self.update(self.datatable)
+            self.parent.updateTableView()
+            QApplication.processEvents()
+        self.parent.statusBar().removeWidget(self.progressBar)
         self.parent.form_view.fillFormFields()
 
 

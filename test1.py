@@ -60,6 +60,8 @@ class MyWindow(QMainWindow):
         # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()
+        
+        self.statusBar().showMessage('Message in statusbar.')
 
     def toggleSettings(self):
         if self.settings.isHidden():

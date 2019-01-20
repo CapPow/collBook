@@ -258,7 +258,7 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>560</width>
+                 <width>703</width>
                  <height>353</height>
                 </rect>
                </property>
@@ -1074,7 +1074,6 @@
    </widget>
    <addaction name="menu_File"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="left_toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
@@ -1120,6 +1119,7 @@
    <addaction name="action_Exit"/>
    <addaction name="actionTestFunction"/>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open">
    <property name="icon">
     <iconset resource="resources/Resources.qrc">
