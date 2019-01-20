@@ -227,6 +227,10 @@ class MyWindow(QMainWindow):
         rowData = self.getVisibleRowData()
         selType, siteNum, specimenNum = self.getTreeSelectionType()
         if (isinstance(rowData, list)) & (selType != 'allRec'):
+            if (selType == 'site') & (len(rowData) > 1):
+                rowData = [rowData[1]]  # only want first row, but other functions expect a list
+            else:
+                rowData = [rowData[0]]
             try:
                 pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
             except LayoutError:
