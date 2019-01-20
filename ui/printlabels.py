@@ -180,7 +180,7 @@ class LabelPDF():
                     
     
             row1 = Table([
-                [Para('samplingEffort','samplingEffortSTY')],
+                [Para('labelProject','labelProjectSTY')],
                 [verifiedByPara('verifiedBy','verifiedBySTY')]],
                          colWidths = self.xPaperSize *.98, rowHeights = None,
                          style = [
@@ -482,8 +482,8 @@ class LabelPDF():
             fontSize= self.relFont,
             alignment=TA_CENTER,
         )
-        styles['samplingEffortSTY'] = ParagraphStyle(
-            'samplingEffortSTY',
+        styles['labelProjectSTY'] = ParagraphStyle(
+            'labelProjectSTY',
             parent=styles['title'],
             fontName='Times-Bold',
             fontSize= self.relFont * 1.18,

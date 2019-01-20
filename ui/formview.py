@@ -10,8 +10,11 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QDate
 from PyQt5.QtCore import Qt
 
-class formView(QtWidgets.QTabWidget):
-
+class formView(QtWidgets.QStackedWidget):
+#class formView(QtWidgets.QTabWidget):
+# changing to stackedWidget removes the ability to edit site level data on a per specimen basis
+# solves user interaction confusion issues at the cost of optional deeper refinements
+    
     def __init__(self, parent = None):
         super(formView, self).__init__(parent)
         
@@ -21,10 +24,16 @@ class formView(QtWidgets.QTabWidget):
         # Without workaround, cannot simultaniously address designer objects form UI file
         # and instance relationships, such as functons I've defined in parent file
         self.parent = parentClass
+        self.parentClass = parentClass
 
     # set up a map for the fields and objects
     # structured as { columnName : ( read Function, save_Function, object )}
         self.formFields = {
+                
+                'labelProject': (self.read_QPlainTextEdit, self.save_selectSites_QPlainTextEdit, self.parent.plainTextEdit_labelProject),
+                'fieldNotes': (self.read_QPlainTextEdit, self.save_selectSites_QPlainTextEdit, self.parent.plainTextEdit_fieldNotes),
+                'eventRemarks':(self.read_QLineEdit, self.save_selectSites_QLineEdit, self.parent.lineEdit_eventRemarks),
+                'samplingEffort':(self.read_QLineEdit, self.save_selectSites_QLineEdit, self.parent.lineEdit_samplingEffort),                
                 'eventDate': (self.read_QDateEdit, self.save_QDateEdit, self.parent.dateEdit_eventDate),
                 'reproductiveCondition': (self.read_QComboBox, self.save_QComboBox, self.parent.comboBox_reproductiveCondition),
                 'individualCount': (self.read_QSpinBox, self.save_QSpinBox,  self.parent.spinBox_individualCount),
@@ -51,7 +60,6 @@ class formView(QtWidgets.QTabWidget):
                 'scientificNameAuthorship':(self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_sciNameAuthority),  # breaks naming convention
                 }
         self.connectFields()
-        
         self.parent = parentInstance
 
     def connectFields(self):
@@ -60,21 +68,19 @@ class formView(QtWidgets.QTabWidget):
         for colName, val in  self.formFields.items():
             _, saveFunc, qtObject = val  # break out the value tuple
             qtObject.colName = colName  # assign each object it's associated column name
-            
             if isinstance(qtObject, QtWidgets.QDateEdit):
-                qtObject.dateChanged.connect(self.save_QDateEdit)
+                qtObject.dateChanged.connect(saveFunc)
             elif isinstance(qtObject, QtWidgets.QComboBox):
-                qtObject.currentTextChanged.connect(self.save_QComboBox)
+                qtObject.currentTextChanged.connect(saveFunc)
             elif isinstance(qtObject, QtWidgets.QLineEdit):
-                qtObject.textChanged.connect(self.save_QLineEdit)
+                qtObject.textChanged.connect(saveFunc)
             elif isinstance(qtObject, QtWidgets.QCheckBox):
-                qtObject.toggled.connect(self.save_establishmentMeans) #  Note, if any other checkboxes are added this will be problematic
+                qtObject.toggled.connect(saveFunc) #  Note, if any other checkboxes are added this will be problematic
             elif isinstance(qtObject, QtWidgets.QSpinBox):
-                qtObject.valueChanged.connect(self.save_QSpinBox)
+                qtObject.valueChanged.connect(saveFunc)
             elif isinstance(qtObject, QtWidgets.QPlainTextEdit):
-                qtObject.textChanged.connect(self.save_QPlainTextEdit)
-            
-    
+                qtObject.textChanged.connect(saveFunc)
+
     def fillFormFields(self):
         """ Used to populate the form_View fields. Reads each key in
         formFields, retrieves the appropriate value and
@@ -89,14 +95,21 @@ class formView(QtWidgets.QTabWidget):
                 readFunc(qtObject, value)
                 qtObject.blockSignals(False)  # Resume data changed signals
 
-    def saveChanges(self, colName, value):
-        pdModel = self.parent.m  # link to the PandasTableModel
-        visibleRows = self.parent.getVisibleRows()  # get what is currently within the user's scope
-        df = pdModel.datatable.loc[visibleRows, ]
-        df[colName] = value
-        pdModel.datatable.update(df)
-        pdModel.update(pdModel.datatable)
-    
+    def saveChanges(self, colName, value, selectSites = False):
+        """ Actualy stores the changes. Called by the other save_xxx funcs."""
+        df = self.parent.m.datatable
+        if selectSites:  # if the saveFunc requested only selectedSites
+            selectedSites = self.parent.getSelectSitesToApply()
+            if len(selectedSites) > 0:  # and if there ARE sites selected
+                df.loc[df['site#'].isin(selectedSites), colName] = value
+            else:  # if requested selected sites ,and none selected. Done.
+                return None
+        else:  # if saveFunc did not request selected sites
+            visibleRows = self.parent.getVisibleRows()  # identify what is currently within the user's scope
+            df.loc[visibleRows, colName] = value  # and select it
+        #self.parent.m.datatable.update(df)
+        self.parent.m.update(df)
+
     def read_QLineEdit(self, obj, value):
         obj.setText(value)
 
@@ -105,11 +118,16 @@ class formView(QtWidgets.QTabWidget):
         colName = sender.colName
         self.saveChanges(colName, value)
 
+    def save_selectSites_QLineEdit(self, value):
+        sender = self.sender()
+        colName = sender.colName
+        self.saveChanges(colName, value, selectSites=True)
+
     def read_QDateEdit(self, obj, value):
         obj.setDate(QDate.fromString(value, "yyyy-MM-dd"))
 
     def save_QDateEdit(self, obj):
-        sender = self.sender()#.objectName()
+        sender = self.sender()
         colName = sender.colName
         value = obj.toString("yyyy-MM-dd")
         self.saveChanges(colName, value)
@@ -162,11 +180,29 @@ class formView(QtWidgets.QTabWidget):
         colName = sender.colName
         value = sender.toPlainText()
         self.saveChanges(colName, value)
+        
+    def save_selectSites_QPlainTextEdit(self):
+        sender = self.sender()
+        colName = sender.colName
+        value = sender.toPlainText()
+        self.saveChanges(colName, value, selectSites=True)
 
     def determineDataLevel(self):
         """ determines the level of data selected according to the table_view"""
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
 
+    def readDefaultNewSiteFields(self):
+        """ returns a dictionary of column names and values from the 
+        Defaults group under the All Records view."""
+        # todo figure out the issue with parent addressing in the form class
+        default_eventDate = self.parentClass.dateEdit_default_eventDate.date().toString("yyyy-MM-dd")
+        default_recordedBy = self.parentClass.lineEdit_default_recordedBy.text()
+        default_associatedCollectors = self.parentClass.lineEdit_default_associatedCollectors.text()
+        
+        defVals = {'eventDate':default_eventDate,
+                   'recordedBy':default_recordedBy,
+                   'associatedCollectors':default_associatedCollectors}
+        return defVals
 
     def siteFieldChanged(self, fieldName):
         """ saves changes to site level data """

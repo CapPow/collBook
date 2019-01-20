@@ -60,9 +60,15 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         """ adds a new, nearly blank site record to the dataTable """
         df = self.datatable
         newSiteNum = max(pd.to_numeric(df['site#'], errors = 'coerce')) + 1
-        df = df.append({'otherCatalogNumbers':f'{newSiteNum}-#', 
+        rowData = {'otherCatalogNumbers':f'{newSiteNum}-#', 
                    'site#':f'{newSiteNum}',
-                   'specimen#':'#'},  ignore_index=True, sort=False)
+                   'specimen#':'#'}
+        defVals = self.parent.form_view.readDefaultNewSiteFields()
+        rowData.update(defVals)
+        
+        df = df.append(rowData,  ignore_index=True, sort=False)
+        
+
         df.fillna('', inplace = True)
         self.update(df)
         self.parent.populateTreeWidget()
@@ -359,8 +365,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             ret = qm.question(self.parent,'', 'Load a blank data set? (any unsaved progress will be lost)', qm.Yes | qm.No)
         if ret == qm.Yes:
             newDFDict = {
-            'site#':['0','1'],
-            'specimen#':['0','1'],
+            'site#':['1','1'],
+            'specimen#':['#','1'],
             'otherCatalogNumbers':['1-#','1-1'],
             'family':['',''],
             'scientificName':['',''],

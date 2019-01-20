@@ -7,7 +7,7 @@ from reportlab.platypus.doctemplate import LayoutError
 from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
 from ui.locality import locality
-from PyQt5.QtCore import QFile
+from PyQt5.QtCore import QFile, Qt
 import qdarkstyle
 from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
@@ -37,7 +37,8 @@ class MyWindow(QMainWindow):
         self.statusBar.initProgressBar(self.status_bar)
         self.progress_bar = self.statusBar.progressBar
         self.m = PandasTableModel(self)
-        self.tree_widget = self.w.tree_widget
+        self.tree_widget = self.w.tree_widget  # The nav tree widget.
+        self.site_tree_widget = self.w.treeWidget_sitesToApply  # site selection tree widget in "all records view"
         self.settings = settingsWindow(self)  # settingsWindow
         self.associatedTaxaWindow = associatedTaxaMainWindow(self)  # associatedTaxaWindow
         self.lineEdit_sciName = self.w.lineEdit_sciName
@@ -64,8 +65,10 @@ class MyWindow(QMainWindow):
         self.w.pushButton_newSite.clicked.connect(self.m.addNewSite)
         self.w.pushButton_newSpecimen.clicked.connect(self.m.addNewSpecimen)
         self.w.pushButton_duplicateSpecimen.clicked.connect(self.m.duplicateSpecimen)
-
-        self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
+        self.w.toolButton_sitesToApply_SelectNone.clicked.connect(self.clearSitesToApply)
+        self.w.toolButton_sitesToApply_SelectAll.clicked.connect(self.selectAllSitesToApply)
+        #self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
+        self.w.actionTestFunction.triggered.connect(self.getSelectSitesToApply)
         # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()
@@ -131,22 +134,23 @@ class MyWindow(QMainWindow):
         if selType == 'site':
             self.statusBar.label_status.setText("  Site View  ")
             #self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
-            self.form_view.setTabEnabled(1, True) #enable site data
-            self.form_view.setTabEnabled(2, False) #disable specimen data
+#            self.form_view.setTabEnabled(1, True) #enable site data
+#            self.form_view.setTabEnabled(2, False) #disable specimen data
             self.form_view.setCurrentIndex(1) #swap to site tab
         elif selType == 'specimen':
             self.statusBar.label_status.setText("Specimen View")
             #self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
-            self.form_view.setTabEnabled(1, True) #enable site data
-            if not self.form_view.isTabEnabled(2): # if specimen tab is not enabled
-                self.form_view.setTabEnabled(2, True) #enable specimen tab
-                self.form_view.setCurrentIndex(2) #swap to specimen tab
+#            self.form_view.setTabEnabled(1, True) #enable site data
+#            if not self.form_view.isTabEnabled(2): # if specimen tab is not enabled
+#                self.form_view.setTabEnabled(2, True) #enable specimen tab
+                #self.form_view.setCurrentIndex(2) #swap to specimen tab
+            self.form_view.setCurrentIndex(2) #swap to specimen tab
             #if self.w.form_view_tabWidget.currentIndex() == 0:
         else: #  all records
             self.statusBar.label_status.setText(" All Records  ")
-            self.form_view.setTabEnabled(0, True) #all records
-            self.form_view.setTabEnabled(1, False) #site data
-            self.form_view.setTabEnabled(2, False) #specimen data
+#            self.form_view.setTabEnabled(0, True) #all records
+#            self.form_view.setTabEnabled(1, False) #site data
+#            self.form_view.setTabEnabled(2, False) #specimen data
             self.form_view.setCurrentIndex(0) #all records
         self.form_view.fillFormFields()
 
@@ -190,7 +194,7 @@ class MyWindow(QMainWindow):
 
     def getVisibleRows(self):
         """ returns a list of indicies which are visible """
-        visibleRows = self.m.getRowsToProcess(*self.getTreeSelectionType())
+        visibleRows = [x for x in range(0, self.m.rowCount()) if not self.table_view.isRowHidden(x)]
         return visibleRows
     
     def getVisibleRowData(self):
@@ -261,16 +265,52 @@ class MyWindow(QMainWindow):
         completerAssociated = QCompleter(wordList, self.associatedTaxaWindow.lineEdit_newAssociatedTaxa)
         self.associatedTaxaWindow.associatedMainWin.lineEdit_newAssociatedTaxa.setCompleter(completerAssociated)
        
+    def getSelectSitesToApply(self):
+        """ queries the site_tree_widget to determine which are checked """
+        fieldNumbers = self.m.getSiteSpecimens()
+        siteNumbers = list(set([x[0] for x in fieldNumbers]))
+        if self.w.radioButton_applyAllRecords.isChecked():
+            return siteNumbers
+        else:
+            siteNumbers = []
+            iterator = QTreeWidgetItemIterator(self.site_tree_widget, QTreeWidgetItemIterator.Checked)
+            while iterator.value():
+                siteText = iterator.value().text(0)
+                siteNum = siteText.split()[-1]
+                siteNumbers.append(siteNum)
+                iterator += 1
+            return siteNumbers
+        
+    def selectAllSitesToApply(self):
+        """ checks all objects in site_tree_widget, may be useful if the user
+        wants to select all but a few in the list"""
+        iterator = QTreeWidgetItemIterator(self.site_tree_widget, QTreeWidgetItemIterator.NotChecked)
+        while iterator.value():
+            obj = iterator.value()
+            obj.setCheckState(0, Qt.Checked)
+            iterator += 1
+
+    def clearSitesToApply(self):
+        """ unchecks all objects in site_tree_widget """
+        iterator = QTreeWidgetItemIterator(self.site_tree_widget, QTreeWidgetItemIterator.Checked)
+        while iterator.value():
+            obj = iterator.value()
+            obj.setCheckState(0, Qt.Unchecked)
+            iterator += 1
+
     def populateTreeWidget(self):
-        """ given a list of tuples structured as(siteNum, specimenNum),
-        populates the TreeWidget with the records nested within the sites."""
-        # store the current selection
+        """ populates the navigation TreeWidget with the records nested 
+        within sites. Also populates site_tree_widget with site numbers"""
+        # store the current selection(s)
         itemSelected = self.tree_widget.currentItem()
+        sites_Selected = self.getSelectSitesToApply()
+        sites_Selected = [f'Site {x}' for x in sites_Selected]
         try:
             text = itemSelected.text(0)
         except AttributeError:
             text = 'All Records'
         self.tree_widget.clear()
+        self.site_tree_widget.clear()
         fieldNumbers = self.m.getSiteSpecimens()
         siteNumbers = list(set([x[0] for x in fieldNumbers]))
         try:
@@ -280,6 +320,15 @@ class MyWindow(QMainWindow):
         # build a hierarchical structure of QTreeWidgetItem(s) to fill the tree with
         self.tree_widget.addTopLevelItem(QTreeWidgetItem(["All Records"]))
         for siteNum in siteNumbers:
+            site_tree_text = f'Site {siteNum}'
+            site_tree_item = QTreeWidgetItem([site_tree_text])
+            if site_tree_text in sites_Selected:
+                site_tree_item.setCheckState(0, Qt.Checked)  # update site_tree_widget
+            else:
+                site_tree_item.setCheckState(0, Qt.Unchecked)  # update site_tree_widget
+            self.site_tree_widget.addTopLevelItems([site_tree_item]) # fill in site_tree_widget
+            
+            # now start on the navigation "tree_widget" object.            
             specimenNumbers = list(set([y for x, y in fieldNumbers if x == siteNum and y != '#']))
             specimenNumbers.sort(key = int)
             site = QTreeWidgetItem([f'Site {siteNum} ({len(specimenNumbers)})'])
@@ -294,7 +343,6 @@ class MyWindow(QMainWindow):
             self.tree_widget.addTopLevelItems([site])
         # return to the selection (if it exists)
         self.selectTreeWidgetItemByName(text)
-
     
 app = QtWidgets.QApplication(sys.argv)
 app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())

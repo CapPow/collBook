@@ -15,26 +15,28 @@ from PyQt5.QtCore import Qt, QCoreApplication
 
 from ui.associatedtaxaUI import Ui_associatedTaxaMainWindow
 
-class associatedTaxaMainWindow(QWidget):
+class selectSitesMainWindow(QWidget):
+    """ a popup box which allows slection of specific sites wich to apply
+    changes form the "all Records" level view. This repurposes the 
+    Ui_associatedTaxaMainWindow widget."""
+    
     def __init__(self, parent=None):
         super().__init__()
         self.init_ui(parent)
            
     def init_ui(self, parent):
         self.parent = parent # this is the master window
-        associatedMainWin = Ui_associatedTaxaMainWindow()
-        associatedMainWin.setupUi(self)
-        
-        # make the entry object addressable
-        self.lineEdit_newAssociatedTaxa = associatedMainWin.lineEdit_newAssociatedTaxa
-        # make the main window easily addressable
-        self.associatedMainWin = associatedMainWin
-        
-        associatedList = associatedMainWin.listWidget_associatedTaxa
-        self.associatedList = associatedList
+        self.selectSitesMainWindow = Ui_associatedTaxaMainWindow()
+        self.selectSitesMainWindow.setupUi(self)
+        # Disable the new item entry box and button
+        self.selectSitesMainWindow.horizontalLayout_2.setEnabled(False)
+        # make the siteList easily accessible
+        self.siteListWindow =  self.selectSitesMainWindow.listWidget_associatedTaxa
+        self.siteList = []
 
 
-    def saveAssociatedTaxa(self):
+
+    def saveSiteList(self):
         """ Populates the mainwindow's lineEdit_associatedTaxa with the 
         checked taxa in associatedList and hides the associatedTaxaMainWindow"""
         #  collect the list, and dump them into the proper field(s)

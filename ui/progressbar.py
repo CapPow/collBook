@@ -61,7 +61,9 @@ class progressBar(QWidget):
         
     
         widgetBox = QWidget(self)
-        widgetBox.setLayout(QHBoxLayout())
+        horizontalLayout = QHBoxLayout()
+        horizontalLayout.setContentsMargins(0, 3, 0, 3)
+        widgetBox.setLayout(horizontalLayout)
         widgetBox.layout().addWidget(self.label_status)
         widgetBox.layout().addWidget(self.progressBar)
         widgetBox.layout().addWidget(self.pushButton_Cancel)
