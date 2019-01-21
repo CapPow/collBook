@@ -10,6 +10,7 @@ https://github.com/Beugeny/python_test/blob/d3e21dc075d9cef8dca323d281cbbdb47652
 """
 from PyQt5 import QtWidgets
 from PyQt5 import QtCore
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QApplication
 
@@ -59,7 +60,11 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def addNewSite(self):
         """ adds a new, nearly blank site record to the dataTable """
         df = self.datatable
-        newSiteNum = max(pd.to_numeric(df['site#'], errors = 'coerce')) + 1
+        try:
+            newSiteNum = max(pd.to_numeric(df['site#'], errors = 'coerce')) + 1
+        except ValueError:
+            newSiteNum = 1
+            
         rowData = {'otherCatalogNumbers':f'{newSiteNum}-#', 
                    'site#':f'{newSiteNum}',
                    'specimen#':'#'}
@@ -124,6 +129,35 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             # change tree_widget's selection to the to new specimen.
             self.parent.selectTreeWidgetItemByName(catNum)
                 
+    def deleteSite(self):
+        """ called from the delete site button """
+        df = self.datatable
+        selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
+        if selType == 'site':
+            newDF = df[df['site#'] != siteNum].copy()
+            newDF = self.sortDF(newDF)
+            self.datatable = newDF
+            self.update(self.datatable)
+            self.parent.populateTreeWidget()
+            # change tree_widget's selection to All Records.
+            self.parent.w.checkBox_delSite.setCheckState(Qt.Unchecked)
+            self.parent.selectTreeWidgetItemByName('All Records')
+
+    def deleteSpecimen(self):
+        """ called from the delete specimen button """
+        df = self.datatable
+        selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
+        if selType == 'specimen':
+            newDF = df[~((df['site#'] == siteNum) & (df['specimen#'] == specimenNum))].copy()
+            newDF = self.sortDF(newDF)
+            self.datatable = newDF
+            self.update(self.datatable)
+            self.parent.populateTreeWidget()
+            # change tree_widget's selection to All Records.
+            self.parent.w.checkBox_deleteRecord.setCheckState(Qt.Unchecked)
+            self.parent.selectTreeWidgetItemByName(f'Site ({siteNum})')
+            self.parent.expandCurrentTreeWidgetItem() # re-expand the site selection
+
     def rowCount(self, parent=QtCore.QModelIndex()):
         return len(self.datatable.index)
 

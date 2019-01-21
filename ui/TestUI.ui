@@ -65,7 +65,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="StackedWidgetPage1">
            <property name="sizePolicy">
@@ -542,7 +542,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="checkBox_2">
+                 <widget class="QCheckBox" name="checkBox_delSite">
                   <property name="text">
                    <string/>
                   </property>
@@ -1005,7 +1005,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="checkBox_deleteRecord">
                 <property name="text">
                  <string/>
                 </property>
@@ -1737,6 +1737,38 @@
     <hint type="destinationlabel">
      <x>769</x>
      <y>394</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_delSite</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButton_deleteSite</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>779</x>
+     <y>94</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>814</x>
+     <y>93</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_deleteRecord</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButton_deleteRecord</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>771</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>818</x>
+     <y>90</y>
     </hint>
    </hints>
   </connection>

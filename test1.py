@@ -65,11 +65,13 @@ class MyWindow(QMainWindow):
         self.w.pushButton_newSite.clicked.connect(self.m.addNewSite)
         self.w.pushButton_newSpecimen.clicked.connect(self.m.addNewSpecimen)
         self.w.pushButton_duplicateSpecimen.clicked.connect(self.m.duplicateSpecimen)
+        self.w.pushButton_deleteSite.clicked.connect(self.m.deleteSite)
+        self.w.pushButton_deleteRecord.clicked.connect(self.m.deleteSpecimen)
         self.w.toolButton_sitesToApply_SelectNone.clicked.connect(self.clearSitesToApply)
         self.w.toolButton_sitesToApply_SelectAll.clicked.connect(self.selectAllSitesToApply)
-        #self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
-        self.w.actionTestFunction.triggered.connect(self.getSelectSitesToApply)
-        # update the preview window as dataframe changes
+
+        self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
+                # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()
         
@@ -133,24 +135,12 @@ class MyWindow(QMainWindow):
 
         if selType == 'site':
             self.statusBar.label_status.setText("  Site View  ")
-            #self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
-#            self.form_view.setTabEnabled(1, True) #enable site data
-#            self.form_view.setTabEnabled(2, False) #disable specimen data
             self.form_view.setCurrentIndex(1) #swap to site tab
         elif selType == 'specimen':
             self.statusBar.label_status.setText("Specimen View")
-            #self.w.form_view_tabWidget.setTabEnabled(0, False) #disable all records
-#            self.form_view.setTabEnabled(1, True) #enable site data
-#            if not self.form_view.isTabEnabled(2): # if specimen tab is not enabled
-#                self.form_view.setTabEnabled(2, True) #enable specimen tab
-                #self.form_view.setCurrentIndex(2) #swap to specimen tab
             self.form_view.setCurrentIndex(2) #swap to specimen tab
-            #if self.w.form_view_tabWidget.currentIndex() == 0:
-        else: #  all records
+        else: #  probably all records
             self.statusBar.label_status.setText(" All Records  ")
-#            self.form_view.setTabEnabled(0, True) #all records
-#            self.form_view.setTabEnabled(1, False) #site data
-#            self.form_view.setTabEnabled(2, False) #specimen data
             self.form_view.setCurrentIndex(0) #all records
         self.form_view.fillFormFields()
 
@@ -162,6 +152,8 @@ class MyWindow(QMainWindow):
             self.selectTreeWidgetItemByName('All Records')
 
     def selectTreeWidgetItemByName(self, name):
+        """ selects an item on the nav tree_widget. Permits site selection without
+        the parenthetical (n) value. ie: 'Site 5' would find 'Site 5 (12)' """
         iterator = QTreeWidgetItemIterator(self.tree_widget, QTreeWidgetItemIterator.All)
         if name[:5] == 'Site ':  # handle changing record counts at set site#s
             name = name.split('(')[0].strip()
@@ -171,6 +163,11 @@ class MyWindow(QMainWindow):
                 self.tree_widget.setCurrentItem(item,1)
                 break
             iterator +=1
+    def expandCurrentTreeWidgetItem(self):
+        """ expands the currently selected tree_widget item """
+        itemSelected = self.tree_widget.currentItem()
+        selectionIndex = self.tree_widget.indexFromItem(itemSelected)
+        self.tree_widget.expand(selectionIndex)
 
     def timeitTest(self):
         """ debugging / improving space for testing various functions or their timings """
