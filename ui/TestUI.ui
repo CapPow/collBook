@@ -65,7 +65,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="StackedWidgetPage1">
            <property name="sizePolicy">
@@ -806,6 +806,29 @@
                     </widget>
                    </item>
                    <item>
+                    <widget class="QToolButton" name="toolButton_reverseGeolocate">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>...</string>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="resources/Resources.qrc">
+                       <normaloff>:/rc_/map-pin.svg</normaloff>:/rc_/map-pin.svg</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>25</width>
+                       <height>25</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <widget class="QPlainTextEdit" name="plainTextEdit_locality">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -1080,7 +1103,30 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="3,1,2">
+                <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,3,1,2">
+                 <item>
+                  <widget class="QToolButton" name="toolButton_verifyTaxonomy">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="resources/Resources.qrc">
+                     <normaloff>:/rc_/check-circle.svg</normaloff>:/rc_/check-circle.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>25</width>
+                     <height>18</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
                  <item>
                   <widget class="QLineEdit" name="lineEdit_sciName">
                    <property name="sizePolicy">
@@ -1612,6 +1658,11 @@
    </property>
    <property name="toolTip">
     <string>Test a function</string>
+   </property>
+  </action>
+  <action name="actionProcessSelectedRecords">
+   <property name="text">
+    <string>&amp;ProcessSelectedRecords</string>
    </property>
   </action>
  </widget>

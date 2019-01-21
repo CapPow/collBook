@@ -208,9 +208,42 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         return records
 
     def geoRef(self):
-        """ applies genLocality over each row among those selected."""
-        rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
-        self.processViewableRecords(rowsToProcess, self.parent.locality.genLocality)        
+        """ applies genLocality over each row among those selected.
+        Combines api calls for records from the same site."""
+        # Needs modified If editing site data at specimen level records is re-enabled.
+
+        selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
+        if selType == 'site':
+            # hacky method to get only site level record (catalogNumber: "n-#")
+            rowsToProcess = self.getRowsToProcess('specimen', siteNum, '#')
+            sitesToUpdate = [siteNum]
+        elif selType == 'allRec':
+            records = self.getSiteSpecimens
+            # less hacky method to get every site level record
+            rowsToProcess = [x for x,y in records if y == '#']
+            sitesToUpdate = rowsToProcess
+        else:
+            rowsToProcess = self.getRowsToProcess(selType, siteNum, specimenNum)
+            sitesToUpdate = []
+        self.processViewableRecords(rowsToProcess, self.parent.locality.genLocality) 
+        self.inheritGeoRefFields(sitesToUpdate) # send site data down stream.
+
+    def inheritGeoRefFields(self, sitesToUpdate):
+        """ passess all geoReference fields from sites to children records """
+        df = self.datatable
+        geoRefCols = ['country', 'stateProvince', 'county',
+                      'municipality', 'path', 'locality',
+                      'decimalLatitude', 'decimalLongitude',
+                      'coordinateUncertaintyInMeters', 
+                      'minimumElevationInMeters']
+        for site in sitesToUpdate:
+            #df.loc[df['Col1'].isnull(),['Col1','Col2', 'Col3']] = replace_with_this.values
+            newVals = df.loc[(df['site#'] == site) & (df['specimen#'] == '#')][geoRefCols]
+            df.loc[(df['site#']== site) & (df['specimen#'] != '#'), geoRefCols] = newVals.values.tolist()
+            QApplication.processEvents()
+            self.datatable.update(df)
+            self.update(self.datatable)
+            self.parent.updateTableView()
         
     def verifyTaxButton(self):
         """ applies verifyTaxonomy over each row among those selected."""
@@ -439,11 +472,9 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             'localitySecurity':['',''],
             'decimalLatitude':['',''],
             'decimalLongitude':['',''],
-            'geodeticDatum':['',''],
             'coordinateUncertaintyInMeters':['',''],
             'verbatimCoordinates':['',''],
             'minimumElevationInMeters':['',''],
-            'maximumElevationInMeters':['',''],
             'verbatimElevation':['',''],
             'duplicateQuantity':['',''],
             'labelProject':['','']}
