@@ -64,6 +64,7 @@ class MyWindow(QMainWindow):
         self.w.toolButton_reverseGeolocate.clicked.connect(self.m.geoRef)
         self.w.action_Verify_Taxonomy.triggered.connect(self.m.verifyTaxButton)
         self.w.toolButton_verifyTaxonomy.clicked.connect(self.m.verifyTaxButton)
+        self.w.action_Verify_All.triggered.connect(self.m.verifyAllButton)
         self.w.action_Export_Labels.triggered.connect(self.exportLabels)
         self.w.pushButton_newSite.clicked.connect(self.m.addNewSite)
         self.w.pushButton_newSpecimen.clicked.connect(self.m.addNewSpecimen)
@@ -72,8 +73,7 @@ class MyWindow(QMainWindow):
         self.w.pushButton_deleteRecord.clicked.connect(self.m.deleteSpecimen)
         self.w.toolButton_sitesToApply_SelectNone.clicked.connect(self.clearSitesToApply)
         self.w.toolButton_sitesToApply_SelectAll.clicked.connect(self.selectAllSitesToApply)
-
-        self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
+        #self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
                 # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()

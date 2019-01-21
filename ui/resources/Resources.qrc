@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="rc_">
+    <file>play.svg</file>
     <file>x-circle.svg</file>
     <file>plus-square.svg</file>
     <file>tag.svg</file>

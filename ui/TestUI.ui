@@ -1498,13 +1498,12 @@
    <addaction name="action_New_Records"/>
    <addaction name="action_Open"/>
    <addaction name="action_Save_As"/>
+   <addaction name="action_Settings"/>
    <addaction name="separator"/>
    <addaction name="action_undo"/>
    <addaction name="action_Redo"/>
    <addaction name="separator"/>
-   <addaction name="action_Verify_Taxonomy"/>
-   <addaction name="action_Reverse_Geolocate"/>
-   <addaction name="action_Settings"/>
+   <addaction name="action_Verify_All"/>
    <addaction name="action_Export_Labels"/>
   </widget>
   <widget class="QToolBar" name="right_toolBar">
@@ -1528,7 +1527,6 @@
    </attribute>
    <addaction name="separator"/>
    <addaction name="action_Exit"/>
-   <addaction name="actionTestFunction"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open">
@@ -1660,7 +1658,11 @@
     <string>Test a function</string>
    </property>
   </action>
-  <action name="actionProcessSelectedRecords">
+  <action name="action_Verify_All">
+   <property name="icon">
+    <iconset resource="resources/Resources.qrc">
+     <normaloff>:/rc_/play.svg</normaloff>:/rc_/play.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;ProcessSelectedRecords</string>
    </property>

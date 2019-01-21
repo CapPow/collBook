@@ -374,7 +374,9 @@ class LabelPDF():
             labelFileName, _ = QFileDialog.getSaveFileName(None, 'Save Label PDF', defaultFileName, 'PDF(*.pdf)')
         else:
             labelFileName, _ = QFileDialog.getSaveFileName(None, 'Save Label PDF', os.getenv('HOME'), 'PDF(*.pdf)')
-        #if labelFileName[0] == '':  # option to check if the user actually used the dialog
+
+        if not labelFileName:  # If the user canceled the dialog
+            return
                 
         doc = BaseDocTemplate(labelFileName,
          pagesize=self.customPageSize,

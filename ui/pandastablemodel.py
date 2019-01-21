@@ -246,13 +246,18 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.parent.updateTableView()
         
     def verifyTaxButton(self):
-        """ applies verifyTaxonomy over each row among those selected."""
+        """ applies verifyTaxonomy over each visible row."""
         # refresh tax settings
         self.parent.tax.onFirstRow = True
         self.parent.tax.readTaxonomicSettings()
         rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
         self.processViewableRecords(rowsToProcess, self.parent.tax.verifyTaxonomy)
 
+    def verifyAllButton(self):
+        """ applies verifyTaxonomy and geoRef over each visible row"""
+        self.geoRef()
+        self.verifyTaxButton()
+        
     def processViewableRecords(self, rowsToProcess, func):
         """ applies a function over each row among rowsToProcess (by index)"""
         #self.parent.statusBar.label_status
