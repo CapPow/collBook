@@ -40,7 +40,7 @@ class formView(QtWidgets.QStackedWidget):
                 'establishmentMeans': (self.read_establishmentMeans, self.save_establishmentMeans, self.parent.checkBox_establishmentMeans),  # special objectType
                 'locality': (self.read_QPlainTextEdit, self.save_QPlainTextEdit, self.parent.plainTextEdit_locality),
                 'recordedBy': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_recordedBy),
-                'associatedCollectors': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_associatedTaxa),
+                'associatedCollectors': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_associatedCollectors),
                 'associatedTaxa': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_associatedTaxa),
                 'habitat': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_habitat),
                 'locationNotes': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_locationNotes),

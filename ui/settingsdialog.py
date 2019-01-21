@@ -6,16 +6,6 @@ Created on Sun Jan  6 10:33:55 2019
 @author: Caleb Powell
 
 """
-#from PyQt5 import Qt
-#from PyQt5 import QtCore
-#from PyQt5.QtCore import QAbstractTableModel
-#from PyQt5.QtCore import QDir
-#from PyQt5.QtCore import QStringListModel
-#from PyQt5.QtCore import QVariant
-#from PyQt5.QtGui import QColor
-#from PyQt5.QtGui import QIcon
-#from PyQt5.QtWidgets import QFileSystemModel
-
 import os
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import QSettings
@@ -52,6 +42,8 @@ class settingsWindow(QMainWindow):
     def saveButtonClicked(self):
         """ hides the preferences window and saves the user entries """
         self.saveSettings()
+        # force pdf_preview window to resize ui elements.
+        self.parent.pdf_preview.initViewer(self.parent)
         self.parent.updatePreview()
         self.parent.updateAutoComplete()
         self.hide()

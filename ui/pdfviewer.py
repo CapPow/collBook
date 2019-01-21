@@ -45,65 +45,65 @@ class PDFViewer(QLabel):
     '''
 
     def __init__(self, parent, pdfData= None, 
-                 document=None, pageno=1, dpi=110,load_cb=None):
+                 document=None, pageno=1, dpi=72,load_cb=None):
         '''
            load_cb: will be called when the document is loaded.
         '''
         #dpi - 72
-        super(PDFViewer, self).__init__(parent)        
-               
+        super(PDFViewer, self).__init__()        
+
+        screenSize = (parent.parent().geometry())
+        screenX = screenSize.width()
+        self.xMax = screenX * 0.5
+        screenY = screenSize.height()
+        self.yMax = screenY * 0.75
         self.filename = pdfData
         self.load_cb = load_cb
-        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.value_X = 140
+        self.value_Y = 90
         if not document:
             self.document = None
             self.load_preview(pdfData)
         else:
             self.document = document
-        
         self.page = None
         self.dpi = dpi
-        # 25.4mm per inch. 
-        # ((n)mm / 25.5) * 
+
     def initViewer(self, parent):
         #print(parent.objectName())
         self.parent = parent
         self.settings = self.parent.settings
-        value_X = int(self.settings.get('value_X', 140))
-        value_Y = int(self.settings.get('value_Y', 90))
-        
-        self.dpi = (value_X * value_Y) / 24.5
-        
-        sizeToPass = min(value_X, value_Y)
-        self.pagesize = QSize(sizeToPass, sizeToPass)
-
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        # at 25.4mm per inch, need to adjust values since they're in mm.
+        self.value_X = int(self.settings.get('value_X', 140)) * (self.dpi / 25.4)
+        self.value_X = min(self.value_X, self.xMax)  # be sure it does not exceed the max
+        self.value_Y = int(self.settings.get('value_Y', 90)) * (self.dpi / 25.4)
+        self.value_Y = min(self.value_Y, self.yMax)  # be sure it does not exceed the max
+        # appears to be a 10% resize error somewhere between these values, the 1.1 corrects this
+        self.pagesize = QSize(self.value_X, self.value_Y) * 1.1
 
     def sizeHint(self):
-        if not self.page:
-            if not self.document:
-                return QSize(100, 200)
-            self.page = self.document.page(0)
-
-        if not self.pagesize:
-            self.pagesize = self.page.pageSize()
-
         return self.pagesize
 
     def load_label_OversizeWarning(self):
         img = QImage(':/rc_/label_OversizeWarning.png')
-        img = img.scaled(400, 400, Qt.KeepAspectRatio)
+        img = img.scaled(self.value_X, self.value_Y, Qt.KeepAspectRatio)
         self.document = None
         self.setPixmap(QPixmap.fromImage(img))
+
 
     def load_preview(self, pdfBytes):
         try:
             self.document = Poppler.Document.loadFromData(pdfBytes) #  Try loading from bytes
+            self.document.setRenderHint(Poppler.Document.TextAntialiasing)
             pdfPage = self.document.page(0)
             img = pdfPage.renderToImage() #  See if it needs rendered to an image
-            img = img.scaled(400, 400, Qt.KeepAspectRatio)
+            img = img.scaled(self.value_X, self.value_Y, Qt.KeepAspectRatio)
+            #img = img.scaled(self.pagesize, Qt.KeepAspectRatio)
         except (AttributeError, TypeError):
             img = QImage(':/rc_/label_Preview.png')
-            img = img.scaled(400, 400, Qt.KeepAspectRatio)
+            img = img.scaled(self.value_X, self.value_Y, Qt.KeepAspectRatio)
+            #img = img.scaled(self.pagesize, Qt.KeepAspectRatio)
         self.setPixmap(QPixmap.fromImage(img))
 
 

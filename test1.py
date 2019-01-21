@@ -31,6 +31,7 @@ class MyWindow(QMainWindow):
 
     def init_ui(self):
         self.w = Ui_MainWindow()
+        self.showMaximized()
         self.w.setupUi(self)
         self.status_bar = self.statusBar()
         self.statusBar = progressBar(self.status_bar)

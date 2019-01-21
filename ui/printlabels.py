@@ -304,7 +304,10 @@ class LabelPDF():
             gpsStrElement = gpsCoordStringer('decimalLatitude', 'decimalLongitude', 'coordinateUncertaintyInMeters', 'minimumElevationInMeters','rightSTYSmall')
             try:
                 gpsStrElement.wrap(self.xPaperSize * .98 , self.yPaperSize * .98)
-                gpsParaWidth = gpsStrElement.getActualLineWidths0()[0]
+                try:
+                    gpsParaWidth = gpsStrElement.getActualLineWidths0()[0]
+                except IndexError:
+                    gpsParaWidth = 0
             except AttributeError:
                 gpsParaWidth = 0
                 

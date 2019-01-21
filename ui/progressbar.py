@@ -62,7 +62,7 @@ class progressBar(QWidget):
     
         widgetBox = QWidget(self)
         horizontalLayout = QHBoxLayout()
-        horizontalLayout.setContentsMargins(0, 3, 0, 3)
+        horizontalLayout.setContentsMargins(6, 3, 6, 3)
         widgetBox.setLayout(horizontalLayout)
         widgetBox.layout().addWidget(self.label_status)
         widgetBox.layout().addWidget(self.progressBar)
