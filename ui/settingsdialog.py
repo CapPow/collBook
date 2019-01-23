@@ -83,7 +83,7 @@ class settingsWindow(QMainWindow):
         to search for"""
         index = obj.findText(value)
         obj.setCurrentIndex(index)
-    
+
     def convertCheckState(self, stringState):
         """ given a string either "true" or "false" returns the proper Qt.CheckState"""
         if str(stringState).lower() != 'true':
@@ -125,6 +125,11 @@ class settingsWindow(QMainWindow):
             b = False    
         self.settingsWindow.groupbox_TNRS.setEnabled(b)
 
+    def scalingChanged(self, Qint):
+        parent = self.settingsWindow
+        val = f'({str(Qint)}%)'.rjust(8, ' ')
+        parent.label_sliderValue.setText(val)        
+        
     def populateSettings(self):
         """ uses self.settings to populate the preferences widget's selections"""
         parent = self.settingsWindow
@@ -138,6 +143,8 @@ class settingsWindow(QMainWindow):
         self.populateQComboBoxSettings( parent.value_TaxAlignSource, value_TaxAlignSource)
         value_Kingdom = self.get('value_Kingdom', 'Plantae')
         self.populateQComboBoxSettings( parent.value_Kingdom, value_Kingdom)
+        value_LogoAlignment = self.get('value_LogoAlignment','Centered')
+        self.populateQComboBoxSettings( parent.value_LogoAlignment, value_LogoAlignment)
         
         #QLineEdit  .setText
         value_VerifiedBy = self.get('value_VerifiedBy')
@@ -158,8 +165,10 @@ class settingsWindow(QMainWindow):
         parent.value_inc_CollectionName.setCheckState(value_inc_CollectionName)
         value_inc_VerifiedBy =  self.convertCheckState(self.get('value_inc_VerifiedBy'))
         parent.value_inc_VerifiedBy.setCheckState(value_inc_VerifiedBy)
+        
+        #QGroupbox (checkstate)
         value_inc_Logo = self.convertCheckState(self.get('value_inc_Logo'))
-        parent.value_inc_Logo.setCheckState(value_inc_Logo)
+        parent.value_inc_Logo.setChecked(value_inc_Logo)
 
         #QSpinBox .setValue
         value_X = int(self.get('value_X', 140))
@@ -171,6 +180,12 @@ class settingsWindow(QMainWindow):
         value_TNRS_Threshold = int(self.get('value_TNRS_Threshold', 85))
         parent.value_TNRS_Threshold.setValue(value_TNRS_Threshold)
     
+        #slider
+        value_LogoScaling = int(self.get('value_LogoScaling', 100))
+        parent.value_LogoScaling.setValue(value_LogoScaling)
+        self.scalingChanged(value_LogoScaling)
+
+
     def saveSettings(self):
         """ stores the preferences widget's selections to self.settings"""
         parent = self.settingsWindow
@@ -184,6 +199,8 @@ class settingsWindow(QMainWindow):
         self.setValue('value_TaxAlignSource', value_TaxAlignSource)
         value_Kingdom = parent.value_Kingdom.currentText()
         self.setValue('value_Kingdom', value_Kingdom)
+        value_LogoAlignment = parent.value_LogoAlignment.currentText()
+        self.setValue('value_LogoAlignment', value_LogoAlignment)
 
         #QLineEdit
         value_VerifiedBy = parent.value_VerifiedBy.text()
@@ -215,5 +232,9 @@ class settingsWindow(QMainWindow):
         value_RelFont = parent.value_RelFont.value()
         self.setValue('value_RelFont', value_RelFont)
         value_TNRS_Threshold = parent.value_TNRS_Threshold.value()
-        self.setValue('value_TNRS_Threshold', value_TNRS_Threshold)       
+        self.setValue('value_TNRS_Threshold', value_TNRS_Threshold)
         
+        #slider
+        value_LogoScaling = parent.value_LogoScaling.value()
+        self.setValue('value_LogoScaling', value_LogoScaling)
+

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from reportlab.platypus import Image, Table, TableStyle, Flowable, SimpleDocTemplate, BaseDocTemplate, PageTemplate, PageBreak
+from reportlab.platypus import Image, Table, TableStyle, Flowable, BaseDocTemplate, SimpleDocTemplate, PageTemplate, PageBreak
 from reportlab.platypus import Frame as platypusFrame   #NOTE SEE Special case import here to avoid namespace conflict with "Frame"
+from reportlab.pdfgen import canvas
 from reportlab.platypus.flowables import Spacer
 from reportlab.platypus.paragraph import Paragraph
 from reportlab.platypus.doctemplate import LayoutError
@@ -9,8 +10,11 @@ from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
 from reportlab.graphics.barcode import code39 #Note, overriding a function from this import in barcode section
 from reportlab.lib.units import inch, mm
 from reportlab.lib import pagesizes
+from reportlab.lib import utils
 
+from reportlab.lib.utils import ImageReader
 
+#from ui.customdocteplate import BaseDocTemplate
 
 
 import os
@@ -30,38 +34,105 @@ from PyQt5.QtWidgets import QFileDialog
 # This entire module needs clean up,
 # dynamic spacing needs redesigned and simplified
 # before size options are added.
+
+#class logoCanvasMaker(canvas.Canvas):
+#    """ used to initalize a canvas with a background image """
+#    
+#    def __init__(self, settings, *args, **kwargs):
+#        byteStream = io.BytesIO()
+#        self.settings = settings
+#        if self.settings.get('value_LogoPath',False):
+#            logoPath = self.settings.get('value_LogoPath')
+#            #logo = Image(logoPath)
+#            self.drawImage(logoPath, int(self.settings.get('value_X')), int(self.settings.get('value_Y')))
+#        self.c.showPage()
+#        self.c.save()
+
 class LabelPDF():
     
     def __init__(self, settings):
         """ xPaperSize, & self.yPaperSize are each assumed to be in mm """
         self.settings = settings
+        #self.logoCanvas = logoCanvasMaker(self.settings)
  
     """ Since this was ported, for now it is faster to just write helper 
     functions to call genPrintLabelsPDFs with appropriate args """
+    
+    def labelInit(self):
+        if self.settings.get('value_LogoPath',False):
+            logoPath = self.settings.get('value_LogoPath')
+            imageFile = ImageReader(logoPath)
+            imageWidth, imageHeight = imageFile.getSize()
+            aspect = imageHeight / float(imageWidth)
+            label_X = int(self.settings.get('value_X')) * mm
+            label_Y = int(self.settings.get('value_Y')) * mm
+            scaled_Img_width = label_X
+            scaled_Img_height = label_Y * aspect
+            # if centered
+            logo_x = (label_X * 0.5) - (scaled_Img_width * 0.5)
+            logo_y = (label_Y * 0.5) - (scaled_Img_height * 0.5)
+            logo_w = scaled_Img_width
+            logo_h = scaled_Img_height
+            
+            # args are : (logoPath, starting x, starting y, logo width, logo height)
+            #self.logoArgs = (logoPath, logo_x, logo_y, logo_w, logo_h)
+            #self.logoArgs = (logoPath, label_X, label_Y, preserveAspectRatio = True, anchor = 'c')
+
+    def labelSetup(self, c, doc):
+        """ Applies a logo to the pdf's background """
+        c.saveState()
+        if self.settings.get('value_inc_Logo', False):
+            logoPath = self.settings.get('value_LogoPath')
+
+            d = {'Upper Left': 'nw',
+             'Upper Center': 'n',
+             'Upper Right': 'ne',
+             'Center Left': 'w',
+             'Center':'c',
+             'Center Right':'e',
+             'Lower Left':'sw',
+             'Lower Center': 's',
+             'Lower Right':'se'}
+            label_X = int(self.settings.get('value_X')) * mm
+            label_Y = int(self.settings.get('value_Y')) * mm
+            logoAlignment = d.get(self.settings.get('value_LogoAlignment'),'c')
+            logoScaling = int(self.settings.get('value_LogoScaling')) / 100
+            logoWidth = logoScaling * label_X
+            logoHeight = logoScaling * label_Y
+            
+            loc_X = 0 + logoScaling / label_X
+            loc_Y = 0 + logoScaling / label_Y
+#            imageFile = ImageReader(logoPath)
+#            imageWidth, imageHeight = imageFile.getSize()
+#            aspect = imageHeight / float(imageWidth)
+
+#            scaled_Img_width = label_X
+#            scaled_Img_height = label_Y * aspect
+#            # if centered
+#            logo_x = (label_X * 0.5) - (scaled_Img_width * 0.5)
+#            logo_y = (label_Y * 0.5) - (scaled_Img_height * 0.5)
+#            logo_w = scaled_Img_width
+#            logo_h = scaled_Img_height
+#            
+            c._setFillAlpha(.3)
+            c.drawImage(logoPath, 0, 0, width=logoWidth, height=logoHeight, preserveAspectRatio = True, anchor = logoAlignment)
+        c.restoreState()
+
     
     def genLabelPreview(self, labelDataInput):
          # Get the value of the BytesIO buffer and write it to the response.
          pdfBytes = self.genPrintLabelPDFs(labelDataInput, returnBytes = True)
          return pdfBytes
 
-    def retrieveCollectionLogo(self):
-        """ loads the collection logo, as determined by 
-        self.settings value_LogoPath"""
-
-        logoPath = self.settings.get('value_LogoPath')
-        logo = Image(logoPath)
-        return logo
-
     def genPrintLabelPDFs(self, labelDataInput, defaultFileName = None, returnBytes = False):
         """labelDataInput = list of dictionaries formatted as: {DWC Column:'field value'}
            defaultFileName = the filename to use as the default when saving the pdf file."""
-        
+
         # strip out the site number rows
         labelDataInput = [x for x in labelDataInput if "#" not in x.get('otherCatalogNumbers').split('-')[-1]]
         if len(labelDataInput) < 1:  # exit early if nothing is left
             return None
-                          
-        
+
         # decent default values 140, 90
         self.xPaperSize = int(self.settings.get('value_X', 140)) * mm
         self.yPaperSize = int(self.settings.get('value_Y', 90)) * mm
@@ -370,8 +441,7 @@ class LabelPDF():
             #Add the flowables to the elements list.
             elements.append(docTable)
             elements.append(PageBreak())
-        
-        #Bookmark
+
         #Build the base document's parameters.
         
         if returnBytes:  # if we only want to make a preview save it to a stream
@@ -385,34 +455,30 @@ class LabelPDF():
 
         if not labelFileName:  # If the user canceled the dialog
             return
-                
+        # TODO fill in title and author based on select form_view or settings info                
         doc = BaseDocTemplate(labelFileName,
-         pagesize=self.customPageSize,
-         pageTemplates=[],
-         showBoundary=0,
-         leftMargin=self.xMargin,
-         rightMargin=self.xMargin,
-         topMargin=self.yMargin,
-         bottomMargin=self.yMargin,
-         allowSplitting= self.allowSplitting,           
-         title=None,
-         author=None,
-         _pageBreakQuick=1,
-         encrypt=None)
+                              pagesize=self.customPageSize,
+                              pageTemplates=[],
+                              showBoundary=0,
+                              leftMargin=self.xMargin,
+                              rightMargin=self.xMargin,
+                              topMargin=self.yMargin,
+                              bottomMargin=self.yMargin,
+                              allowSplitting= self.allowSplitting,           
+                              title=None,
+                              author=None,
+                              _pageBreakQuick=1,
+                              encrypt=None)
     
         #Function to build the pdf
     
         def build_pdf(flowables):
             """ actually loads the flowables into the document """
-            
-            if self.settings.get('value_LogoPath',False):
-                img = self.retrieveCollectionLogo()
-                #flowables.insert(0, img)
-                flowables.append(img)
-                print(flowables)
+
             doc.addPageTemplates(
                 [
                     PageTemplate(
+                        onPage = self.labelSetup,
                         frames=[
                             platypusFrame(
                                 doc.leftMargin,

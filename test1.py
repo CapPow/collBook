@@ -49,6 +49,9 @@ class MyWindow(QMainWindow):
         self.form_view.init_ui(self, self.w)
         self.tax = taxonomicVerification(self.settings)  # taxonomic verifier
         self.p = LabelPDF(self.settings)
+        
+        self.p.labelInit()  # alter this to happen based on settings changes
+        
         self.pdf_preview = self.w.pdf_preview
         self.pdf_preview.initViewer(self)
         self.m.new_Records(True)
