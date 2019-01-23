@@ -44,6 +44,14 @@ class LabelPDF():
          pdfBytes = self.genPrintLabelPDFs(labelDataInput, returnBytes = True)
          return pdfBytes
 
+    def retrieveCollectionLogo(self):
+        """ loads the collection logo, as determined by 
+        self.settings value_LogoPath"""
+
+        logoPath = self.settings.get('value_LogoPath')
+        logo = Image(logoPath)
+        return logo
+
     def genPrintLabelPDFs(self, labelDataInput, defaultFileName = None, returnBytes = False):
         """labelDataInput = list of dictionaries formatted as: {DWC Column:'field value'}
            defaultFileName = the filename to use as the default when saving the pdf file."""
@@ -395,6 +403,13 @@ class LabelPDF():
         #Function to build the pdf
     
         def build_pdf(flowables):
+            """ actually loads the flowables into the document """
+            
+            if self.settings.get('value_LogoPath',False):
+                img = self.retrieveCollectionLogo()
+                #flowables.insert(0, img)
+                flowables.append(img)
+                print(flowables)
             doc.addPageTemplates(
                 [
                     PageTemplate(

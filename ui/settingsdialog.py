@@ -7,6 +7,7 @@ Created on Sun Jan  6 10:33:55 2019
 
 """
 import os
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QApplication
@@ -38,6 +39,7 @@ class settingsWindow(QMainWindow):
         self.populateSettings()
         self.settingsWindow.button_SaveExit.clicked.connect(self.saveButtonClicked)
         self.settingsWindow.button_Cancel.clicked.connect(self.cancelButtonClicked)
+        self.settingsWindow.toolButton_GetLogoPath.clicked.connect(self.getLogoPath)
 
     def saveButtonClicked(self):
         """ hides the preferences window and saves the user entries """
@@ -54,6 +56,13 @@ class settingsWindow(QMainWindow):
         self.hide()
         self.populateSettings()
         
+    def getLogoPath(self):
+        """ opens a QFileDialog to select an image"""
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Select Logo Image",
+                                                            QtCore.QDir.homePath(), 'Image Files(*.png *.jpg *.bmp)')
+        if fileName:  # if an image was selected, store the path
+            self.settingsWindow.value_LogoPath.setText(fileName)
+
     def has(self, key):
         return self.settings.contains(key)
 
@@ -133,6 +142,8 @@ class settingsWindow(QMainWindow):
         #QLineEdit  .setText
         value_VerifiedBy = self.get('value_VerifiedBy')
         parent.value_VerifiedBy.setText(value_VerifiedBy)
+        value_LogoPath = self.get('value_LogoPath')
+        parent.value_LogoPath.setText(value_LogoPath)
 
         #QPlainTextEdit .setPlainText        
         value_CollectionName = self.get('value_CollectionName')
@@ -147,7 +158,9 @@ class settingsWindow(QMainWindow):
         parent.value_inc_CollectionName.setCheckState(value_inc_CollectionName)
         value_inc_VerifiedBy =  self.convertCheckState(self.get('value_inc_VerifiedBy'))
         parent.value_inc_VerifiedBy.setCheckState(value_inc_VerifiedBy)
-        
+        value_inc_Logo = self.convertCheckState(self.get('value_inc_Logo'))
+        parent.value_inc_Logo.setCheckState(value_inc_Logo)
+
         #QSpinBox .setValue
         value_X = int(self.get('value_X', 140))
         parent.value_X.setValue(value_X)
@@ -175,6 +188,8 @@ class settingsWindow(QMainWindow):
         #QLineEdit
         value_VerifiedBy = parent.value_VerifiedBy.text()
         self.setValue('value_VerifiedBy',value_VerifiedBy)
+        value_LogoPath = parent.value_LogoPath.text()
+        self.setValue('value_LogoPath',value_LogoPath)
 
         #QPlainTextEdit        
         value_CollectionName = parent.value_CollectionName.toPlainText()
@@ -188,7 +203,9 @@ class settingsWindow(QMainWindow):
         value_inc_CollectionName = parent.value_inc_CollectionName.isChecked()
         self.setValue('value_inc_CollectionName',value_inc_CollectionName)
         value_inc_VerifiedBy = parent.value_inc_VerifiedBy.isChecked()
-        self.setValue('value_inc_VerifiedBy',value_inc_VerifiedBy)
+        self.setValue('value_inc_VerifiedBy', value_inc_VerifiedBy)
+        value_inc_Logo = parent.value_inc_Logo.isChecked()
+        self.setValue('value_inc_Logo', value_inc_Logo)
         
         #QSpinBox
         value_X = parent.value_X.value()
