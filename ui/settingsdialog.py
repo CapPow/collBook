@@ -46,6 +46,7 @@ class settingsWindow(QMainWindow):
         self.saveSettings()
         # force pdf_preview window to resize ui elements.
         self.parent.pdf_preview.initViewer(self.parent)
+        self.parent.p.initLogoCanvas() # re-build the logo backdrop for labels.
         self.parent.updatePreview()
         self.parent.updateAutoComplete()
         self.hide()
@@ -128,8 +129,13 @@ class settingsWindow(QMainWindow):
     def scalingChanged(self, Qint):
         parent = self.settingsWindow
         val = f'({str(Qint)}%)'.rjust(8, ' ')
-        parent.label_sliderValue.setText(val)        
-        
+        parent.label_scalingValue.setText(val)
+    
+    def opacityChanged(self, Qint):
+        parent = self.settingsWindow
+        val = f'({str(Qint)}%)'.rjust(8, ' ')
+        parent.label_opacityValue.setText(val)
+
     def populateSettings(self):
         """ uses self.settings to populate the preferences widget's selections"""
         parent = self.settingsWindow
@@ -179,11 +185,16 @@ class settingsWindow(QMainWindow):
         parent.value_RelFont.setValue(value_RelFont)
         value_TNRS_Threshold = int(self.get('value_TNRS_Threshold', 85))
         parent.value_TNRS_Threshold.setValue(value_TNRS_Threshold)
+        value_LogoMargin = int(self.get('value_LogoMargin', 2))
+        parent.value_LogoMargin.setValue(value_LogoMargin)
     
         #slider
         value_LogoScaling = int(self.get('value_LogoScaling', 100))
         parent.value_LogoScaling.setValue(value_LogoScaling)
         self.scalingChanged(value_LogoScaling)
+        value_LogoOpacity = int(self.get('value_LogoOpacity', 30))
+        parent.value_LogoOpacity.setValue(value_LogoOpacity)
+        self.opacityChanged(value_LogoOpacity)
 
 
     def saveSettings(self):
@@ -233,8 +244,12 @@ class settingsWindow(QMainWindow):
         self.setValue('value_RelFont', value_RelFont)
         value_TNRS_Threshold = parent.value_TNRS_Threshold.value()
         self.setValue('value_TNRS_Threshold', value_TNRS_Threshold)
+        value_LogoMargin = parent.value_LogoMargin.value()
+        self.setValue('value_LogoMargin', value_LogoMargin)
         
         #slider
         value_LogoScaling = parent.value_LogoScaling.value()
         self.setValue('value_LogoScaling', value_LogoScaling)
+        value_LogoOpacity = parent.value_LogoOpacity.value()
+        self.setValue('value_LogoOpacity', value_LogoOpacity)
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>595</width>
-    <height>610</height>
+    <height>641</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -191,7 +191,7 @@
                  </property>
                  <layout class="QGridLayout" name="gridLayout_4">
                   <item row="1" column="0" colspan="2">
-                   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,10">
+                   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,10,0,0">
                     <item>
                      <widget class="QLabel" name="label_2">
                       <property name="text">
@@ -251,7 +251,31 @@
                       </item>
                      </widget>
                     </item>
+                    <item>
+                     <widget class="QLabel" name="label_5">
+                      <property name="text">
+                       <string>Margin</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSpinBox" name="value_LogoMargin">
+                      <property name="maximum">
+                       <number>9999</number>
+                      </property>
+                      <property name="value">
+                       <number>3</number>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="value_LogoPath">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
                   </item>
                   <item row="0" column="0">
                    <widget class="QToolButton" name="toolButton_GetLogoPath">
@@ -270,19 +294,12 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="1">
-                   <widget class="QLineEdit" name="value_LogoPath">
-                    <property name="enabled">
-                     <bool>false</bool>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="2" column="0" colspan="2">
                    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,8,2">
                     <item>
                      <widget class="QLabel" name="label_3">
                       <property name="text">
-                       <string>Logo Scaling</string>
+                       <string>Logo Scaling   </string>
                       </property>
                      </widget>
                     </item>
@@ -300,12 +317,43 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QLabel" name="label_sliderValue">
+                     <widget class="QLabel" name="label_scalingValue">
                       <property name="text">
                        <string/>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="3" column="0" colspan="2">
+                   <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,8,2">
+                    <item>
+                     <widget class="QLabel" name="label_4">
+                      <property name="text">
+                       <string>Logo Opacity  </string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSlider" name="value_LogoOpacity">
+                      <property name="maximum">
+                       <number>100</number>
+                      </property>
+                      <property name="value">
+                       <number>30</number>
+                      </property>
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_opacityValue">
+                      <property name="text">
+                       <string/>
                       </property>
                      </widget>
                     </item>
@@ -572,7 +620,7 @@
      <y>217</y>
     </hint>
     <hint type="destinationlabel">
-     <x>639</x>
+     <x>564</x>
      <y>257</y>
     </hint>
    </hints>
@@ -588,7 +636,7 @@
      <y>217</y>
     </hint>
     <hint type="destinationlabel">
-     <x>639</x>
+     <x>564</x>
      <y>257</y>
     </hint>
    </hints>
@@ -604,7 +652,7 @@
      <y>284</y>
     </hint>
     <hint type="destinationlabel">
-     <x>610</x>
+     <x>564</x>
      <y>371</y>
     </hint>
    </hints>
@@ -620,7 +668,7 @@
      <y>284</y>
     </hint>
     <hint type="destinationlabel">
-     <x>639</x>
+     <x>564</x>
      <y>371</y>
     </hint>
    </hints>
@@ -632,8 +680,8 @@
    <slot>toggleTNRSSettings(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>483</x>
-     <y>163</y>
+     <x>180</x>
+     <y>69</y>
     </hint>
     <hint type="destinationlabel">
      <x>321</x>
@@ -664,8 +712,8 @@
    <slot>kingdomChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>339</x>
-     <y>79</y>
+     <x>180</x>
+     <y>59</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -685,7 +733,23 @@
     </hint>
     <hint type="destinationlabel">
      <x>408</x>
-     <y>-10</y>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_LogoOpacity</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>settingsWindow</receiver>
+   <slot>opacityChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>361</x>
+     <y>511</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>430</x>
+     <y>-16</y>
     </hint>
    </hints>
   </connection>
@@ -694,5 +758,6 @@
   <slot>toggleTNRSSettings(QString)</slot>
   <slot>kingdomChanged(QString)</slot>
   <slot>scalingChanged(int)</slot>
+  <slot>opacityChanged(int)</slot>
  </slots>
 </ui>

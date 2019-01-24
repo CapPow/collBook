@@ -1,21 +1,21 @@
 #!/usr/bin/env python
-from reportlab.platypus import Image, Table, TableStyle, Flowable, BaseDocTemplate, SimpleDocTemplate, PageTemplate, PageBreak
+from reportlab.platypus import Table, BaseDocTemplate, PageTemplate, PageBreak
 from reportlab.platypus import Frame as platypusFrame   #NOTE SEE Special case import here to avoid namespace conflict with "Frame"
-from reportlab.pdfgen import canvas
 from reportlab.platypus.flowables import Spacer
 from reportlab.platypus.paragraph import Paragraph
 from reportlab.platypus.doctemplate import LayoutError
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
 from reportlab.graphics.barcode import code39 #Note, overriding a function from this import in barcode section
-from reportlab.lib.units import inch, mm
-from reportlab.lib import pagesizes
-from reportlab.lib import utils
-
+from reportlab.lib.units import mm
 from reportlab.lib.utils import ImageReader
+
+#from reportlab.platypus import Image as rlImage 
 
 #from ui.customdocteplate import BaseDocTemplate
 
+from PIL import Image, ImageFilter
+import math
 
 import os
 import sys
@@ -35,88 +35,106 @@ from PyQt5.QtWidgets import QFileDialog
 # dynamic spacing needs redesigned and simplified
 # before size options are added.
 
-#class logoCanvasMaker(canvas.Canvas):
-#    """ used to initalize a canvas with a background image """
-#    
-#    def __init__(self, settings, *args, **kwargs):
-#        byteStream = io.BytesIO()
-#        self.settings = settings
-#        if self.settings.get('value_LogoPath',False):
-#            logoPath = self.settings.get('value_LogoPath')
-#            #logo = Image(logoPath)
-#            self.drawImage(logoPath, int(self.settings.get('value_X')), int(self.settings.get('value_Y')))
-#        self.c.showPage()
-#        self.c.save()
-
 class LabelPDF():
     
     def __init__(self, settings):
         """ xPaperSize, & self.yPaperSize are each assumed to be in mm """
         self.settings = settings
-        #self.logoCanvas = logoCanvasMaker(self.settings)
+        self.useLogo = self.settings.get('value_inc_Logo',False)
+        self.logoPath = self.settings.get('value_LogoPath', '')
+        self.opacity = 0
+        self.logo = None
+        if self.useLogo:
+            self.initLogoCanvas()
  
-    """ Since this was ported, for now it is faster to just write helper 
-    functions to call genPrintLabelsPDFs with appropriate args """
+    def initLogoCanvas(self):
+        """ initalizes the logo and stores it in memory to be applied to each
+        label (and label preview). """
+        # save variables to avoid looking them up for every preview.
+        self.useLogo = self.settings.get('value_inc_Logo',False)
+        if self.useLogo:
+            self.logoPath = self.settings.get('value_LogoPath', '')
+            if self.logoPath != '':
+                self.opacity = int(self.settings.get('value_LogoOpacity', 30)) / 100
+                self.useLogo = self.settings.get('value_LogoPath',False)
+                # start to set up the logo
+                logoPath = self.settings.get('value_LogoPath')
+                logoScaling = int(self.settings.get('value_LogoScaling', 100)) / 100
+                logoMargin = int(self.settings.get('value_LogoMargin', 2))
+                try:
+                    im = Image.open(logoPath)
+                except:  # if the path provided seems broken, clear the setting
+                    self.logoPath = ''
+                    self.settings.setValue('value_LogoPath','')
+                    self.settings.settingsWindow.value_LogoPath.setText('')
+                    return
+                logoDPIx, logoDPIy = im.info['dpi']  # get DPI of input logo image
+                label_X = int(self.settings.get('value_X'))  # get mm size of labels
+                #maxLogoX = int(label_X / 24.5 * logoDPIx)
+                label_X = int(label_X * mm)
+                label_Y = int(self.settings.get('value_Y'))
+                #maxLogoY = int(label_Y / 24.5 * logoDPIy)
+                label_Y = int(label_Y * mm)
+                # resize the image to fit within the label dimentions
+                # then expand the image to the proper ratio filling alpha values in.
+                maxsize = (int(label_X * logoScaling), int(label_Y * logoScaling))
+                im.thumbnail(maxsize, Image.ANTIALIAS)       
+                im = im.filter(ImageFilter.SHARPEN) # sharpen to clean up scaling losses
+                logoWidth, logoHeight = im.size  # get size of image
+                # align image on the backdrop.
+                logoAlignment = self.settings.get('value_LogoAlignment')
+                if logoAlignment == 'Upper Left':
+                    x1 = logoMargin
+                    y1 = logoMargin
+                elif logoAlignment == 'Upper Center':
+                    x1 = int(math.floor((label_X - logoWidth) / 2))
+                    y1 = logoMargin
+                elif logoAlignment == 'Upper Right':
+                    x1 = int(label_X - logoWidth) -logoMargin
+                    y1 = logoMargin
+                elif logoAlignment == 'Center Left':
+                    x1 = 2
+                    y1 = int(math.floor((label_Y - logoHeight) / 2))
+                elif logoAlignment == 'Center Right':
+                    x1 = int(label_X - logoWidth) -logoMargin
+                    y1 = int(math.floor((label_Y - logoHeight) / 2))
+                elif logoAlignment == 'Lower Left':
+                    x1 = logoMargin
+                    y1 = int(label_Y - logoHeight) - logoMargin
+                elif logoAlignment == 'Lower Center':
+                    x1 = int(math.floor((label_X - logoWidth) / 2))
+                    y1 = int(label_Y - logoHeight) - logoMargin
+                elif logoAlignment == 'Lower Right':
+                    x1 = int(label_X - logoWidth) -logoMargin
+                    y1 = int(label_Y - logoHeight) - logoMargin
+                else:  # it is probably 'center'     
+                    x1 = int(math.floor((label_X - logoWidth) / 2))
+                    y1 = int(math.floor((label_Y - logoHeight) / 2))       
     
-    def labelInit(self):
-        if self.settings.get('value_LogoPath',False):
-            logoPath = self.settings.get('value_LogoPath')
-            imageFile = ImageReader(logoPath)
-            imageWidth, imageHeight = imageFile.getSize()
-            aspect = imageHeight / float(imageWidth)
-            label_X = int(self.settings.get('value_X')) * mm
-            label_Y = int(self.settings.get('value_Y')) * mm
-            scaled_Img_width = label_X
-            scaled_Img_height = label_Y * aspect
-            # if centered
-            logo_x = (label_X * 0.5) - (scaled_Img_width * 0.5)
-            logo_y = (label_Y * 0.5) - (scaled_Img_height * 0.5)
-            logo_w = scaled_Img_width
-            logo_h = scaled_Img_height
-            
-            # args are : (logoPath, starting x, starting y, logo width, logo height)
-            #self.logoArgs = (logoPath, logo_x, logo_y, logo_w, logo_h)
-            #self.logoArgs = (logoPath, label_X, label_Y, preserveAspectRatio = True, anchor = 'c')
+                mode = im.mode
+                if len(mode) == 1:  # L, 1
+                    new_background = (255)
+                if len(mode) == 3:  # RGB
+                    new_background = (255, 255, 255)
+                if len(mode) == 4:  # RGBA, CMYK
+                    new_background = (255, 255, 255, 255)
+                resizedLogo = Image.new(mode, (label_X, label_Y), new_background)
+                resizedLogo.paste(im, (x1, y1, x1 + logoWidth, y1 + logoHeight))
+                logoData = io.BytesIO()
+                #im.save('imlocalSave.png',quality=100)
+                resizedLogo.save(logoData, format='PNG', quality=100)
+                resizedLogo.seek(0)
+                logo = ImageReader(logoData)     
+    
+                self.logo = logo
 
     def labelSetup(self, c, doc):
         """ Applies a logo to the pdf's background """
-        c.saveState()
-        if self.settings.get('value_inc_Logo', False):
-            logoPath = self.settings.get('value_LogoPath')
-
-            d = {'Upper Left': 'nw',
-             'Upper Center': 'n',
-             'Upper Right': 'ne',
-             'Center Left': 'w',
-             'Center':'c',
-             'Center Right':'e',
-             'Lower Left':'sw',
-             'Lower Center': 's',
-             'Lower Right':'se'}
-            label_X = int(self.settings.get('value_X')) * mm
-            label_Y = int(self.settings.get('value_Y')) * mm
-            logoAlignment = d.get(self.settings.get('value_LogoAlignment'),'c')
-            logoScaling = int(self.settings.get('value_LogoScaling')) / 100
-            logoWidth = logoScaling * label_X
-            logoHeight = logoScaling * label_Y
-            
-            loc_X = 0 + logoScaling / label_X
-            loc_Y = 0 + logoScaling / label_Y
-#            imageFile = ImageReader(logoPath)
-#            imageWidth, imageHeight = imageFile.getSize()
-#            aspect = imageHeight / float(imageWidth)
-
-#            scaled_Img_width = label_X
-#            scaled_Img_height = label_Y * aspect
-#            # if centered
-#            logo_x = (label_X * 0.5) - (scaled_Img_width * 0.5)
-#            logo_y = (label_Y * 0.5) - (scaled_Img_height * 0.5)
-#            logo_w = scaled_Img_width
-#            logo_h = scaled_Img_height
-#            
-            c._setFillAlpha(.3)
-            c.drawImage(logoPath, 0, 0, width=logoWidth, height=logoHeight, preserveAspectRatio = True, anchor = logoAlignment)
-        c.restoreState()
+        if self.logo:
+            c.saveState()
+            c._setFillAlpha(self.opacity)
+            c.drawImage(self.logo, 0, 0)#, width=logoWidth, height=logoHeight, preserveAspectRatio = True, anchor = logoAlignment)
+            c.restoreState()
 
     
     def genLabelPreview(self, labelDataInput):

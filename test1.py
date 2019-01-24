@@ -50,7 +50,7 @@ class MyWindow(QMainWindow):
         self.tax = taxonomicVerification(self.settings)  # taxonomic verifier
         self.p = LabelPDF(self.settings)
         
-        self.p.labelInit()  # alter this to happen based on settings changes
+        self.p.initLogoCanvas()  # alter this to happen based on settings changes
         
         self.pdf_preview = self.w.pdf_preview
         self.pdf_preview.initViewer(self)
