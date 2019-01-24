@@ -97,6 +97,31 @@ class settingsWindow(QMainWindow):
         """
         self.populateSources(QString)
     
+    def updateCatalogNumberPreview(self, QString):
+        """ called when a change is made to any of the appropriate fields in 
+        catalogNumberPage. Updates the example preview catalog number """
+        
+        prefix = self.settingsWindow.value_catalogNumberPrefix.text()
+        digits = int(self.settingsWindow.value_catalogNumberDigits.value())
+        startingNum = str(self.settingsWindow.value_catalogNumberStartingNum.value())
+        startingNum = startingNum.zfill(digits)  # fill in leading zeroes
+        previewText = f'{prefix}{startingNum}'  # assemble the preview string.
+        self.settingsWindow.label_catalogNumber_Preview.setText(previewText)  # set it
+
+    def updateStartingCatalogNumber(self, val):
+        """ called when value_catalogNumberdigits changes and alters the max
+        value allowed in value_catalogNumberStartingNum. Also, called when
+        Catalog numbers are applied, to increment the value_catalogNumberStartingNum"""
+        sender = self.sender()
+        # check if it is appropriate to alter the maximum digits for starting value
+        if sender.objectName() == "value_catalogNumberDigits":
+            maxDigits = int(val)
+            newMax = int(''.zfill(maxDigits, 9))
+            self.settingsWindow.value_catalogNumberstartingNum.setMaximum(newMax)
+        else:  # otherwise just edit the starting value
+            self.settingsWindow.value_catalogNumberstartingNum.setValue(val)
+        self.updateCatalogNumberPreview
+
     def populateSources(self, QString):
         """ called when value_Kingdom changes text. Decides what the options
         should be for value_TaxAlignSource (taxanomic alignment source)."""
@@ -196,6 +221,8 @@ class settingsWindow(QMainWindow):
         parent.value_LogoOpacity.setValue(value_LogoOpacity)
         self.opacityChanged(value_LogoOpacity)
 
+        #clean up
+        self.updateCatalogNumberPreview
 
     def saveSettings(self):
         """ stores the preferences widget's selections to self.settings"""

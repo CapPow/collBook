@@ -43,7 +43,7 @@ class LabelPDF():
         self.useLogo = self.settings.get('value_inc_Logo',False)
         self.logoPath = self.settings.get('value_LogoPath', '')
         self.opacity = 0
-        self.logo = None
+        self.logo = False
         if self.useLogo:
             self.initLogoCanvas()
  
@@ -63,6 +63,7 @@ class LabelPDF():
                 logoMargin = int(self.settings.get('value_LogoMargin', 2))
                 try:
                     im = Image.open(logoPath)
+                    
                 except:  # if the path provided seems broken, clear the setting
                     self.logoPath = ''
                     self.settings.setValue('value_LogoPath','')
@@ -122,7 +123,7 @@ class LabelPDF():
                 resizedLogo.paste(im, (x1, y1, x1 + logoWidth, y1 + logoHeight))
                 logoData = io.BytesIO()
                 #im.save('imlocalSave.png',quality=100)
-                resizedLogo.save(logoData, format='PNG', quality=100)
+                resizedLogo.save(logoData, format='PNG', quality=95, optimize = True)
                 resizedLogo.seek(0)
                 logo = ImageReader(logoData)     
     
@@ -130,7 +131,7 @@ class LabelPDF():
 
     def labelSetup(self, c, doc):
         """ Applies a logo to the pdf's background """
-        if self.logo:
+        if isinstance(self.logo, ImageReader) and self.useLogo :
             c.saveState()
             c._setFillAlpha(self.opacity)
             c.drawImage(self.logo, 0, 0)#, width=logoWidth, height=logoHeight, preserveAspectRatio = True, anchor = logoAlignment)
