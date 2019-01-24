@@ -218,7 +218,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             rowsToProcess = self.getRowsToProcess('specimen', siteNum, '#')
             sitesToUpdate = [siteNum]
         elif selType == 'allRec':
-            records = self.getSiteSpecimens
+            records = self.getSiteSpecimens()
             # less hacky method to get every site level record
             rowsToProcess = [x for x,y in records if y == '#']
             sitesToUpdate = rowsToProcess

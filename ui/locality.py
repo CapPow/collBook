@@ -8,6 +8,7 @@ Created on Sun Jan  6 10:33:55 2019
 """
 
 import requests
+from requests import ConnectionError
 from PyQt5.QtWidgets import QMessageBox
 
 # status codes
@@ -50,7 +51,10 @@ class locality():
 
     def reverseGeoCall(self, latitude, longitude):
         apiUrl = f'https://maps.googleapis.com/maps/api/geocode/json?latlng={str(latitude)},{str(longitude)}&key={self.gAPIkey}'
-        apiCall = requests.get(apiUrl)
+        try:
+            apiCall = requests.get(apiUrl)
+        except ConnectionError:
+            return False
         status = apiCall.json()['status']
         # api returns OK (query went through, received results)
         if status == 'OK':
@@ -125,7 +129,7 @@ class locality():
        
         else:   # if the Google API call returned error/status string
             apiErrorMessage = address
-            message = f'MISSING GPS at row {currentRow+1}. Location lookup error at row {currentRow+1}: Google reverse Geolocate service responded with: "{str(apiErrorMessage)}". This may be internet connection problems, or invalid GPS values.'
+            message = f'MISSING GPS at row {currentRow}. Location lookup error at row {currentRow}: Google reverse Geolocate service responded with: "{apiErrorMessage}". This may be internet connection problems, or invalid GPS values.'
             self.userNotice( message )
             # could consider a retry option here
             raise Exception
