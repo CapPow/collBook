@@ -29,9 +29,15 @@ class taxonomicVerification():
         # a flag to avoid user dialog twice on first row of apply function
         # set to True from verifyTaxButton (in main UI) and set to False after verifyTaxonomy
         self.onFirstRow = True
-        
+    
     def readTaxonomicSettings(self):
         """ Fetches the most up-to-date taxonomy relevant settings"""
+        # TODO check if this is redundant, shouldn't the settings window "Save and exit" button establish these changes?
+        # meaning, whenever this was called the function could just go straight to the settings module and use it?
+        # additionally, this may be reloading the local alignments excessively
+        # The function is called in pandastablemodel (at least)
+
+
         #which service to utalize to make alignments
         self.TaxAlignSource = self.settings.get('value_TaxAlignSource')
         # how to handle name reccomendations

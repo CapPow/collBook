@@ -7,7 +7,7 @@ from reportlab.platypus.doctemplate import LayoutError
 from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
 from ui.locality import locality
-from PyQt5.QtCore import QFile, Qt
+from PyQt5.QtCore import QFile, Qt, QDir
 import qdarkstyle
 from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
@@ -76,8 +76,10 @@ class MyWindow(QMainWindow):
         self.w.pushButton_deleteRecord.clicked.connect(self.m.deleteSpecimen)
         self.w.toolButton_sitesToApply_SelectNone.clicked.connect(self.clearSitesToApply)
         self.w.toolButton_sitesToApply_SelectAll.clicked.connect(self.selectAllSitesToApply)
+        self.w.action_Export_Records.triggered.connect(self.exportRecords)
         #self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
-                # update the preview window as dataframe changes
+        self.w.actionTestFunction.triggered.connect(self.m.assignCatalogNumbers)        
+        # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()
         
@@ -211,14 +213,30 @@ class MyWindow(QMainWindow):
             rowData = None
         return rowData
 
-
-    def exportLabels(self):
+    def exportRecords(self):
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save Records",
+                                                                QDir.homePath(), "PDF (*.pdf, *.csv)")
+        
+        if not fileName.lower().endswith(('.pdf')):
+            fileName = f'{fileName}.pdf'
+        rowsToProcess = self.m.getRowsToProcess(*self.getTreeSelectionType())
+        labelSuccess = self.exportLabels(fileName = fileName)
+        if labelSuccess:
+            fileName = fileName.rpartition('.')[0]  
+            fileName = f'{fileName}.csv'
+            outDF = self.m.datatable.iloc[rowsToProcess, ]
+            outDF = outDF.loc[outDF['specimen#'] != '#']
+            self.m.save_CSV(df = outDF, fileName = fileName)
+                  
+        
+    def exportLabels(self, fileName = None):
         """ bundles records up and passes them to printlabels.genPrintLabelPDFs() """
         try:
             rowsToProcess = self.m.getRowsToProcess(*self.getTreeSelectionType())
             outDF = self.m.datatable.iloc[rowsToProcess, ]
             outDict = self.m.dataToDict(outDF)
-            self.p.genPrintLabelPDFs(outDict)
+            self.p.genPrintLabelPDFs(outDict, defaultFileName = fileName)
+            return True
         except LayoutError:
             from PyQt5.QtWidgets import QMessageBox
             msg = QMessageBox()
@@ -227,6 +245,8 @@ class MyWindow(QMainWindow):
             msg.setWindowTitle('Label Export Error')
             msg.setStandardButtons(QMessageBox.Ok)
             msg.exec_()
+            return False
+
 
     def updatePreview(self):
         """ updates the pdf preview window """

@@ -116,10 +116,11 @@ class settingsWindow(QMainWindow):
         # check if it is appropriate to alter the maximum digits for starting value
         if sender.objectName() == "value_catalogNumberDigits":
             maxDigits = int(val)
-            newMax = int(''.zfill(maxDigits, 9))
-            self.settingsWindow.value_catalogNumberstartingNum.setMaximum(newMax)
+            newMax = int(''.ljust(maxDigits, '9'))
+            self.settingsWindow.value_catalogNumberStartingNum.setMaximum(newMax)
         else:  # otherwise just edit the starting value
-            self.settingsWindow.value_catalogNumberstartingNum.setValue(val)
+            self.settingsWindow.value_catalogNumberStartingNum.setValue(val)
+            self.setValue('value_catalogNumberStartingNum', val)
         self.updateCatalogNumberPreview
 
     def populateSources(self, QString):
@@ -182,6 +183,8 @@ class settingsWindow(QMainWindow):
         parent.value_VerifiedBy.setText(value_VerifiedBy)
         value_LogoPath = self.get('value_LogoPath')
         parent.value_LogoPath.setText(value_LogoPath)
+        value_catalogNumberPrefix = self.get('value_catalogNumberPrefix')
+        parent.value_catalogNumberPrefix.setText(value_catalogNumberPrefix)
 
         #QPlainTextEdit .setPlainText        
         value_CollectionName = self.get('value_CollectionName')
@@ -196,10 +199,14 @@ class settingsWindow(QMainWindow):
         parent.value_inc_CollectionName.setCheckState(value_inc_CollectionName)
         value_inc_VerifiedBy =  self.convertCheckState(self.get('value_inc_VerifiedBy'))
         parent.value_inc_VerifiedBy.setCheckState(value_inc_VerifiedBy)
+        value_catalogNumberAssignExport = self.convertCheckState(self.get('value_catalogNumberAssignExport'))
+        parent.value_catalogNumberAssignExport.setCheckState(value_catalogNumberAssignExport)
         
         #QGroupbox (checkstate)
         value_inc_Logo = self.convertCheckState(self.get('value_inc_Logo'))
         parent.value_inc_Logo.setChecked(value_inc_Logo)
+        value_assignCatalogNumbers = self.convertCheckState(self.get('value_assignCatalogNumbers'))
+        parent.value_assignCatalogNumbers.setChecked(value_assignCatalogNumbers)
 
         #QSpinBox .setValue
         value_X = int(self.get('value_X', 140))
@@ -212,6 +219,10 @@ class settingsWindow(QMainWindow):
         parent.value_TNRS_Threshold.setValue(value_TNRS_Threshold)
         value_LogoMargin = int(self.get('value_LogoMargin', 2))
         parent.value_LogoMargin.setValue(value_LogoMargin)
+        value_catalogNumberDigits = int(self.get('value_catalogNumberDigits', 1))
+        parent.value_catalogNumberDigits.setValue(value_catalogNumberDigits)
+        value_catalogNumberStartingNum = int(self.get('value_catalogNumberStartingNum', 0))
+        parent.value_catalogNumberStartingNum.setValue(value_catalogNumberStartingNum)
     
         #slider
         value_LogoScaling = int(self.get('value_LogoScaling', 100))
@@ -245,6 +256,8 @@ class settingsWindow(QMainWindow):
         self.setValue('value_VerifiedBy',value_VerifiedBy)
         value_LogoPath = parent.value_LogoPath.text()
         self.setValue('value_LogoPath',value_LogoPath)
+        value_catalogNumberPrefix = parent.value_catalogNumberPrefix.text()
+        self.setValue('value_catalogNumberPrefix', value_catalogNumberPrefix)
 
         #QPlainTextEdit        
         value_CollectionName = parent.value_CollectionName.toPlainText()
@@ -259,8 +272,16 @@ class settingsWindow(QMainWindow):
         self.setValue('value_inc_CollectionName',value_inc_CollectionName)
         value_inc_VerifiedBy = parent.value_inc_VerifiedBy.isChecked()
         self.setValue('value_inc_VerifiedBy', value_inc_VerifiedBy)
+        value_assignCatalogNumbers = parent.value_assignCatalogNumbers.isChecked()
+        self.setValue('value_assignCatalogNumbers', value_assignCatalogNumbers)
+        value_catalogNumberAssignExport = parent.value_catalogNumberAssignExport.isChecked()
+        self.setValue('value_catalogNumberAssignExport', value_catalogNumberAssignExport)
+        
+        #QGroupbox
         value_inc_Logo = parent.value_inc_Logo.isChecked()
         self.setValue('value_inc_Logo', value_inc_Logo)
+        value_assignCatalogNumbers = parent.value_assignCatalogNumbers.isChecked()
+        self.setValue('value_assignCatalogNumbers', value_assignCatalogNumbers)
         
         #QSpinBox
         value_X = parent.value_X.value()
@@ -273,6 +294,11 @@ class settingsWindow(QMainWindow):
         self.setValue('value_TNRS_Threshold', value_TNRS_Threshold)
         value_LogoMargin = parent.value_LogoMargin.value()
         self.setValue('value_LogoMargin', value_LogoMargin)
+        value_catalogNumberDigits = parent.value_catalogNumberDigits.value()
+        self.setValue('value_catalogNumberDigits', value_catalogNumberDigits)
+        value_catalogNumberStartingNum = parent.value_catalogNumberStartingNum.value()
+        self.setValue('value_catalogNumberStartingNum', value_catalogNumberStartingNum)
+        
         
         #slider
         value_LogoScaling = parent.value_LogoScaling.value()

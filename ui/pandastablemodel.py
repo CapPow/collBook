@@ -245,6 +245,31 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.update(self.datatable)
             self.parent.updateTableView()
         
+    def assignCatalogNumbers(self):
+        """If appropriate assigns catalogNumbers over each visible row."""
+        # the checkbox for enabling the "Assign catalog numbers" group box.
+        assign = self.parent.settings.get('value_assignCatalogNumbers', False)
+        # the checkbox for automatically assigning catalog numbers while processing.
+        assign_Durring_Processing = self.parent.settings.get('value_catalogNumberAssignExport', False)
+
+        if assign & assign_Durring_Processing:
+            rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
+            df = self.datatable.iloc[rowsToProcess, ]
+            df = df.loc[(df['specimen#'].str.isdigit()) & 
+                        (df['catalogNumber'] == '')].copy()
+            if len(df) > 0:
+                catStartingNum = int(self.parent.settings.get('value_catalogNumberStartingNum'))
+                catDigits = int(self.parent.settings.get('value_catalogNumberDigits'))
+                catPrefix = self.parent.settings.get('value_catalogNumberPrefix')
+                for i in df.index:
+                    newCatNum = f'{catPrefix}{str(catStartingNum).zfill(catDigits)}'
+                    df.loc[i, 'catalogNumber'] = newCatNum
+                    catStartingNum += 1 # add 1 to the starting catNumber                
+                self.datatable.update(df)
+                self.update(self.datatable)
+                self.parent.updateTableView()
+                self.parent.settings.updateStartingCatalogNumber(catStartingNum)
+
     def verifyTaxButton(self):
         """ applies verifyTaxonomy over each visible row."""
         # refresh tax settings
@@ -373,11 +398,15 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.parent.form_view.fillFormFields()
             return True
 
-    def save_CSV(self, fileName = None):
+    def save_CSV(self, fileName = None, df = None):
         # is triggered by the action_Save:
-        df = self.datatable
-        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save CSV",
-                                                            QtCore.QDir.homePath(), "CSV (*.csv)")
+        if df is None:
+            df = self.datatable
+        else:
+            df = df.copy()
+        if fileName is None:
+            fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save CSV",
+                                                                QtCore.QDir.homePath(), "CSV (*.csv)")
         if fileName:  # if a csv was selected, start loading the data.
             drop_col_Names = ['site#', 'specimen#']
             keep_col_Names = [x for x in df.columns if x not in drop_col_Names]

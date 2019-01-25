@@ -135,9 +135,8 @@ class LabelPDF():
             c.saveState()
             c._setFillAlpha(self.opacity)
             c.drawImage(self.logo, 0, 0)#, width=logoWidth, height=logoHeight, preserveAspectRatio = True, anchor = logoAlignment)
-            c.restoreState()
+            c.restoreState()  
 
-    
     def genLabelPreview(self, labelDataInput):
          # Get the value of the BytesIO buffer and write it to the response.
          pdfBytes = self.genPrintLabelPDFs(labelDataInput, returnBytes = True)
@@ -468,7 +467,8 @@ class LabelPDF():
             labelFileName = byteStream
 
         elif defaultFileName:
-            labelFileName, _ = QFileDialog.getSaveFileName(None, 'Save Label PDF', defaultFileName, 'PDF(*.pdf)')
+            labelFileName = defaultFileName
+            #labelFileName, _ = QFileDialog.getSaveFileName(None, 'Save Label PDF', defaultFileName, 'PDF(*.pdf)')
         else:
             labelFileName, _ = QFileDialog.getSaveFileName(None, 'Save Label PDF', os.getenv('HOME'), 'PDF(*.pdf)')
 
