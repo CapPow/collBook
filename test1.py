@@ -257,11 +257,13 @@ class MyWindow(QMainWindow):
         # show the dialog
         while saved is False:
             #saveDialog.exec_()
+            if not self.testRunLabels():
+                return False
             chosenFileName, _ =  QtWidgets.QFileDialog.getSaveFileName(self, "Export Labels", "", "Label PDFs (*.pdf)")
             if chosenFileName == "":  # The user probably pressed Cancel
                 return None
             else:
-                fileName = Path(chosenFileName).name
+                fileName = chosenFileName
                 fileExtension = Path(chosenFileName).suffix
                 if fileExtension != '':
                     fileName = fileName.replace(fileExtension,'')
@@ -288,6 +290,22 @@ class MyWindow(QMainWindow):
                         self.m.save_CSV(df = outDF, fileName = csvFileName)
                         saved = True
             
+    def testRunLabels(self):
+        """ Tests generating the labels to ensure the contents all fit.
+        Returns True or False depending on test's results."""
+        try:
+            # generate test labels and toss them out. to test for oversize warnings
+            self.p.genLabelPreview(self.getVisibleRowData())
+            return True
+        except LayoutError:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("""The content of one or more of your labels is too large for the label dimentions. Alter your settings, and try again.""")
+            msg.setWindowTitle('Label Generation Error')
+            msg.setStandardButtons(QMessageBox.Ok)
+            msg.exec_()
+            return False
+
     def exportLabels(self, fileName = None):
         """ bundles records up and passes them to printlabels.genPrintLabelPDFs() """
         try:

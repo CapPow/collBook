@@ -13,6 +13,8 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QApplication
+from reportlab.platypus.doctemplate import LayoutError
+
 
 import pandas as pd
 
@@ -291,7 +293,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.parent.updateTableView()
 
     def assignCatalogNumbers(self):
-        # TODO deal with preview CAT Numbers
         """If appropriate assigns catalogNumbers over each visible row."""
         #TODO consider checking SERNEC for those Catalog Number's existance
         # IE: http://sernecportal.org/portal/collections/list.php?db=311&catnum=UCHT012345%20-%20UCHT0123555&othercatnum=1
@@ -351,9 +352,11 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
     def verifyAllButton(self):
         """ applies verifyTaxonomy and geoRef over each visible row"""
+        # TODO find logical point in workflow to clean associatedTaxa.
         self.geoRef()
         self.verifyTaxButton()
-        
+        self.parent.testRunLabels()
+            
     def processViewableRecords(self, rowsToProcess, func):
         """ applies a function over each row among rowsToProcess (by index)"""
         #self.parent.statusBar.label_status

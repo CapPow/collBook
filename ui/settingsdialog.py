@@ -136,9 +136,9 @@ class settingsWindow(QMainWindow):
         # conditionally build a list of those which to add.
         # NOTE: keeping Local options in index 0 position
         if kingdom == 'Plantae':
-            toAdd = ['ITIS (local)', 'Catalog of Life (web API)', 'ITIS (web API)', 'Taxonomic Name Resolution Service (web API)']
+            toAdd = ['ITIS (local)', 'Catalog of Life (web API)', 'Taxonomic Name Resolution Service (web API)']
         elif kingdom == 'Fungi':
-            toAdd = ['MycoBank (local)', 'Catalog of Life (web API)', 'MycoBank (web API)']
+            toAdd = ['MycoBank (local)', 'Catalog of Life (web API)']
         source.addItems(toAdd)
         newIndex = source.findText(sourceValue) # look for new index of initial selection
         if newIndex == -1:  # if it is no longer in the list

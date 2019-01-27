@@ -347,7 +347,7 @@ class Ui_settingsWindow(object):
         settingsWindow.setMenuBar(self.menubar)
 
         self.retranslateUi(settingsWindow)
-        self.catalogNumberPage.setCurrentIndex(0)
+        self.catalogNumberPage.setCurrentIndex(2)
         self.value_LogoAlignment.setCurrentIndex(4)
         self.value_Kingdom.setCurrentIndex(1)
         self.value_inc_VerifiedBy.toggled['bool'].connect(self.value_VerifiedBy.setEnabled)
