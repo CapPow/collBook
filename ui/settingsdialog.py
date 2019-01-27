@@ -234,6 +234,9 @@ class settingsWindow(QMainWindow):
         parent.value_catalogNumberDigits.setValue(value_catalogNumberDigits)
         value_catalogNumberStartingNum = int(self.get('value_catalogNumberStartingNum', 0))
         parent.value_catalogNumberStartingNum.setValue(value_catalogNumberStartingNum)
+        value_max_Associated = int(self.get('value_max_Associated', 10))
+        parent.value_max_Associated.setValue(value_max_Associated)
+        
     
         #slider
         value_LogoScaling = int(self.get('value_LogoScaling', 100))
@@ -249,7 +252,7 @@ class settingsWindow(QMainWindow):
     def saveSettings(self):
         """ stores the preferences widget's selections to self.settings"""
         parent = self.settingsWindow
-        
+
         #QComboBox
         value_AuthChangePolicy = parent.value_AuthChangePolicy.currentText()
         self.setValue('value_AuthChangePolicy',value_AuthChangePolicy)
@@ -273,7 +276,7 @@ class settingsWindow(QMainWindow):
         #QPlainTextEdit        
         value_CollectionName = parent.value_CollectionName.toPlainText()
         self.setValue('value_CollectionName', value_CollectionName)
-        
+
         #QCheckBox
         value_inc_Associated = parent.value_inc_Associated.isChecked()
         self.setValue('value_inc_Associated',value_inc_Associated)
@@ -289,7 +292,7 @@ class settingsWindow(QMainWindow):
         self.setValue('value_inc_Logo', value_inc_Logo)
         value_assignCatalogNumbers = parent.value_assignCatalogNumbers.isChecked()
         self.setValue('value_assignCatalogNumbers', value_assignCatalogNumbers)
-        
+
         #QSpinBox
         value_X = parent.value_X.value()
         self.setValue('value_X',value_X)
@@ -305,8 +308,9 @@ class settingsWindow(QMainWindow):
         self.setValue('value_catalogNumberDigits', value_catalogNumberDigits)
         value_catalogNumberStartingNum = parent.value_catalogNumberStartingNum.value()
         self.setValue('value_catalogNumberStartingNum', value_catalogNumberStartingNum)
-        
-        
+        value_max_Associated = parent.value_max_Associated.value()
+        self.setValue('value_max_Associated', value_max_Associated)
+
         #slider
         value_LogoScaling = parent.value_LogoScaling.value()
         self.setValue('value_LogoScaling', value_LogoScaling)

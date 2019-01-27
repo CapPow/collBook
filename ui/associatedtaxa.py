@@ -49,11 +49,10 @@ class associatedTaxaMainWindow(QWidget):
         joinedTaxa = ', '.join(checkedTaxa)
         self.parent.w.lineEdit_associatedTaxa.setText(joinedTaxa)
         self.hide()
-        
 
     def cleanAssociatedTaxa(self, rowData):
         """ Expects a row of data formatted in tWDC. Conditionally called by
-        saveChanges() in formview.py. Removes row's scientificName from the 
+        saveChanges() in formview.py. Removes row's scientificName from the
         associatedTaxa list. This avoids records naming themselves among their
         associatedTaxa."""
         sciName = rowData['scientificName'].strip().lower()

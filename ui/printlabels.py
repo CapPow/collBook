@@ -12,10 +12,8 @@ from reportlab.lib.utils import ImageReader
 
 #from reportlab.platypus import Image as rlImage 
 #from ui.customdocteplate import BaseDocTemplate
-
 from PIL import Image, ImageFilter
 import math
-
 import os
 import sys
 import io
@@ -163,17 +161,31 @@ class LabelPDF():
         self.yMargin = self.xMarginProportion * self.yPaperSize
         self.customPageSize = (self.xPaperSize, self.yPaperSize)
         
-        # check some of the optional label settings
+        # check some of the optional label settings, & make adjustments.
         additionalData = {}
         if self.settings.get('value_inc_VerifiedBy'):
             additionalData['verifiedBy'] = self.settings.get('value_VerifiedBy')
+        else:
+            additionalData['verifiedBy'] = ''
         if self.settings.get('value_inc_CollectionName'):
             additionalData['collectionName'] = self.settings.get('value_CollectionName')
-            
+        else:
+            additionalData['collectionName'] = ''
+        # setting these now, to avoid redundant .get calls.
+        incAssociated = self.settings.get('value_inc_Associated')
+        maxAssociated = int(self.settings.get('value_max_Associated'))
+        if not incAssociated:
+            additionalData['associatedTaxa'] = ''
         for rowData in labelDataInput:
-            for key, value in additionalData.items():
-                rowData[key] = value
-    
+           if incAssociated:
+                associatedTaxa = rowData['associatedTaxa']
+                associatedTaxaItems = associatedTaxa.split(', ')
+                if len(associatedTaxaItems) > maxAssociated: #if it is too large, trunicate it, and append "..." to indicate trunication.
+                    associatedTaxa =  ', '.join(associatedTaxaItems[:maxAssociated])+' ...'
+                    rowData['associatedTaxa'] = associatedTaxa
+                for key, value in additionalData.items():
+                    rowData[key] = value
+
         tableSty = [                                    #Default table style
                 ('LEFTPADDING',(0,0),(-1,-1), 0),
                 ('RIGHTPADDING',(0,0),(-1,-1), 0),
@@ -253,14 +265,12 @@ class LabelPDF():
                 return barcode39Std
             else:
                 return ''
-    
-    
         elements = []      # a list to dump the flowables into for pdf generation
         for labelFieldsDict in labelDataInput:
             def dfl(key):                       # dict lookup helper function
                 value = labelFieldsDict.get(key,'') # return empty string if no result from lookup.
                 return str(value)
-    
+
         #Building list of flowable elements below
             if (len(dfl('catalogNumber')) > 0) | (self.settings.dummyCatNumber != False):
                 row0 = Table([[

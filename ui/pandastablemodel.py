@@ -249,8 +249,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 #if CatNumberBar.stuCollCheckBoxVar.get() == 1: # for each dict, if it is student collection
                 #    record['verifiedBy'] = CatNumberBar.stuCollVerifyByVar.get() #then add the verified by name to the dict.
                 associatedTaxaItems = record.get('associatedTaxa').split(', ') #for each dict, verify that the associatedTaxa string does not consist of >15 items.
-                if len(associatedTaxaItems) > 10:   #if it is too large, trunicate it at 15, and append "..." to indicate trunication.
-                    record['associatedTaxa'] = ', '.join(associatedTaxaItems[:10])+' ...'   
+#                if len(associatedTaxaItems) > 10:   #if it is too large, trunicate it at 15, and append "..." to indicate trunication.
+#                    record['associatedTaxa'] = ', '.join(associatedTaxaItems[:10])+' ...'   
         return records
 
     def geoRef(self):

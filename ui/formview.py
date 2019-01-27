@@ -29,7 +29,6 @@ class formView(QtWidgets.QStackedWidget):
     # set up a map for the fields and objects
     # structured as { columnName : ( read Function, save_Function, object )}
         self.formFields = {
-                
                 'labelProject': (self.read_QPlainTextEdit, self.save_selectSites_QPlainTextEdit, self.parent.plainTextEdit_labelProject),
                 'fieldNotes': (self.read_QPlainTextEdit, self.save_selectSites_QPlainTextEdit, self.parent.plainTextEdit_fieldNotes),
                 'eventRemarks':(self.read_QLineEdit, self.save_selectSites_QLineEdit, self.parent.lineEdit_eventRemarks),
@@ -91,9 +90,12 @@ class formView(QtWidgets.QStackedWidget):
             for colName, val in self.formFields.items():
                 readFunc, _, qtObject = val  # break out the value tuple
                 value = rowData.get(colName, '')
-                qtObject.blockSignals(True)  # Pause data changed signals
-                readFunc(qtObject, value)
-                qtObject.blockSignals(False)  # Resume data changed signals
+                if colName == 'associatedTaxa':  # don't block signals for associatedTaxa
+                    readFunc(qtObject, value)
+                else:  # blocking signals on populate reduces unnecessary work
+                    qtObject.blockSignals(True)  # Pause data changed signals
+                    readFunc(qtObject, value)
+                    qtObject.blockSignals(False)  # Resume data changed signals
 
     def saveChanges(self, colName, value, selectSites = False):
         """ Actualy stores the changes. Called by the other save_xxx funcs."""
@@ -111,7 +113,6 @@ class formView(QtWidgets.QStackedWidget):
             df = df.apply(self.parent.associatedTaxaWindow.cleanAssociatedTaxa, axis = 1)
         #  it may be worth while to do something similar for associatedCollectors & recordedBy
         self.parent.m.update(df)
-
 
     def read_QLineEdit(self, obj, value):
         obj.setText(value)
