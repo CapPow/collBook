@@ -578,6 +578,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             'stateProvince':['',''],
             'county':['',''],
             'municipality':['',''],
+            'path':['',''],
             'locality':['',''],
             'localitySecurity':['',''],
             'decimalLatitude':['',''],

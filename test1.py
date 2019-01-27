@@ -1,3 +1,17 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+.... (as of yet unnamed) is the desktop companion to (as of yet unnamed). 
+This project seeks to provide direct-to-database format field notes for 
+field researchers making biological collections. 
+"""
+__author__ = "Caleb Powell, Jacob Motley"
+__credits__ = ["Caleb Powell, Jacob Motley, Joey Shaw"]
+__email__ = "calebadampowell@gmail.com"
+__status__ = "Alpha"
+__version__ = '0.1.0'
+
+
 import sys
 from io import StringIO
 from pathlib import Path
@@ -9,7 +23,7 @@ from reportlab.platypus.doctemplate import LayoutError
 from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
 from ui.locality import locality
-from PyQt5.QtCore import QFile, Qt, QDir
+from PyQt5.QtCore import QFile, Qt
 import qdarkstyle
 from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow

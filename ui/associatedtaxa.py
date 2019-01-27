@@ -24,21 +24,18 @@ class associatedTaxaMainWindow(QWidget):
         self.parent = parent # this is the master window
         associatedMainWin = Ui_associatedTaxaMainWindow()
         associatedMainWin.setupUi(self)
-        
         # make the entry object addressable
         self.lineEdit_newAssociatedTaxa = associatedMainWin.lineEdit_newAssociatedTaxa
         # make the main window easily addressable
         self.associatedMainWin = associatedMainWin
-        
         associatedList = associatedMainWin.listWidget_associatedTaxa
         self.associatedList = associatedList
 
-
     def saveAssociatedTaxa(self):
         """ Populates the mainwindow's lineEdit_associatedTaxa with the 
-        checked taxa in associatedList and hides the associatedTaxaMainWindow"""
+        checked taxa in associatedList and hides the associatedTaxaMainWindow.
+        Called from associatedTaxaUI.py when button_save is pressed."""
         #  collect the list, and dump them into the proper field(s)
-
         checkedTaxa = []
         for index in range(self.associatedList.count()):
             if self.associatedList.item(index).checkState() == Qt.Checked:
@@ -53,9 +50,23 @@ class associatedTaxaMainWindow(QWidget):
         self.parent.w.lineEdit_associatedTaxa.setText(joinedTaxa)
         self.hide()
         
+
+    def cleanAssociatedTaxa(self, rowData):
+        """ Expects a row of data formatted in tWDC. Conditionally called by
+        saveChanges() in formview.py. Removes row's scientificName from the 
+        associatedTaxa list. This avoids records naming themselves among their
+        associatedTaxa."""
+        sciName = rowData['scientificName'].strip().lower()
+        associatedTaxa = rowData['associatedTaxa'].split(', ')
+        # filter out the scientificName, case insensative.
+        associatedTaxa = list(set(x for x in associatedTaxa if
+                                  x.strip().lower() not in sciName))
+        associatedTaxa.sort()
+        rowData['associatedTaxa'] = ', '.join(associatedTaxa)
+        return rowData
+
     def populateAssociatedTaxa(self):
         """ populates the items in the associatedLists """
-        
         self.associatedList.clear()
         # determine what is currently selected
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
@@ -65,7 +76,6 @@ class associatedTaxaMainWindow(QWidget):
         rowsToConsider = self.parent.m.getRowsToKeep(selType, siteNum, None)
         # generate a  list of all taxa from the selections
         taxaList = []
-        
         for row in rowsToConsider:
             rowData = self.parent.m.retrieveRowData(row)
             associatedNames =  rowData['associatedTaxa'].split(',')
@@ -80,8 +90,6 @@ class associatedTaxaMainWindow(QWidget):
                 item.setCheckState(Qt.Unchecked)
                 self.associatedList.addItem(item)
         self.associatedList.sortItems(Qt.AscendingOrder)
-        #  if it is a specimen, check existing associated records         
-        
         if None not in existingAssociatedTaxa:
             self.checkItems(existingAssociatedTaxa)            
 

@@ -11,7 +11,6 @@ from reportlab.lib.units import mm
 from reportlab.lib.utils import ImageReader
 
 #from reportlab.platypus import Image as rlImage 
-
 #from ui.customdocteplate import BaseDocTemplate
 
 from PIL import Image, ImageFilter

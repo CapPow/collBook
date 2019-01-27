@@ -107,8 +107,11 @@ class formView(QtWidgets.QStackedWidget):
         else:  # if saveFunc did not request selected sites
             visibleRows = self.parent.getVisibleRows()  # identify what is currently within the user's scope
             df.loc[visibleRows, colName] = value  # and select it
-        #self.parent.m.datatable.update(df)
+        if colName == 'associatedTaxa':
+            df = df.apply(self.parent.associatedTaxaWindow.cleanAssociatedTaxa, axis = 1)
+        #  it may be worth while to do something similar for associatedCollectors & recordedBy
         self.parent.m.update(df)
+
 
     def read_QLineEdit(self, obj, value):
         obj.setText(value)
