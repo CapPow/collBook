@@ -40,6 +40,7 @@ class settingsWindow(QMainWindow):
         self.settingsWindow.button_SaveExit.clicked.connect(self.saveButtonClicked)
         self.settingsWindow.button_Cancel.clicked.connect(self.cancelButtonClicked)
         self.settingsWindow.toolButton_GetLogoPath.clicked.connect(self.getLogoPath)
+        self.genDummyCatalogNumber()
 
     def saveButtonClicked(self):
         """ hides the preferences window and saves the user entries """
@@ -47,6 +48,7 @@ class settingsWindow(QMainWindow):
         # force pdf_preview window to resize ui elements.
         self.parent.pdf_preview.initViewer(self.parent)
         self.parent.p.initLogoCanvas() # re-build the logo backdrop for labels.
+        self.genDummyCatalogNumber()
         self.parent.updatePreview()
         self.parent.updateAutoComplete()
         self.hide()
@@ -161,6 +163,17 @@ class settingsWindow(QMainWindow):
         parent = self.settingsWindow
         val = f'({str(Qint)}%)'.rjust(8, ' ')
         parent.label_opacityValue.setText(val)
+    
+    def genDummyCatalogNumber(self):
+        """ generates a single dummy catalog number for label previews"""
+        incDummy = self.get('value_inc_Barcode', False)
+        if incDummy:
+            catDigits = int(self.get('value_catalogNumberDigits'))
+            catPrefix = self.get('value_catalogNumberPrefix')
+            dummyCatNumber = f'{catPrefix}{str(0).zfill(catDigits)}'
+        else:
+            dummyCatNumber = False
+        self.dummyCatNumber = dummyCatNumber
 
     def populateSettings(self):
         """ uses self.settings to populate the preferences widget's selections"""
@@ -199,8 +212,6 @@ class settingsWindow(QMainWindow):
         parent.value_inc_CollectionName.setCheckState(value_inc_CollectionName)
         value_inc_VerifiedBy =  self.convertCheckState(self.get('value_inc_VerifiedBy'))
         parent.value_inc_VerifiedBy.setCheckState(value_inc_VerifiedBy)
-        value_catalogNumberAssignExport = self.convertCheckState(self.get('value_catalogNumberAssignExport'))
-        parent.value_catalogNumberAssignExport.setCheckState(value_catalogNumberAssignExport)
         
         #QGroupbox (checkstate)
         value_inc_Logo = self.convertCheckState(self.get('value_inc_Logo'))
@@ -272,11 +283,7 @@ class settingsWindow(QMainWindow):
         self.setValue('value_inc_CollectionName',value_inc_CollectionName)
         value_inc_VerifiedBy = parent.value_inc_VerifiedBy.isChecked()
         self.setValue('value_inc_VerifiedBy', value_inc_VerifiedBy)
-        value_assignCatalogNumbers = parent.value_assignCatalogNumbers.isChecked()
-        self.setValue('value_assignCatalogNumbers', value_assignCatalogNumbers)
-        value_catalogNumberAssignExport = parent.value_catalogNumberAssignExport.isChecked()
-        self.setValue('value_catalogNumberAssignExport', value_catalogNumberAssignExport)
-        
+
         #QGroupbox
         value_inc_Logo = parent.value_inc_Logo.isChecked()
         self.setValue('value_inc_Logo', value_inc_Logo)

@@ -98,7 +98,21 @@
                <property name="labelAlignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
-               <item row="1" column="1">
+               <item row="1" column="0" colspan="2">
+                <widget class="QCheckBox" name="value_inc_Barcode">
+                 <property name="text">
+                  <string>Include dummy barcode in label previews</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Catalog Number Prefix</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
                  <item>
                   <widget class="QLineEdit" name="value_catalogNumberPrefix">
@@ -129,7 +143,14 @@
                  </item>
                 </layout>
                </item>
-               <item row="2" column="1">
+               <item row="5" column="0">
+                <widget class="QLabel" name="label_8">
+                 <property name="text">
+                  <string>Starting Number</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_5">
                  <item>
                   <widget class="QSpinBox" name="value_catalogNumberStartingNum">
@@ -156,7 +177,14 @@
                  </item>
                 </layout>
                </item>
-               <item row="3" column="1">
+               <item row="6" column="0">
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string>Preview</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_6">
                  <item>
                   <widget class="QLabel" name="label_catalogNumber_Preview">
@@ -183,35 +211,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_6">
-                 <property name="text">
-                  <string>Catalog Number Prefix</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_8">
-                 <property name="text">
-                  <string>Starting Number</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_10">
-                 <property name="text">
-                  <string>Preview</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="0" colspan="2">
-                <widget class="QCheckBox" name="value_catalogNumberAssignExport">
-                 <property name="text">
-                  <string>Assign on Export</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="0">
+               <item row="10" column="0">
                 <spacer name="verticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -510,16 +510,6 @@
                    </layout>
                   </item>
                  </layout>
-                </widget>
-               </item>
-               <item row="11" column="0" colspan="2">
-                <widget class="QCheckBox" name="value_inc_Barcode">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="text">
-                  <string>Include catalogNumber barcode</string>
-                 </property>
                 </widget>
                </item>
               </layout>
@@ -878,8 +868,8 @@
    <slot>scalingChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>421</x>
-     <y>479</y>
+     <x>516</x>
+     <y>519</y>
     </hint>
     <hint type="destinationlabel">
      <x>408</x>
@@ -894,8 +884,8 @@
    <slot>opacityChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>361</x>
-     <y>511</y>
+     <x>516</x>
+     <y>548</y>
     </hint>
     <hint type="destinationlabel">
      <x>430</x>
@@ -910,8 +900,8 @@
    <slot>updateCatalogNumberPreview(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>421</x>
-     <y>90</y>
+     <x>509</x>
+     <y>168</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -926,8 +916,8 @@
    <slot>updateCatalogNumberPreview(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>562</x>
-     <y>81</y>
+     <x>601</x>
+     <y>167</y>
     </hint>
     <hint type="destinationlabel">
      <x>288</x>
@@ -942,8 +932,8 @@
    <slot>updateCatalogNumberPreview(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>318</x>
-     <y>115</y>
+     <x>403</x>
+     <y>202</y>
     </hint>
     <hint type="destinationlabel">
      <x>348</x>
@@ -958,12 +948,28 @@
    <slot>updateStartingCatalogNumber(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>579</x>
-     <y>89</y>
+     <x>601</x>
+     <y>167</y>
     </hint>
     <hint type="destinationlabel">
      <x>387</x>
      <y>-13</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_assignCatalogNumbers</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>value_inc_Barcode</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>378</x>
+     <y>313</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>382</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>

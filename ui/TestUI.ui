@@ -1725,8 +1725,8 @@
    <slot>updateTableView()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>206</x>
-     <y>671</y>
+     <x>216</x>
+     <y>653</y>
     </hint>
     <hint type="destinationlabel">
      <x>457</x>
@@ -1757,8 +1757,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>834</x>
-     <y>153</y>
+     <x>904</x>
+     <y>182</y>
     </hint>
     <hint type="destinationlabel">
      <x>794</x>
@@ -1773,8 +1773,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>833</x>
-     <y>159</y>
+     <x>904</x>
+     <y>182</y>
     </hint>
     <hint type="destinationlabel">
      <x>845</x>
@@ -1789,12 +1789,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>854</x>
-     <y>153</y>
+     <x>904</x>
+     <y>182</y>
     </hint>
     <hint type="destinationlabel">
-     <x>837</x>
-     <y>388</y>
+     <x>895</x>
+     <y>306</y>
     </hint>
    </hints>
   </connection>
@@ -1805,12 +1805,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>858</x>
-     <y>156</y>
+     <x>904</x>
+     <y>182</y>
     </hint>
     <hint type="destinationlabel">
-     <x>769</x>
-     <y>394</y>
+     <x>800</x>
+     <y>306</y>
     </hint>
    </hints>
   </connection>
@@ -1821,12 +1821,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>779</x>
-     <y>94</y>
+     <x>832</x>
+     <y>103</y>
     </hint>
     <hint type="destinationlabel">
-     <x>814</x>
-     <y>93</y>
+     <x>923</x>
+     <y>107</y>
     </hint>
    </hints>
   </connection>
@@ -1837,12 +1837,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>771</x>
-     <y>89</y>
+     <x>124</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>818</x>
-     <y>90</y>
+     <x>124</x>
+     <y>104</y>
     </hint>
    </hints>
   </connection>

@@ -19,79 +19,79 @@ import pandas as pd
 class PandasTableModel(QtCore.QAbstractTableModel):
     def __init__(self, parent=None, editable = True, *args):
         super(PandasTableModel, self).__init__(parent)
-        self.parent = parent        
+        self.parent = parent
         self.datatable = None  # what the user is seeing & interacting with
-        # custom undo implimentation, essentially storing copies of dataframes 
-        # stored as a list of tuples (df, "description of change")
-        # undoing or redoing simply restores the list according to the index
-        self.undoStack = []  # holds the checkpoints
-        self.undoIndex = 0  # the current position in the checkpoint list
-        self.updateUndoRedoButtons()
-        
-    def add_to_undo_stack(self, description = 'the last major action'):
+        # custom undo method
+        self.undoList = []  # holds the checkpoints
+        self.redoList = []  # the current position in the checkpoint list
+        self.updateUndoRedoButtons()  # set up initial undo / redo state
+
+    def addToUndoList(self, description='undo the last major action'):
         """ to be called just before a change is made to the underlaying df """
-        self.undoIndex = 0 # if a change was made, reset the index
-        if self.undoIndex >= 20:  # be sure not to grow too big
-            self.undoStack = self.undoStack[:20]
+        selection = self.parent.getTreeSelectionType()
         df = self.datatable   # save the details into a checkpoint
-        checkPoint = (df.copy(deep=True), description)
-        self.undoStack.insert(0, checkPoint)  # insert it at the top of the list
-        print(len(self.undoStack))
-        self.undoIndex = 0
+        checkPoint = (df.copy(deep=True), selection, description)
+        self.undoList.append(checkPoint)
+        self.redoList = []  # if we're adding to undoList, clear redoList
         self.updateUndoRedoButtons()
+        if len(self.undoList) > 20:  # be sure not to grow too big
+            self.undoList = self.undoList[20:]
 
     def redo(self):
-        """ restores the underlaying df to a lower index checkpoint """
-        pos = self.undoIndex  # the current position in the undo stack 
-        checkpoint = self.undoStack[pos + 1]
-        df, reMsg = checkpoint  # not sure we need reMsg here (redo message)
-        self.datatable.update(df)
-        self.update(self.datatable)
-        self.parent.updateTableView()
-        self.undoIndex -= 1  # increment undo index (position)
+        """ restores the underlaying df the most recent redoList point """
+        origDF = self.datatable
+        try:
+            checkpoint = self.redoList.pop()
+        except IndexError:
+            checkpoint = (None,  (None, None, None),  'the last major action')
+        df, sel, msg = checkpoint
+        if isinstance(df, pd.DataFrame):
+            self.datatable = df
+            self.update(self.datatable)
+            self.parent.updateTableView()
+        self.undoList.append((origDF, sel, msg))
         self.updateUndoRedoButtons()
-        
+        self.parent.populateTreeWidget()
+        self.parent.setTreeSelectionByType(*sel)  # return the selection
+
     def undo(self):
-        """ restores the underlaying df to a higher index checkpoint """
-        checkpoint = self.undoStack[self.undoIndex] # get current position checkpoint
-        df, unMsg = checkpoint  # not sure we need unMsg here (undo message)
-        self.datatable.update(df)
-        self.update(self.datatable)
-        self.parent.updateTableView()
-        self.undoIndex += 1 # increment undo index (position)    
+        """ restores the underlaying df to the most recent undoList point"""
+        origDF = self.datatable
+        try:
+            checkpoint = self.undoList.pop()
+        except IndexError:
+            checkpoint = (None, (None, None, None), 'the last major action')
+        df, sel, msg = checkpoint
+        if isinstance(df, pd.DataFrame):
+            self.datatable = df
+            self.update(self.datatable)
+            self.parent.updateTableView()
+        self.redoList.append((origDF, sel, msg))
         self.updateUndoRedoButtons()
+        self.parent.populateTreeWidget()
+        self.parent.setTreeSelectionByType(*sel)  # return the selection
 
     def updateUndoRedoButtons(self):
         """ called if the self.undoIndex changes. Updates the hint text of the
             undo, & redo buttons to reflect the description appended in 
-            add_to_undo_stack"""
-        # if the undo stack is at the end disable it
-        pos = self.undoIndex  # the current position in the undo stack
-        if len(self.undoStack) < 1:
-            self.parent.w.action_undo.setEnabled(False)
-            self.parent.w.action_undo.setToolTip('undo last major action')
-            self.parent.w.action_redo.setEnabled(False)
-            self.parent.w.action_redo.setToolTip('redo last major action')
-
-        elif pos > len(self.undoStack) - 1:  # at the end of undo stack (no undos)
-            self.parent.w.action_undo.setEnabled(False)
-            self.parent.w.action_undo.setToolTip('nothing to undo')
-            self.parent.w.action_redo.setEnabled(True)
-            print(pos)
-            self.parent.w.action_redo.setToolTip(self.undoStack[pos + 1][1])
-
-        elif pos < 1:  # at the top of undo stack (no redos)
+            addToUndoList"""
+        if len(self.undoList) > 0 :
             self.parent.w.action_undo.setEnabled(True)
-            self.parent.w.action_undo.setToolTip(self.undoStack[pos][1])
-            self.parent.w.action_redo.setEnabled(False)
-            self.parent.w.action_redo.setToolTip('nothing to redo')
+            msg = self.undoList[-1][-1]#.replace('redo: ', 'undo: ')
+            msg = f'undo: {msg}'
+        else:
+            self.parent.w.action_undo.setEnabled(False)
+            msg = 'undo the last major action'
+        self.parent.w.action_undo.setToolTip(msg)
 
-        else:  # in the middle of undo stack (can redo or undo)
-            self.parent.w.action_undo.setEnabled(True)
-            self.parent.w.action_undo.setToolTip(self.undoStack[pos][1])
+        if len(self.redoList) > 0 :
             self.parent.w.action_redo.setEnabled(True)
-            self.parent.w.action_redo.setToolTip(self.undoStack[pos + 1][1])
-
+            msg = self.redoList[-1][-1]#.replace('undo', 'redo')
+            msg = f'redo: {msg}'
+        else:
+            self.parent.w.action_redo.setEnabled(False)
+            msg = 'redo the last major action'    
+        self.parent.w.action_redo.setToolTip(msg)
 
     def update(self, dataIn):
         self.beginResetModel()
@@ -107,7 +107,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             newSiteNum = max(pd.to_numeric(df['site#'], errors = 'coerce')) + 1
         except ValueError:
             newSiteNum = 1
-        self.add_to_undo_stack(f'added site {newSiteNum}')  # set checkpoint in undostack
+        self.addToUndoList(f'added site {newSiteNum}')  # set checkpoint in undostack
         rowData = {'otherCatalogNumbers':f'{newSiteNum}-#', 
                    'site#':f'{newSiteNum}',
                    'specimen#':'#'}
@@ -135,7 +135,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                             (df['specimen#'] == '#')].copy()
             newRowData['specimen#'] = f'{newSpNum}'
             catNum =  f'{siteNum}-{newSpNum}'
-            self.add_to_undo_stack(f'added specimen {catNum}')  # set checkpoint in undostack
+            self.addToUndoList(f'added specimen {catNum}')  # set checkpoint in undostack
             newRowData['otherCatalogNumbers'] = catNum
             df = df.append(newRowData, ignore_index=True, sort=False)
             df = self.sortDF(df)
@@ -151,7 +151,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df = self.datatable
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
         if selType == 'specimen':
-            self.add_to_undo_stack(f'duplicated specimen {siteNum}-{specimenNum}')  # set checkpoint in undostack
+            self.addToUndoList(f'duplicated specimen {siteNum}-{specimenNum}')  # set checkpoint in undostack
             try:  # try to make the new row data
                 spNums = df[(df['site#'] == siteNum) &
                             (df['specimen#'] != '#')]['specimen#']
@@ -176,7 +176,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df = self.datatable
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
         if selType == 'site':
-            self.add_to_undo_stack(f'undo: removed site {siteNum}')  # set checkpoint in undostack
+            self.addToUndoList(f'removed site {siteNum}')  # set checkpoint in undostack
             newDF = df[df['site#'] != siteNum].copy()
             newDF = self.sortDF(newDF)
             self.datatable = newDF
@@ -191,7 +191,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df = self.datatable
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
         if selType == 'specimen':
-            self.add_to_undo_stack(f'undo: removed specimen {siteNum}-{specimenNum}')  # set checkpoint in undostack
+            self.addToUndoList(f'removed specimen {siteNum}-{specimenNum}')  # set checkpoint in undostack
             newDF = df[~((df['site#'] == siteNum) & (df['specimen#'] == specimenNum))].copy()
             newDF = self.sortDF(newDF)
             self.datatable = newDF
@@ -256,7 +256,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         Combines api calls for records from the same site."""
         # Needs modified If editing site data at specimen level records is re-enabled.
 
-        self.add_to_undo_stack('undo: geolocate process')  # set checkpoint in undostack
+        self.addToUndoList('geolocate process')  # set checkpoint in undostack
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
         if selType == 'site':
             # hacky method to get only site level record (catalogNumber: "n-#")
@@ -289,18 +289,16 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.datatable.update(df)
             self.update(self.datatable)
             self.parent.updateTableView()
-        
+
     def assignCatalogNumbers(self):
+        # TODO deal with preview CAT Numbers
         """If appropriate assigns catalogNumbers over each visible row."""
         #TODO consider checking SERNEC for those Catalog Number's existance
         # IE: http://sernecportal.org/portal/collections/list.php?db=311&catnum=UCHT012345%20-%20UCHT0123555&othercatnum=1
         # Could webscrape a requests return from something like: http://sernecportal.org/portal/collections/list.php?db=311&catnum=UCHT999900%20-%20UCHT999991&othercatnum=1
         # the checkbox for enabling the "Assign catalog numbers" group box.
         assign = self.parent.settings.get('value_assignCatalogNumbers', False)
-        # the checkbox for automatically assigning catalog numbers while processing.
-        assign_Durring_Processing = self.parent.settings.get('value_catalogNumberAssignExport', False)
-
-        if assign & assign_Durring_Processing:
+        if assign:
             rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
             dfOrig = self.datatable.iloc[rowsToProcess, ]
             df = dfOrig.loc[(dfOrig['specimen#'].str.isdigit()) & 
@@ -337,15 +335,15 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                         if answer is True:  # if the user agreed to assign the catalog numbers
                             dfNonUnique['catalogNumber'] = newCatNums
                             self.datatable.update(dfNonUnique)
-                    self.datatable.update(dfNonUnique)
-                    self.update(self.datatable)
-                    self.parent.updateTableView()
-                    self.parent.settings.updateStartingCatalogNumber(catStartingNum)
+                            self.datatable.update(dfNonUnique)
+                            self.update(self.datatable)
+                            self.parent.updateTableView()
+                            self.parent.settings.updateStartingCatalogNumber(catStartingNum)
 
     def verifyTaxButton(self):
         """ applies verifyTaxonomy over each visible row."""
         # refresh tax settings
-        self.add_to_undo_stack('undo: verify taxonomy process')  # set checkpoint in undostack
+        self.addToUndoList('verify taxonomy process')  # set checkpoint in undostack
         self.parent.tax.onFirstRow = True
         self.parent.tax.readTaxonomicSettings()
         rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
@@ -535,9 +533,11 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         qm = QMessageBox
         if skipDialog:
             ret = QMessageBox.Yes
-        else:    
-            ret = qm.question(self.parent,'', 'Load a blank data set? (any unsaved progress will be lost)', qm.Yes | qm.No)
+        else:
+            ret = qm.question(self.parent, '', 'Load a blank data set? (any unsaved progress will be lost)', qm.Yes | qm.No)
         if ret == qm.Yes:
+            if not skipDialog:
+                self.addToUndoList(f'loaded new, blank site data')  # set checkpoint in undostack
             newDFDict = {
             'site#':['1','1'],
             'specimen#':['#','1'],

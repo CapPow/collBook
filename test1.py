@@ -181,6 +181,18 @@ class MyWindow(QMainWindow):
         selectionIndex = self.tree_widget.indexFromItem(itemSelected)
         self.tree_widget.expand(selectionIndex)
 
+    def setTreeSelectionByType(self, selType, siteNum, specimenNum):
+        """ sets tree selection using the returned values of
+        getTreeSelectionType called by pandastablemodel when redoing
+        or undoing other df states """
+        if selType == 'allRec':
+            text = "All Records"
+        elif selType == 'site':
+            text = f'Site {siteNum}'
+        elif selType == 'specimen':
+            text = f'{siteNum}-{specimenNum}'
+        self.selectTreeWidgetItemByName(text)
+
     def timeitTest(self):
         """ debugging / improving space for testing various functions or their timings """
 

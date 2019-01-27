@@ -46,7 +46,7 @@ class LabelPDF():
         self.logo = False
         if self.useLogo:
             self.initLogoCanvas()
- 
+
     def initLogoCanvas(self):
         """ initalizes the logo and stores it in memory to be applied to each
         label (and label preview). """
@@ -245,6 +245,9 @@ class LabelPDF():
         def createBarCodes():   #Unsure of the benefits downsides of using extended vs standard?
             if len(dfl('catalogNumber')) > 0:
                 barcodeValue = dfl('catalogNumber')
+            else:
+                barcodeValue =  self.settings.dummyCatNumber
+            if barcodeValue:
                 code39._Code39Base._humanText = newHumanText  #Note, overriding the human text from this library to omit the stopcode ('+')
                 barcode39Std = code39.Standard39(barcodeValue,barHeight=(self.yPaperSize * .10  ), barWidth=((self.xPaperSize * 0.28)/(len(barcodeValue)*13+35)), humanReadable=True, quiet = False, checksum=0)
                                                  #^^^Note width is dynamic, but I don't know the significe of *13+35 beyond making it work.
@@ -260,7 +263,7 @@ class LabelPDF():
                 return str(value)
     
         #Building list of flowable elements below
-            if len(dfl('catalogNumber')) > 0:                   #If the catalog number is known, add the barcode. If not, don't.
+            if (len(dfl('catalogNumber')) > 0) | (self.settings.dummyCatNumber != False):
                 row0 = Table([[
                     Para('collectionName','collectionNameSTY'),
                     createBarCodes()
