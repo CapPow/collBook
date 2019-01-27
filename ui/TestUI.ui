@@ -1507,11 +1507,10 @@
    </attribute>
    <addaction name="action_New_Records"/>
    <addaction name="action_Open"/>
-   <addaction name="action_Save_As"/>
    <addaction name="action_Settings"/>
    <addaction name="separator"/>
    <addaction name="action_undo"/>
-   <addaction name="action_Redo"/>
+   <addaction name="action_redo"/>
    <addaction name="separator"/>
    <addaction name="action_Verify_All"/>
    <addaction name="action_Export_Records"/>
@@ -1537,7 +1536,6 @@
    </attribute>
    <addaction name="separator"/>
    <addaction name="action_Exit"/>
-   <addaction name="actionTestFunction"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open">
@@ -1623,7 +1621,7 @@
     <string>undo last major action</string>
    </property>
   </action>
-  <action name="action_Redo">
+  <action name="action_redo">
    <property name="icon">
     <iconset resource="resources/Resources.qrc">
      <normaloff>:/rc_/corner-down-right.svg</normaloff>
@@ -1633,7 +1631,7 @@
     <string>&amp;Redo</string>
    </property>
    <property name="toolTip">
-    <string>undo last major action</string>
+    <string>redo last major action</string>
    </property>
   </action>
   <action name="action_Settings">

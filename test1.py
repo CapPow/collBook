@@ -1,8 +1,10 @@
 import sys
 from io import StringIO
+from pathlib import Path
 import pandas as pd
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator, QItemDelegate, QCompleter
+from PyQt5.QtWidgets import QMessageBox
 from reportlab.platypus.doctemplate import LayoutError
 from ui.printlabels import LabelPDF
 from ui.pandastablemodel import PandasTableModel
@@ -60,6 +62,8 @@ class MyWindow(QMainWindow):
         self.w.action_Open.triggered.connect(self.m.open_CSV)
         self.w.action_Save_As.triggered.connect(self.m.save_CSV)
         self.w.action_New_Records.triggered.connect(self.m.new_Records)
+        self.w.action_undo.triggered.connect(self.m.undo)
+        self.w.action_redo.triggered.connect(self.m.redo)
         self.w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))
         self.w.action_Settings.triggered.connect(self.toggleSettings)
         self.w.button_associatedTaxa.clicked.connect(self.toggleAssociated)
@@ -78,7 +82,7 @@ class MyWindow(QMainWindow):
         self.w.toolButton_sitesToApply_SelectAll.clicked.connect(self.selectAllSitesToApply)
         self.w.action_Export_Records.triggered.connect(self.exportRecords)
         #self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
-        self.w.actionTestFunction.triggered.connect(self.m.assignCatalogNumbers)        
+        #self.w.actionTestFunction.triggered.connect(self.m.assignCatalogNumbers)        
         # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()
@@ -213,22 +217,65 @@ class MyWindow(QMainWindow):
             rowData = None
         return rowData
 
+    # TODO for simplicity, move all userASK and userNOTIFY functions into mainWindow and alter calls in other modules to use it.
+    def userAsk(self, text, title):
+        """ a general user dialog with yes / cancel options"""
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Question)
+        msg.setText(text)
+        msg.setWindowTitle(title)
+        msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+        reply = msg.exec_()
+        if reply == QMessageBox.Yes:
+            return True
+        elif reply == QMessageBox.No:
+            return False
+        else:
+            return "cancel"
+
     def exportRecords(self):
-        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save Records",
-                                                                QDir.homePath(), "PDF (*.pdf, *.csv)")
-        
-        if not fileName.lower().endswith(('.pdf')):
-            fileName = f'{fileName}.pdf'
-        rowsToProcess = self.m.getRowsToProcess(*self.getTreeSelectionType())
-        labelSuccess = self.exportLabels(fileName = fileName)
-        if labelSuccess:
-            fileName = fileName.rpartition('.')[0]  
-            fileName = f'{fileName}.csv'
-            outDF = self.m.datatable.iloc[rowsToProcess, ]
-            outDF = outDF.loc[outDF['specimen#'] != '#']
-            self.m.save_CSV(df = outDF, fileName = fileName)
-                  
-        
+        """ saves a pdf file of the labels AND a csv of the records prepared for
+        SERNEC upload. """
+        saved = False  # have both files successfully saved?
+        #saveDialog = QtWidgets.QFileDialog(self)
+        # the name filters must be a list
+#        saveDialog.setWindowTitle('Export Labels')
+ #       saveDialog.setNameFilters(["Labels (*.pdf)"])
+ #       saveDialog.selectNameFilter("Labels (*.pdf)")
+        # show the dialog
+        while saved is False:
+            #saveDialog.exec_()
+            chosenFileName, _ =  QtWidgets.QFileDialog.getSaveFileName(self, "Export Labels", "", "Label PDFs (*.pdf)")
+            if chosenFileName == "":  # The user probably pressed Cancel
+                return None
+            else:
+                fileName = Path(chosenFileName).name
+                fileExtension = Path(chosenFileName).suffix
+                if fileExtension != '':
+                    fileName = fileName.replace(fileExtension,'')
+                csvFileName = f'{fileName}.csv'
+                pdfFileName = f'{fileName}.pdf'
+                if Path(csvFileName).is_file():
+                    message = f'Record file named: "{csvFileName}" already exist! OVERWRITE the Record (csv) file?'
+                    title = 'Export Records'
+                    answer = self.userAsk(message, title)
+                    if answer:
+                        readyToSave = True  # have we settled on the fileName(S)?
+                    else: 
+                        readyToSave = False # have we settled on the fileName(S)?
+                else:
+                    readyToSave = True # have we settled on the fileName(S)?
+                if readyToSave:  # if fileName(s) are settled...
+                    self.m.assignCatalogNumbers()  # the assignCatalogNumber function checks user settings before applying
+                    rowsToProcess = self.m.getRowsToProcess(*self.getTreeSelectionType())
+                    labelSuccess = self.exportLabels(fileName = pdfFileName)
+                    if labelSuccess:
+                        outDF = self.m.datatable.iloc[rowsToProcess, ]
+                        outDF = outDF.loc[outDF['specimen#'] != '#']
+                        csvName = csvFileName
+                        self.m.save_CSV(df = outDF, fileName = csvFileName)
+                        saved = True
+            
     def exportLabels(self, fileName = None):
         """ bundles records up and passes them to printlabels.genPrintLabelPDFs() """
         try:
