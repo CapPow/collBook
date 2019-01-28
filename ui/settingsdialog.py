@@ -19,29 +19,26 @@ class settingsWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
         self.init_ui(parent)
-        #TODO add a consideration for if the config file has never been created... fill in default values
-        # can use the get() argument for alt values and just code it into the populateSettings() function
            
     def init_ui(self, parent):
         self.parent = parent # this is the master window
         settingsWindow = Ui_settingsWindow()
         settingsWindow.setupUi(self)
         self.settingsWindow = settingsWindow
-        self.settings = QSettings('pdProject', 'collDesk')        
-        # TODO fix the settings file being saved to " test1.py.conf " and ignoring the organization and application inputs
-        #QApplication.setOrganizationName('Powell')
-        #QCoreApplication.setOrganizationName("pdProject");
-        #QApplication.setOrganizationDomain()
-        #QApplication.setApplicationName('pdDesk')
-        self.settingsWindow.value_CollectionName.setPlainText(self.get('value_CollectionName'))
-        #QApplication.setApplicationVersion()
-        self.settings.setFallbacksEnabled(False)    # File only, no fallback to registry or or.
+        self.settings = QSettings('pdProject', 'collBook')        
+        #self.settingsWindow.value_CollectionName.setPlainText(self.get('value_CollectionName'))
+        self.settings.setFallbacksEnabled(False)    # File only, no fallback to registry.
+        # before we populate them, verify the file exists
         self.populateSettings()
         self.settingsWindow.button_SaveExit.clicked.connect(self.saveButtonClicked)
         self.settingsWindow.button_Cancel.clicked.connect(self.cancelButtonClicked)
         self.settingsWindow.toolButton_GetLogoPath.clicked.connect(self.getLogoPath)
         self.genDummyCatalogNumber()
-
+        # be sure the settings file exists
+        if not self.settings.value('version', False):
+            self.saveSettings()
+        # can also later do a check if the version is not up-to-date
+        
     def saveButtonClicked(self):
         """ hides the preferences window and saves the user entries """
         self.saveSettings()
@@ -252,6 +249,9 @@ class settingsWindow(QMainWindow):
     def saveSettings(self):
         """ stores the preferences widget's selections to self.settings"""
         parent = self.settingsWindow
+        # save the version number
+        version = self.parent.w.version
+        self.setValue('version', version)
 
         #QComboBox
         value_AuthChangePolicy = parent.value_AuthChangePolicy.currentText()

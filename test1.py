@@ -33,6 +33,8 @@ from ui.scinameinputdialog import sciNameDialog
 
 from ui.progressbar import progressBar
 
+#from . import version
+
 class editorDelegate(QItemDelegate):
     """solution to the table_view editor clearing pre-existing cell values
     ref: https://stackoverflow.com/questions/39387842/not-displaying-old-value-when-editing-cell-in-a-qtablewidget"""
@@ -46,10 +48,12 @@ class MyWindow(QMainWindow):
         super().__init__()
         self.init_ui()
 
+
     def init_ui(self):
         self.w = Ui_MainWindow()
         self.showMaximized()
         self.w.setupUi(self)
+        self.w.version = __version__
         self.status_bar = self.statusBar()
         self.statusBar = progressBar(self.status_bar)
         self.statusBar.initProgressBar(self.status_bar)
