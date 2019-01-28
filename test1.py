@@ -249,11 +249,10 @@ class MyWindow(QMainWindow):
         return rowData
 
     def userSciNameInput(self, title = "", message = ""):
-        title = 'a title for me'
-        message = 'a message for you'
+        """ opens a cusotm user dialog and requests a scientificName """
         dlg = sciNameDialog()
         res = dlg.textBox(self.wordList, message, title)
-        print(res)
+        return res
 
     # TODO for simplicity, move all userASK and userNOTIFY functions into mainWindow and alter calls in other modules to use it.
     def userAsk(self, text, title=''):

@@ -91,8 +91,11 @@ class taxonomicVerification():
         changeAuth = False  # flag to determine if the authority needs altered.
         if result[0] == None:  # if no scientificName was returned
             #message = f'No {self.value_Kingdom} results for {scientificName} found using {self.TaxAlignSource}. Record {rowNum} is unchanged.'
-            message = f'No {self.value_Kingdom} results for {scientificName} found using {self.TaxAlignSource}. Record {rowNum} is unchanged.'
-            self.parent.userSciNameInput(message, 'Taxonomic alignment')
+            message = f'No {self.value_Kingdom} results for "{scientificName}" (# {rowNum}) found using {self.TaxAlignSource}.\n This may be a typo, would you like to reenter the name?'
+            reply = self.parent.userSciNameInput(f'{rowNum}: Taxonomic alignment', message)
+            if reply:
+                rowData['scientificName'] = reply
+                rowData = self.verifyTaxonomy(rowData)
             #self.parent.userNotice(message, 'Taxonomic alignment')
             return rowData
         if resultSciName not in scientificName:
