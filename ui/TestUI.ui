@@ -1541,7 +1541,6 @@
    </attribute>
    <addaction name="separator"/>
    <addaction name="action_Exit"/>
-   <addaction name="actionTestFunction"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open">

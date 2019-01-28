@@ -27,12 +27,12 @@ class settingsWindow(QMainWindow):
         settingsWindow = Ui_settingsWindow()
         settingsWindow.setupUi(self)
         self.settingsWindow = settingsWindow
-        self.settings = QSettings()        
+        self.settings = QSettings('pdProject', 'collDesk')        
         # TODO fix the settings file being saved to " test1.py.conf " and ignoring the organization and application inputs
         #QApplication.setOrganizationName('Powell')
-        QCoreApplication.setOrganizationName("pdProject");
+        #QCoreApplication.setOrganizationName("pdProject");
         #QApplication.setOrganizationDomain()
-        QApplication.setApplicationName('pdDesk')
+        #QApplication.setApplicationName('pdDesk')
         self.settingsWindow.value_CollectionName.setPlainText(self.get('value_CollectionName'))
         #QApplication.setApplicationVersion()
         self.settings.setFallbacksEnabled(False)    # File only, no fallback to registry or or.

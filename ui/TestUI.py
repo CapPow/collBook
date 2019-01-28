@@ -804,7 +804,6 @@ class Ui_MainWindow(object):
         self.left_toolBar.addAction(self.action_Export_Records)
         self.right_toolBar.addSeparator()
         self.right_toolBar.addAction(self.action_Exit)
-        self.right_toolBar.addAction(self.actionTestFunction)
         self.label_associatedTaxa.setBuddy(self.button_associatedTaxa)
         self.label_habitat.setBuddy(self.lineEdit_habitat)
         self.label_locationNotes.setBuddy(self.lineEdit_locationNotes)
