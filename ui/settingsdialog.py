@@ -233,7 +233,6 @@ class settingsWindow(QMainWindow):
         parent.value_catalogNumberStartingNum.setValue(value_catalogNumberStartingNum)
         value_max_Associated = int(self.get('value_max_Associated', 10))
         parent.value_max_Associated.setValue(value_max_Associated)
-        
     
         #slider
         value_LogoScaling = int(self.get('value_LogoScaling', 100))
@@ -242,6 +241,12 @@ class settingsWindow(QMainWindow):
         value_LogoOpacity = int(self.get('value_LogoOpacity', 30))
         parent.value_LogoOpacity.setValue(value_LogoOpacity)
         self.opacityChanged(value_LogoOpacity)
+
+        #radiobutton
+        value_DarkTheme = self.get('value_DarkTheme', False)
+        parent.value_DarkTheme.setChecked(value_DarkTheme)
+        value_LightTheme = self.get('value_LightTheme', True)
+        parent.value_LightTheme.setChecked(value_LightTheme)
 
         #clean up
         self.updateCatalogNumberPreview
@@ -316,4 +321,10 @@ class settingsWindow(QMainWindow):
         self.setValue('value_LogoScaling', value_LogoScaling)
         value_LogoOpacity = parent.value_LogoOpacity.value()
         self.setValue('value_LogoOpacity', value_LogoOpacity)
+        
+        #radiobutton
+        value_DarkTheme = parent.value_DarkTheme.isChecked()
+        self.setValue('value_DarkTheme', value_DarkTheme)
+        value_LightTheme = parent.value_LightTheme.isChecked()
+        self.setValue('value_LightTheme', value_LightTheme)
 

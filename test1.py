@@ -496,8 +496,9 @@ class MyWindow(QMainWindow):
         self.selectTreeWidgetItemByName(text)
     
 app = QtWidgets.QApplication(sys.argv)
-app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
 w = MyWindow()
+if w.settings.get('value_DarkTheme', False):
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
 w.show()
 
 sys.exit(app.exec_())
