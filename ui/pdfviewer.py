@@ -1,19 +1,6 @@
 #!/usr/bin/env python3
-
-# How to view PDF in a Qt5 widget.
-# Poppler has almost no documentation and Python-Qt5 isn't much better,
-# so maybe this will help someone.
-# Copyright 2018 by Akkana Peck: share and enjoy under the GPLv2 or later.
-
-# Uses popplerqt5: https://pypi.org/project/python-poppler-qt5/
-# or Debian package python3-poppler-qt5
-
-# Poppler is theoretically available from gi (instead of popplerqt5),
-# but I haven't found any way to get that Poppler to work with Qt5
-# because it can only draw to a Cairo context.
-# import gi
-# gi.require_version('Poppler', '0.18')
-# from gi.repository import Poppler
+#"Based on qpdfview.py by Akkana Peck (akkana@shallowsky.com),
+#available at: https://github.com/akkana
 
 import sys
 import traceback

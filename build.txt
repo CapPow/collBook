@@ -4,3 +4,5 @@ pyuic5 -o ui/settingsUI.py ui/settingsUI.ui
 pyuic5 -o ui/associatedtaxaUI.py ui/associatettaxaUI.ui
 pyuic5 -o ui/statusbarUI.py ui/statusBar.ui
 pyuic5 -o ui/scinameinputdialogUI.py ui/scinameinputdialogUI.ui
+
+pyinstaller --onefile --add-binary C:\Users\JohnSmith\AppData\Local\Programs\Python\Python36\Lib\site-packages\pyzbar\*.dll;pyzbar bcAudit.py
