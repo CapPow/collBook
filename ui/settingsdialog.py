@@ -180,7 +180,7 @@ class settingsWindow(QMainWindow):
         parent = self.settingsWindow
 
         #QComboBox
-        value_AuthChangePolicy = self.get('value_AuthChangePolicy', 'Fill blanks')
+        value_AuthChangePolicy = self.get('value_AuthChangePolicy', 'Always ask')
         self.populateQComboBoxSettings( parent.value_AuthChangePolicy, value_AuthChangePolicy)        
         value_NameChangePolicy = self.get('value_NameChangePolicy', 'Always ask')
         self.populateQComboBoxSettings( parent.value_NameChangePolicy, value_NameChangePolicy)

@@ -20,15 +20,12 @@ import json
 
 
 class taxonomicVerification():
-    def __init__(self, settings, editable = True, *args):
+    def __init__(self, settings, parent, editable = True, *args):
         super(taxonomicVerification, self).__init__()
-        
+        self.parent = parent
         self.settings = settings       
         # precompile regex cleaning string to save time.
         self.strNormRegex = re.compile('[^a-z ]')
-        # a flag to avoid user dialog twice on first row of apply function
-        # set to True from verifyTaxButton (in main UI) and set to False after verifyTaxonomy
-        self.onFirstRow = True
     
     def readTaxonomicSettings(self):
         """ Fetches the most up-to-date taxonomy relevant settings"""
@@ -36,8 +33,6 @@ class taxonomicVerification():
         # meaning, whenever this was called the function could just go straight to the settings module and use it?
         # additionally, this may be reloading the local alignments excessively
         # The function is called in pandastablemodel (at least)
-
-
         #which service to utalize to make alignments
         self.TaxAlignSource = self.settings.get('value_TaxAlignSource')
         # how to handle name reccomendations
@@ -47,31 +42,32 @@ class taxonomicVerification():
         # tnrs score threshold
         self.value_TNRS_Threshold = self.settings.get('value_TNRS_Threshold')
         # which kingdom we're interested in
-        self.value_Kingdom = self.settings.get('value_Kingdom')
-        if '(local)' in self.TaxAlignSource:       
-            from io import StringIO
-            stream = QFile(f':/rc_/{self.value_Kingdom}_Reference.csv')
-            if stream.open(QFile.ReadOnly):
-                df = StringIO(str(stream.readAll(), 'utf-8'))
-                stream.close()
-            self.local_Reference = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
+        current_value_Kingdom = self.settings.get('value_Kingdom')
+        try:  # see if it's necessary to reload the local_Reference
+            if self.value_Kingdom != current_value_Kingdom:
+                raise AttributeError # force exception and boolean into same outcome
+        except AttributeError:  # load the local reference
+            self.value_Kingdom = current_value_Kingdom
+            if '(local)' in self.TaxAlignSource:       
+                from io import StringIO
+                stream = QFile(f':/rc_/{self.value_Kingdom}_Reference.csv')
+                if stream.open(QFile.ReadOnly):
+                    df = StringIO(str(stream.readAll(), 'utf-8'))
+                    stream.close()
+                self.local_Reference = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
 
     
     def verifyTaxonomy(self, rowData):
         """general method to align taxonomy and retrieve authority.
         accepts a df row argument, treats it as a dictionary and makes
         refinements. Returning a the modified argument."""
-        
-        if self.onFirstRow:
-            self.onFirstRow = False
-            return rowData
 
         if rowData['scientificName'] in ['', None]:
             return rowData
         
         rowNum = f"{rowData['site#']}-{rowData['specimen#']}"     
         scientificName = rowData['scientificName']
-        scientificNameAuthorship = rowData['scientificNameAuthorship']
+        scientificNameAuthorship = rowData['scientificNameAuthorship'].strip()
         inputSciName = scientificName
         querySciName = self.normalizeStrInput(scientificName)
         
@@ -94,17 +90,18 @@ class taxonomicVerification():
         # Decide how to handle resulting data
         changeAuth = False  # flag to determine if the authority needs altered.
         if result[0] == None:  # if no scientificName was returned
+            #message = f'No {self.value_Kingdom} results for {scientificName} found using {self.TaxAlignSource}. Record {rowNum} is unchanged.'
             message = f'No {self.value_Kingdom} results for {scientificName} found using {self.TaxAlignSource}. Record {rowNum} is unchanged.'
-            self.userNotice(message)
+            self.parent.userSciNameInput(message, 'Taxonomic alignment')
+            #self.parent.userNotice(message, 'Taxonomic alignment')
             return rowData
-        
         if resultSciName not in scientificName:
             if self.NameChangePolicy == 'Accept all suggestions':
                 rowData['scientificName'] = resultSciName
                 changeAuth = True
             elif self.NameChangePolicy == 'Always ask':
                  message = f'Change {scientificName} to {resultSciName} at record {rowNum}?'
-                 answer = self.userAsk(message)
+                 answer = self.parent.userAsk(message, 'Taxonomic alignment')
                  if answer:
                      rowData['scientificName'] = resultSciName
                      changeAuth = True
@@ -114,15 +111,27 @@ class taxonomicVerification():
             rowData['scientificNameAuthorship'] = resultAuthor
         elif resultAuthor not in [scientificNameAuthorship, None]:
             # if the authors don't match check user policies
+            # conditional actions based on AuthChangePolicy
             if self.AuthChangePolicy == 'Accept all suggestions':
                 rowData['scientificNameAuthorship'] = resultAuthor
+
+            elif self.AuthChangePolicy == 'Fill blanks':
+                if scientificNameAuthorship == '':  # if it is blank fill it
+                    rowData['scientificNameAuthorship'] = resultAuthor
+                else:  # if not blank, ask.
+                    message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
+                    answer = self.parent.userAsk(message, 'Authority alignment')
+                    if answer:
+                        rowData['scientificNameAuthorship'] = resultAuthor
+
             elif self.AuthChangePolicy == 'Always ask':
-                message = f'Update author of {scientificName} from:\n{scientificNameAuthorship} to {scientificNameAuthorship} at record {rowNum}?'
-                answer = self.userAsk(message)
+                if scientificNameAuthorship == '':  # custom dialog box if the field was empty. 'Always ask' may be annoying!
+                    message = f'Fill in blank author of {rowData["scientificName"]} to {resultAuthor} at record {rowNum}?'
+                else:
+                    message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
+                answer = self.parent.userAsk(message, 'Authority alignment')
                 if answer:
                     rowData['scientificNameAuthorship'] = resultAuthor
-
-        #self.onFirstRow = False  # indicate we're not on the first row
         return rowData
         
     def normalizeStrInput(self, inputStr):
@@ -235,34 +244,6 @@ class taxonomicVerification():
                 
         return result
 
-    def userNotice(self, text):
-        if self.onFirstRow:
-            return False
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Warning)
-        msg.setText(text)
-        #msg.setInformativeText("This is additional information")
-        msg.setWindowTitle('Taxanomic alignment')
-        #msg.setDetailedText("The details are as follows:")
-        msg.setStandardButtons(QMessageBox.Ok)
-        msg.exec_()
-    
-    def userAsk(self, text):
-        if self.onFirstRow:
-            return False
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Question)
-        msg.setText(text)
-        msg.setWindowTitle('Taxanomic alignment')
-        msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-        reply = msg.exec_()
-        if reply == QMessageBox.Yes:
-            return True
-        elif reply == QMessageBox.No:
-            return False
-        else:
-            return "cancel"
-        
         #    def cleanSciName(self, sciNameStr):
 #        """partial snipit to remove autonymns"""
 #        

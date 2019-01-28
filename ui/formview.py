@@ -111,6 +111,7 @@ class formView(QtWidgets.QStackedWidget):
             df.loc[visibleRows, colName] = value  # and select it
         if colName == 'associatedTaxa':
             df = df.apply(self.parent.associatedTaxaWindow.cleanAssociatedTaxa, axis = 1)
+            self.parent.associatedTaxaWindow.isWaitingOnUser = False
         #  it may be worth while to do something similar for associatedCollectors & recordedBy
         self.parent.m.update(df)
 

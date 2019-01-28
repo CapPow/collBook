@@ -1541,6 +1541,7 @@
    </attribute>
    <addaction name="separator"/>
    <addaction name="action_Exit"/>
+   <addaction name="actionTestFunction"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open">
@@ -1826,12 +1827,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>832</x>
-     <y>103</y>
+     <x>124</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>923</x>
-     <y>107</y>
+     <x>124</x>
+     <y>104</y>
     </hint>
    </hints>
   </connection>

@@ -7,13 +7,11 @@ Created on Sun Jan  6 10:33:55 2019
 
 """
 
-import os
-from PyQt5.QtWidgets import QMainWindow, QWidget, QListWidgetItem
-from PyQt5.QtCore import QSettings
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import Qt, QCoreApplication
+from PyQt5.QtWidgets import QWidget, QListWidgetItem, QDialog
+from PyQt5.QtCore import Qt
 
 from ui.associatedtaxaUI import Ui_associatedTaxaMainWindow
+
 
 class associatedTaxaMainWindow(QWidget):
     def __init__(self, parent=None):
@@ -30,6 +28,20 @@ class associatedTaxaMainWindow(QWidget):
         self.associatedMainWin = associatedMainWin
         associatedList = associatedMainWin.listWidget_associatedTaxa
         self.associatedList = associatedList
+
+    def cleanAssociatedTaxa(self, rowData):
+        """ Expects a row of data formatted in tWDC. Conditionally called by
+        saveChanges() in formview.py. Removes row's scientificName from the
+        associatedTaxa list. This avoids records naming themselves among their
+        associatedTaxa."""
+        sciName = rowData['scientificName'].strip().lower()
+        associatedTaxa = rowData['associatedTaxa'].split(', ')
+        # filter out the scientificName, case insensative.
+        associatedTaxa = list(set(x for x in associatedTaxa if
+                                  x.strip().lower() not in sciName))
+        associatedTaxa.sort()
+        rowData['associatedTaxa'] = ', '.join(associatedTaxa)
+        return rowData
 
     def saveAssociatedTaxa(self):
         """ Populates the mainwindow's lineEdit_associatedTaxa with the 
@@ -50,21 +62,7 @@ class associatedTaxaMainWindow(QWidget):
         self.parent.w.lineEdit_associatedTaxa.setText(joinedTaxa)
         self.hide()
 
-    def cleanAssociatedTaxa(self, rowData):
-        """ Expects a row of data formatted in tWDC. Conditionally called by
-        saveChanges() in formview.py. Removes row's scientificName from the
-        associatedTaxa list. This avoids records naming themselves among their
-        associatedTaxa."""
-        sciName = rowData['scientificName'].strip().lower()
-        associatedTaxa = rowData['associatedTaxa'].split(', ')
-        # filter out the scientificName, case insensative.
-        associatedTaxa = list(set(x for x in associatedTaxa if
-                                  x.strip().lower() not in sciName))
-        associatedTaxa.sort()
-        rowData['associatedTaxa'] = ', '.join(associatedTaxa)
-        return rowData
-
-    def populateAssociatedTaxa(self):
+    def populateAssociatedTaxa(self, checkall = False):
         """ populates the items in the associatedLists """
         self.associatedList.clear()
         # determine what is currently selected
@@ -86,7 +84,10 @@ class associatedTaxaMainWindow(QWidget):
         for taxon in taxaList:
                 item = QListWidgetItem(taxon, self.associatedList)
                 item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-                item.setCheckState(Qt.Unchecked)
+                if checkall:
+                    item.setCheckState(Qt.Checked)
+                else:
+                    item.setCheckState(Qt.Unchecked)
                 self.associatedList.addItem(item)
         self.associatedList.sortItems(Qt.AscendingOrder)
         if None not in existingAssociatedTaxa:

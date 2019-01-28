@@ -17,7 +17,7 @@ from io import StringIO
 from pathlib import Path
 import pandas as pd
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator, QItemDelegate, QCompleter
+from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator, QItemDelegate, QCompleter, QInputDialog, QLineEdit
 from PyQt5.QtWidgets import QMessageBox
 from reportlab.platypus.doctemplate import LayoutError
 from ui.printlabels import LabelPDF
@@ -29,6 +29,7 @@ from ui.TestUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
 from ui.taxonomy import taxonomicVerification
 from ui.associatedtaxa import associatedTaxaMainWindow
+from ui.scinameinputdialog import sciNameDialog
 
 from ui.progressbar import progressBar
 
@@ -58,12 +59,14 @@ class MyWindow(QMainWindow):
         self.site_tree_widget = self.w.treeWidget_sitesToApply  # site selection tree widget in "all records view"
         self.settings = settingsWindow(self)  # settingsWindow
         self.associatedTaxaWindow = associatedTaxaMainWindow(self)  # associatedTaxaWindow
+        self.associatedTaxaWindow.setWindowModality(Qt.ApplicationModal)
+        
         self.lineEdit_sciName = self.w.lineEdit_sciName
         self.form_view = self.w.formView
         self.table_view = self.w.table_view
         self.table_view.setItemDelegate(editorDelegate(self.table_view))  # use flipped proxy delegate
         self.form_view.init_ui(self, self.w)
-        self.tax = taxonomicVerification(self.settings)  # taxonomic verifier
+        self.tax = taxonomicVerification(self.settings, self)  # taxonomic verifier
         self.p = LabelPDF(self.settings)
         
         self.p.initLogoCanvas()  # alter this to happen based on settings changes
@@ -97,6 +100,7 @@ class MyWindow(QMainWindow):
         self.w.action_Export_Records.triggered.connect(self.exportRecords)
         #self.w.actionTestFunction.triggered.connect(self.timeitTest)  # a test function button for debugging or time testing
         #self.w.actionTestFunction.triggered.connect(self.m.assignCatalogNumbers)        
+        self.w.actionTestFunction.triggered.connect(self.userSciNameInput)
         # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()
@@ -111,10 +115,11 @@ class MyWindow(QMainWindow):
         if self.associatedTaxaWindow.isHidden():
             self.associatedTaxaWindow.show()
             self.associatedTaxaWindow.populateAssociatedTaxa()
+            selType, siteNum, specimenNum = self.getTreeSelectionType()
+            self.associatedTaxaWindow.setWindowTitle(f'Associated taxa: site {siteNum}')
         else:
             self.associatedTaxaWindow.associatedList.clear()
-            self.associatedTaxaWindow.hide()
-
+            self.associatedTaxaWindow.close()
     def getTreeSelectionType(self):
         """ checks the tree_widget's type of selection """
         # TODO alter selType to become a custom attribute of mainWindow, setting it upon changes. This should reduce checks with this function
@@ -158,7 +163,6 @@ class MyWindow(QMainWindow):
             except ValueError:
                 self.table_view.clearSelection()
         self.updatePreview()
-
         if selType == 'site':
             self.statusBar.label_status.setText("  Site View  ")
             self.form_view.setCurrentIndex(1) #swap to site tab
@@ -189,6 +193,7 @@ class MyWindow(QMainWindow):
                 self.tree_widget.setCurrentItem(item,1)
                 break
             iterator +=1
+
     def expandCurrentTreeWidgetItem(self):
         """ expands the currently selected tree_widget item """
         itemSelected = self.tree_widget.currentItem()
@@ -238,19 +243,28 @@ class MyWindow(QMainWindow):
         rowsVisible = self.getVisibleRows()
         if rowsVisible:
             rowData = self.m.retrieveRowData(rowsVisible)
-            rowData = self.m.dataToDict(rowData)
+            rowData = self.m.getSelectedLabelDict(rowData)
         else:
             rowData = None
         return rowData
 
+    def userSciNameInput(self, title = "", message = ""):
+        title = 'a title for me'
+        message = 'a message for you'
+        dlg = sciNameDialog()
+        res = dlg.textBox(self.wordList, message, title)
+        print(res)
+
     # TODO for simplicity, move all userASK and userNOTIFY functions into mainWindow and alter calls in other modules to use it.
-    def userAsk(self, text, title):
+    def userAsk(self, text, title=''):
         """ a general user dialog with yes / cancel options"""
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Question)
         msg.setText(text)
         msg.setWindowTitle(title)
         msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+        halt = msg.addButton('Halt Process', QtWidgets.QMessageBox.ResetRole)
+        halt.clicked.connect(self.statusBar.flipCancelSwitch)
         reply = msg.exec_()
         if reply == QMessageBox.Yes:
             return True
@@ -258,6 +272,20 @@ class MyWindow(QMainWindow):
             return False
         else:
             return "cancel"
+
+
+    def userNotice(self, text, title=''):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText(text)
+        #msg.setInformativeText("This is additional information")
+        msg.setWindowTitle(title)
+        #msg.setDetailedText("The details are as follows:")
+        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
+        halt = msg.addButton('Halt Process', QtWidgets.QMessageBox.ResetRole)
+        halt.clicked.connect(self.statusBar.flipCancelSwitch)
+        msg.exec_()
+        
 
     def exportRecords(self):
         """ saves a pdf file of the labels AND a csv of the records prepared for
@@ -325,7 +353,7 @@ class MyWindow(QMainWindow):
         try:
             rowsToProcess = self.m.getRowsToProcess(*self.getTreeSelectionType())
             outDF = self.m.datatable.iloc[rowsToProcess, ]
-            outDict = self.m.dataToDict(outDF)
+            outDict = self.m.getSelectedLabelDict(outDF)
             self.p.genPrintLabelPDFs(outDict, defaultFileName = fileName)
             return True
         except LayoutError:
@@ -369,14 +397,20 @@ class MyWindow(QMainWindow):
         stream = QFile(f':/rc_/{value_Kingdom}_Reference.csv')
         if stream.open(QFile.ReadOnly):
             df = StringIO(str(stream.readAll(), 'utf-8'))
-            stream.close()
-        wordList = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
-        wordList = sorted(wordList[nameCol].tolist())      
+            stream.close()     
+        # completer.setCompletionMode(QCompleter.InlineCompletion)
+#		completer.maxVisibleItems=10
+#		completer.setCaseSensitivity(Qt.CaseInsensitive)
+		# make the completer selection also erase the text edit
+ #       completer.activated.connect(self.cleartext,type=Qt.QueuedConnection)
         
-        completer = QCompleter(wordList, self.lineEdit_sciName)
+        wordList = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
+        self.wordList = sorted(wordList[nameCol].tolist())      
+        
+        completer = QCompleter(self.wordList, self.lineEdit_sciName)
         self.lineEdit_sciName.setCompleter(completer)
 
-        completerAssociated = QCompleter(wordList, self.associatedTaxaWindow.lineEdit_newAssociatedTaxa)
+        completerAssociated = QCompleter(self.wordList, self.associatedTaxaWindow.lineEdit_newAssociatedTaxa)
         self.associatedTaxaWindow.associatedMainWin.lineEdit_newAssociatedTaxa.setCompleter(completerAssociated)
        
     def getSelectSitesToApply(self):

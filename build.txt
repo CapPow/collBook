@@ -3,3 +3,4 @@ pyuic5 -o ui/TestUI.py ui/TestUI.ui
 pyuic5 -o ui/settingsUI.py ui/settingsUI.ui
 pyuic5 -o ui/associatedtaxaUI.py ui/associatettaxaUI.ui
 pyuic5 -o ui/statusbarUI.py ui/statusBar.ui
+pyuic5 -o ui/scinameinputdialogUI.py ui/scinameinputdialogUI.ui

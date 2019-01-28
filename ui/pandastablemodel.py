@@ -237,22 +237,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             labelDicts.append(datum)
         return labelDicts
 
-    def dataToDict(self, df):
-        """ given a df (or series) bundles the data as a dictionary
-        Initially written for label pdf generation, may also be useful for
-        field population"""
-        records = self.getSelectedLabelDict(df)  #function returns a list of dicts (one for each record to print)
-        if len(records) > 0:
-            for record in records:   
-                # TODO needs to be updated for "verified by" considerations
-                # currently just has it commented out
-                #if CatNumberBar.stuCollCheckBoxVar.get() == 1: # for each dict, if it is student collection
-                #    record['verifiedBy'] = CatNumberBar.stuCollVerifyByVar.get() #then add the verified by name to the dict.
-                associatedTaxaItems = record.get('associatedTaxa').split(', ') #for each dict, verify that the associatedTaxa string does not consist of >15 items.
-#                if len(associatedTaxaItems) > 10:   #if it is too large, trunicate it at 15, and append "..." to indicate trunication.
-#                    record['associatedTaxa'] = ', '.join(associatedTaxaItems[:10])+' ...'   
-        return records
-
     def geoRef(self):
         """ applies genLocality over each row among those selected.
         Combines api calls for records from the same site."""
@@ -345,7 +329,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         """ applies verifyTaxonomy over each visible row."""
         # refresh tax settings
         self.addToUndoList('verify taxonomy process')  # set checkpoint in undostack
-        self.parent.tax.onFirstRow = True
         self.parent.tax.readTaxonomicSettings()
         rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
         self.processViewableRecords(rowsToProcess, self.parent.tax.verifyTaxonomy)
@@ -353,15 +336,41 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def verifyAllButton(self):
         """ applies verifyTaxonomy and geoRef over each visible row"""
         # TODO find logical point in workflow to clean associatedTaxa.
-        self.geoRef()
-        self.verifyTaxButton()
+        selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
+        xButton = self.parent.statusBar.pushButton_Cancel
+        xButton.setEnabled(True)  
+        if selType == 'site':
+            sites = [siteNum]
+        else:
+            sites = [x for x,y in self.getSiteSpecimens() if y == '#']
+        for site in sites:  # enforce a site-by-site workflow
+            QApplication.processEvents()
+            if xButton.status:  # check for cancel button
+                break
+            self.parent.selectTreeWidgetItemByName(f'Site {site}')
+            self.parent.updateTableView()
+            self.parent.expandCurrentTreeWidgetItem()
+            QApplication.processEvents()
+            self.verifyTaxButton()
+            if xButton.status:  # check for cancel button
+                break
+            self.geoRef()
+            if xButton.status:  # check for cancel button
+                break
+            waitingForUser = QtCore.QEventLoop()
+            self.parent.associatedTaxaWindow.associatedMainWin.button_save.clicked.connect(waitingForUser.quit)
+            self.parent.associatedTaxaWindow.associatedMainWin.button_cancel.clicked.connect(waitingForUser.quit)
+            self.parent.toggleAssociated() # call user input window and wait
+            waitingForUser.exec_()
+            QApplication.processEvents()
         self.parent.testRunLabels()
+        xButton.setEnabled(False)
+        xButton.status = False
             
     def processViewableRecords(self, rowsToProcess, func):
         """ applies a function over each row among rowsToProcess (by index)"""
         #self.parent.statusBar.label_status
         xButton = self.parent.statusBar.pushButton_Cancel
-        xButton.setEnabled(True)
         df = self.datatable.loc[rowsToProcess]
         totRows = len(df)
         pb = self.parent.statusBar.progressBar
@@ -371,17 +380,14 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             QApplication.processEvents()
             if xButton.status:  # check for cancel button
                 break
-            rowData = df.loc[[i]]
-            rowData.apply(func,1)
+            rowData = df.loc[i]
+            df.loc[i] = func(rowData)
             pb.setValue(c + 1)
             #msg = (f'{c + 1} of {totRows}')
             df.update(rowData)
             self.datatable.update(df)
             self.update(self.datatable)
             self.parent.updateTableView()
-        #self.parent.statusBar().removeWidget(self.progressBar)
-        xButton.setEnabled(False)
-        xButton.status = False
         self.parent.form_view.fillFormFields()
         pb.setValue(0)
 
