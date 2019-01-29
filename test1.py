@@ -96,6 +96,7 @@ class MyWindow(QMainWindow):
         self.w.action_Export_Labels.triggered.connect(self.exportLabels)
         self.w.pushButton_newSite.clicked.connect(self.m.addNewSite)
         self.w.pushButton_newSpecimen.clicked.connect(self.m.addNewSpecimen)
+        self.w.pushButton_newSpecimen_2.clicked.connect(self.m.addNewSpecimen)  # copy of above, except placed on specimen view
         self.w.pushButton_duplicateSpecimen.clicked.connect(self.m.duplicateSpecimen)
         self.w.pushButton_deleteSite.clicked.connect(self.m.deleteSite)
         self.w.pushButton_deleteRecord.clicked.connect(self.m.deleteSpecimen)
@@ -117,10 +118,11 @@ class MyWindow(QMainWindow):
 
     def toggleAssociated(self):
         if self.associatedTaxaWindow.isHidden():
-            self.associatedTaxaWindow.show()
             self.associatedTaxaWindow.populateAssociatedTaxa()
             selType, siteNum, specimenNum = self.getTreeSelectionType()
-            self.associatedTaxaWindow.setWindowTitle(f'Associated taxa: site {siteNum}')
+            self.associatedTaxaWindow.setWindowTitle(f'Associated taxa')
+            self.associatedTaxaWindow.associatedMainWin.label_UserMsg.setText(f'Select associated taxa for site {siteNum}')
+            self.associatedTaxaWindow.show()
         else:
             self.associatedTaxaWindow.associatedList.clear()
             self.associatedTaxaWindow.close()
@@ -259,15 +261,16 @@ class MyWindow(QMainWindow):
         return res
 
     # TODO for simplicity, move all userASK and userNOTIFY functions into mainWindow and alter calls in other modules to use it.
-    def userAsk(self, text, title=''):
+    def userAsk(self, text, title='', inclHalt = True):
         """ a general user dialog with yes / cancel options"""
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Question)
         msg.setText(text)
         msg.setWindowTitle(title)
         msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
-        halt = msg.addButton('Halt Process', QtWidgets.QMessageBox.ResetRole)
-        halt.clicked.connect(self.statusBar.flipCancelSwitch)
+        if inclHalt:
+            halt = msg.addButton('Halt Process', QtWidgets.QMessageBox.ResetRole)
+            halt.clicked.connect(self.statusBar.flipCancelSwitch)
         reply = msg.exec_()
         if reply == QMessageBox.Yes:
             return True

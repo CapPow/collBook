@@ -126,7 +126,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         """ adds a new specimen record to selected site """
         df = self.datatable
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
-        if selType == 'site':
+        if selType in ['site','specimen']:
             try:  # try to make the new row data
                 spNums = df[(df['site#'] == siteNum) &
                             (df['specimen#'] != '#')]['specimen#']
@@ -339,9 +339,9 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
         xButton = self.parent.statusBar.pushButton_Cancel
         xButton.setEnabled(True)  
-        if selType == 'site':
+        if selType in ['site', 'specimen']:
             sites = [siteNum]
-        else:
+        else:  # it is probably 'allRec'.
             sites = [x for x,y in self.getSiteSpecimens() if y == '#']
         for site in sites:  # enforce a site-by-site workflow
             QApplication.processEvents()
@@ -362,10 +362,13 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.parent.associatedTaxaWindow.associatedMainWin.button_cancel.clicked.connect(waitingForUser.quit)
             self.parent.toggleAssociated() # call user input window and wait
             waitingForUser.exec_()
+            if xButton.status:  # check for cancel button
+                break
             QApplication.processEvents()
         self.parent.testRunLabels()
         xButton.setEnabled(False)
         xButton.status = False
+        self.parent.setTreeSelectionByType(selType, siteNum, specimenNum)  # return the selection
             
     def processViewableRecords(self, rowsToProcess, func):
         """ applies a function over each row among rowsToProcess (by index)"""
@@ -551,6 +554,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             'site#':['1','1'],
             'specimen#':['#','1'],
             'otherCatalogNumbers':['1-#','1-1'],
+            'catalogNumber':['',''],
             'family':['',''],
             'scientificName':['',''],
             'genus':['',''],
@@ -597,7 +601,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             'labelProject':['','']}
     
             df = pd.DataFrame.from_dict(newDFDict)
-            df['-'] = '-' # add in the little "-" seperator.
             df.fillna('') # make any nans into empty strings.
             self.update(df)  # this function actually updates the visible dataframe
             self.parent.populateTreeWidget()

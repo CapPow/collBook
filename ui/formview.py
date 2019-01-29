@@ -31,6 +31,8 @@ class formView(QtWidgets.QStackedWidget):
         self.formFields = {
                 'labelProject': (self.read_QPlainTextEdit, self.save_selectSites_QPlainTextEdit, self.parent.plainTextEdit_labelProject),
                 'fieldNotes': (self.read_QPlainTextEdit, self.save_selectSites_QPlainTextEdit, self.parent.plainTextEdit_fieldNotes),
+                'identificationReferences': (self.read_QPlainTextEdit, self.save_QPlainTextEdit, self.parent.plainTextEdit_identificationReferences),
+                'identificationRemarks': (self.read_QPlainTextEdit, self.save_QPlainTextEdit, self.parent.plainTextEdit_identificationRemarks),
                 'eventRemarks':(self.read_QLineEdit, self.save_selectSites_QLineEdit, self.parent.lineEdit_eventRemarks),
                 'samplingEffort':(self.read_QLineEdit, self.save_selectSites_QLineEdit, self.parent.lineEdit_samplingEffort),                
                 'eventDate': (self.read_QDateEdit, self.save_QDateEdit, self.parent.dateEdit_eventDate),

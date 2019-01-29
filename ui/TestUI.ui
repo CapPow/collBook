@@ -65,7 +65,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="StackedWidgetPage1">
            <property name="sizePolicy">
@@ -534,7 +534,7 @@
                 <item>
                  <widget class="QPushButton" name="pushButton_newSpecimen">
                   <property name="text">
-                   <string>Add specimen to site</string>
+                   <string>Add specimen to this site</string>
                   </property>
                  </widget>
                 </item>
@@ -1018,9 +1018,16 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_10">
               <item>
+               <widget class="QPushButton" name="pushButton_newSpecimen_2">
+                <property name="text">
+                 <string>Add specimen to this site</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="pushButton_duplicateSpecimen">
                 <property name="text">
-                 <string>Duplicate record</string>
+                 <string>Duplicate this record</string>
                 </property>
                </widget>
               </item>
@@ -1826,12 +1833,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>124</x>
-     <y>104</y>
+     <x>832</x>
+     <y>103</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>104</y>
+     <x>923</x>
+     <y>107</y>
     </hint>
    </hints>
   </connection>
@@ -1842,12 +1849,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>87</x>
-     <y>88</y>
+     <x>819</x>
+     <y>102</y>
     </hint>
     <hint type="destinationlabel">
-     <x>114</x>
-     <y>88</y>
+     <x>924</x>
+     <y>106</y>
     </hint>
    </hints>
   </connection>

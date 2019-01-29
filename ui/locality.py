@@ -65,25 +65,25 @@ class locality():
             status = str(status)
             return status
 
-   
     def genLocality(self, currentRowArg):
         """ Generate locality fields, uses API call to get
         country, state, city, etc. from GPS coordinates."""
         # both locality functions would benefit from some systemic methid of determining when to add italics to binomial (scientific) names.
         # such the italic tags "<i> and </i>" would need to be stripped before exporting for database submission.
         currentRow = f"{currentRowArg['site#']}-{currentRowArg['specimen#']}"
+        currentSiteName = f"Site {currentRowArg['site#']}"
         currentLocality = currentRowArg['locality']
         latitude = currentRowArg['decimalLatitude']
         longitude = currentRowArg['decimalLongitude']
         if latitude == '' or longitude == '':
-            message = f'MISSING GPS at row {currentRow}. Would you like to halt record processing to add GPS coordinates for row {currentRow}?'
-            answer = self.userAsk(message)
+            message = f'MISSING GPS at {currentSiteName}. Would you like to halt the process to add GPS coordinates to {currentSiteName}?'
+            answer = self.parent.userAsk(message, title='GeoLocation')
             if answer:
-                self.parent.selectTreeWidgetItemByName(currentRow)
-                raise Exception
+                self.parent.statusBar.pushButton_Cancel.status = True
+                self.parent.selectTreeWidgetItemByName(currentSiteName)
+                return currentRowArg
             else:
                 return currentRowArg
-        
         address = self.reverseGeoCall(latitude, longitude)
         if isinstance(address, list):
             newLocality = []

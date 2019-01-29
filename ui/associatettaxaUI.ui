@@ -9,15 +9,46 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>301</width>
-    <height>379</height>
+    <width>336</width>
+    <height>443</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Associated Taxa</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="0">
+  <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,7,0,0">
+   <item row="3" column="0">
+    <widget class="QListWidget" name="listWidget_associatedTaxa">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="resizeMode">
+      <enum>QListView::Adjust</enum>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>select none</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>select all</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="5" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="spacer">
@@ -48,7 +79,7 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QLineEdit" name="lineEdit_newAssociatedTaxa"/>
@@ -67,33 +98,9 @@
     </layout>
    </item>
    <item row="0" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>select none</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>select all</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0">
-    <widget class="QListWidget" name="listWidget_associatedTaxa">
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="resizeMode">
-      <enum>QListView::Adjust</enum>
-     </property>
-     <property name="sortingEnabled">
-      <bool>true</bool>
+    <widget class="QLabel" name="label_UserMsg">
+     <property name="text">
+      <string>Select associated taxa.</string>
      </property>
     </widget>
    </item>

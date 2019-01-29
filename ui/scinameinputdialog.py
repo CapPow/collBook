@@ -28,12 +28,13 @@ class sciNameDialog(QDialog):
         self.btn = self.dlg.buttonBox.button(QDialogButtonBox.Yes) 
         self.dlg.buttonBox.button(QDialogButtonBox.No).setAutoDefault(False)
         self.btn.setEnabled(False)
-        self.dlg.lineEdit.editingFinished.connect(self.enableYesBox)
+        self.dlg.lineEdit.textChanged.connect(self.enableYesBox)
 
-    def enableYesBox(self):
+    def enableYesBox(self, userInput):
         """ connected to editingFinished on lineEdit """
-        self.btn.setEnabled(True)
-        self.btn.setDefault(True)
+        if len(userInput) > 4:
+            self.btn.setEnabled(True)
+            self.btn.setDefault(True)
         
     def textBox(self, wordList, message = "", title = "", ):
         if title != '':
