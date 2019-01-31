@@ -51,7 +51,7 @@ class MyWindow(QMainWindow):
 
     def init_ui(self):
         self.w = Ui_MainWindow()
-        self.showMaximized()
+        self.setWindowState(Qt.WindowMaximized)
         self.w.setupUi(self)
         self.w.version = __version__
         self.status_bar = self.statusBar()
@@ -64,7 +64,6 @@ class MyWindow(QMainWindow):
         self.settings = settingsWindow(self)  # settingsWindow
         self.associatedTaxaWindow = associatedTaxaMainWindow(self)  # associatedTaxaWindow
         self.associatedTaxaWindow.setWindowModality(Qt.ApplicationModal)
-        
         self.lineEdit_sciName = self.w.lineEdit_sciName
         self.form_view = self.w.formView
         self.table_view = self.w.table_view
@@ -72,9 +71,7 @@ class MyWindow(QMainWindow):
         self.form_view.init_ui(self, self.w)
         self.tax = taxonomicVerification(self.settings, self)  # taxonomic verifier
         self.p = LabelPDF(self.settings)
-        
         self.p.initLogoCanvas()  # alter this to happen based on settings changes
-        
         self.pdf_preview = self.w.pdf_preview
         self.pdf_preview.initViewer(self)
         self.m.new_Records(True)
@@ -378,6 +375,7 @@ class MyWindow(QMainWindow):
         #TODO modify this to be called from within the pdfviewer class
         rowData = self.getVisibleRowData()
         selType, siteNum, specimenNum = self.getTreeSelectionType()
+        errorType = False
         if (isinstance(rowData, list)) & (selType != 'allRec'):
             if (selType == 'site') & (len(rowData) > 1):
                 rowData = [rowData[1]]  # only want first row, but other functions expect a list
@@ -385,21 +383,28 @@ class MyWindow(QMainWindow):
                 rowData = [rowData[0]]
             try:
                 pdfBytes = self.p.genLabelPreview(rowData)  # retrieves the pdf in Bytes
-            except LayoutError:
-                self.pdf_preview.load_label_OversizeWarning()
-                return
-        else:
+            except LayoutError:  # Not enough space on label for the content
+                pdfBytes = None
+                errorType = 'oversize'
+        else:  # there is not appropriate row data to preview
             pdfBytes = None
-        self.pdf_preview.load_preview(pdfBytes)  # starts the loading display process        
+            errorType = 'preview' # display generic "Preview window text"
+        self.pdf_preview.load_preview(pdfBytes, errorType)  # starts the loading display process        
 
     def updatePreviewZoom(self, val):
         """ changes the value_Zoom setting stored in self.settings, used by
         pdfviewer.py to determine the size of the preview window. Additionally,
         updates the label_zoomLevel's text in MainWindow """
 
-        self.settings.setValue('value_zoomLevel', val)  # update settings
-        self.w.label_zoomLevel.setText(f'{str(val).rjust(4," ")}%')  # update the label
-        self.updatePreview()  # update the pdfPreview (this could get cpu intensive)
+        try:
+            self.settings.setMaxZoom()
+            self.settings.setValue('value_zoomLevel', val)  # update settings
+            self.w.label_zoomLevel.setText(f'{str(val).rjust(4," ")}%')  # update the label
+            self.updatePreview()  # update the pdfPreview (this could get cpu intensive)
+        except AttributeError:
+            # It gets called too early on start up, this skips it
+            pass
+
 
     def updateAutoComplete(self):
         """ updates the Completer's reference text based on the kingdom """

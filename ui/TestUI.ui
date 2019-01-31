@@ -17,7 +17,7 @@
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
     <item>
      <layout class="QGridLayout" name="gridLayout_7">
-      <item row="0" column="1" rowspan="3">
+      <item row="0" column="2" rowspan="3">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <property name="topMargin">
          <number>3</number>
@@ -1383,6 +1383,22 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_zoomLevel">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="PDFViewer" name="pdf_preview">
         <property name="sizePolicy">
@@ -1402,21 +1418,18 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_zoomLevel">
-        <property name="maximumSize">
+      <item row="0" column="1">
+       <spacer name="verticalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
          <size>
-          <width>150</width>
-          <height>16777215</height>
+          <width>20</width>
+          <height>40</height>
          </size>
         </property>
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
+       </spacer>
       </item>
      </layout>
     </item>
@@ -1891,12 +1904,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>832</x>
-     <y>103</y>
+     <x>349</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>923</x>
-     <y>107</y>
+     <x>349</x>
+     <y>104</y>
     </hint>
    </hints>
   </connection>
@@ -1907,18 +1920,18 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>819</x>
-     <y>102</y>
+     <x>349</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>924</x>
-     <y>106</y>
+     <x>349</x>
+     <y>104</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>value_zoomLevel</sender>
-   <signal>sliderMoved(int)</signal>
+   <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
    <slot>updatePreviewZoom(int)</slot>
    <hints>

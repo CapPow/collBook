@@ -37,19 +37,45 @@ class settingsWindow(QMainWindow):
         # be sure the settings file exists
         if not self.settings.value('version', False):
             self.saveSettings()
+        self.setMaxZoom()
         # can also later do a check if the version is not up-to-date
-        
+
+    def setMaxZoom(self):
+        screenSize = (self.parent.geometry())
+        screenX = screenSize.width()
+        xMax = screenX * 0.6
+        screenY = screenSize.height()
+        yMax = screenY * 0.75
+        #  resulting pdfs are 96dpi skip calling getPixmap twice, Assume 96
+        #  96dpi / 25.4mm per inch = 3.780 dots per mm
+        label_X = int(self.settingsWindow.value_X.value() * (3.780))
+        label_Y = int(self.settingsWindow.value_Y.value() * (3.780))
+        max_XZoom = xMax / label_X
+        max_YZoom = yMax / label_Y
+        max_Zoom = int(min(max_XZoom, max_YZoom) * 100)
+        self.parent.w.value_zoomLevel.setMaximum(max_Zoom)
+        currentZoom = int(self.parent.w.value_zoomLevel.value())
+        if currentZoom > max_Zoom:
+            valueToSet = (max_Zoom)
+        else:
+            valueToSet = currentZoom
+        self.parent.w.value_zoomLevel.setValue(valueToSet)
+        self.parent.w.label_zoomLevel.setText(f'{str(valueToSet).rjust(4," ")}%')  # update the label
+            
+
     def saveButtonClicked(self):
         """ hides the preferences window and saves the user entries """
+        # check the new limitations on zoomlevel
+        self.setMaxZoom()
         self.saveSettings()
         # force pdf_preview window to resize ui elements.
         self.parent.pdf_preview.initViewer(self.parent)
-        self.parent.p.initLogoCanvas() # re-build the logo backdrop for labels.
+        self.parent.p.initLogoCanvas()  # build the logo backdrop for labels.
         self.genDummyCatalogNumber()
         self.parent.updatePreview()
         self.parent.updateAutoComplete()
         self.hide()
-    
+
     def cancelButtonClicked(self):
         """ hides the preferences window and resets user entries to last
         known good saved values """

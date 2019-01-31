@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from reportlab.platypus import Table, BaseDocTemplate, PageTemplate, PageBreak
+from reportlab.platypus import Table, BaseDocTemplate, SimpleDocTemplate, PageTemplate, PageBreak
 from reportlab.platypus import Frame as platypusFrame   #NOTE SEE Special case import here to avoid namespace conflict with "Frame"
-from reportlab.platypus.flowables import Spacer
+from reportlab.platypus.flowables import Spacer, KeepInFrame
 from reportlab.platypus.paragraph import Paragraph
 from reportlab.platypus.doctemplate import LayoutError
 from reportlab.lib.styles import ParagraphStyle
@@ -9,6 +9,8 @@ from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
 from reportlab.graphics.barcode import code39 #Note, overriding a function from this import in barcode section
 from reportlab.lib.units import mm
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase.pdfmetrics import stringWidth
+
 
 #from reportlab.platypus import Image as rlImage 
 #from ui.customdocteplate import BaseDocTemplate
@@ -18,7 +20,7 @@ import os
 import sys
 import io
 
-# TODO with the conversion to pyqt5, popplerqt5 should allow us to display & open 
+# TODO with the conversion to pyqt5, pymupdf should allow us to display & open 
 # print dialogs for the pdfs without relying on system installed pdf viewer
 
 # TODO investigate stringWidth function to simplify the width checking options.
@@ -33,7 +35,7 @@ from PyQt5.QtWidgets import QFileDialog
 # before size options are added.
 
 class LabelPDF():
-    
+
     def __init__(self, settings):
         """ xPaperSize, & self.yPaperSize are each assumed to be in mm """
         self.settings = settings
@@ -60,7 +62,7 @@ class LabelPDF():
                 logoMargin = int(self.settings.get('value_LogoMargin', 2))
                 try:
                     im = Image.open(logoPath)
-                    
+
                 except:  # if the path provided seems broken, clear the setting
                     self.logoPath = ''
                     self.settings.setValue('value_LogoPath','')
@@ -68,10 +70,8 @@ class LabelPDF():
                     return
                 logoDPIx, logoDPIy = im.info['dpi']  # get DPI of input logo image
                 label_X = int(self.settings.get('value_X'))  # get mm size of labels
-                #maxLogoX = int(label_X / 24.5 * logoDPIx)
                 label_X = int(label_X * mm)
                 label_Y = int(self.settings.get('value_Y'))
-                #maxLogoY = int(label_Y / 24.5 * logoDPIy)
                 label_Y = int(label_Y * mm)
                 # resize the image to fit within the label dimentions
                 # then expand the image to the proper ratio filling alpha values in.
@@ -553,6 +553,59 @@ class LabelPDF():
         open_file(labelFileName)
 
 
+    def genErrorLabel(self, errorMSG, relFont=None):
+        """ Generates a PDF with the errorMSG clearly printed. Used as a
+        simple solution to displaying errors inside the pdfviewer which
+        can be easily, correctly, scaled and manipulated by the viewer."""
+
+        labelFileName = io.BytesIO()
+        self.xPaperSize = int(self.settings.get('value_X', 140)) * mm
+        self.yPaperSize = int(self.settings.get('value_Y', 90)) * mm
+        self.customPageSize = (self.xPaperSize, self.yPaperSize)
+        self.relFont = int(self.settings.get('value_RelFont', 12))
+
+        style = ParagraphStyle(
+                name = 'test',
+                fontName='Times-Bold',
+                fontSize= self.relFont * 1.5,
+                textColor='Grey',
+                alignment=TA_CENTER)
+        
+        fontSize = style.fontSize
+        pageStrW = max([stringWidth(x, style.fontName, fontSize) for x in errorMSG])
+        availWidth = self.xPaperSize *.9
+        # because the label size can be user set, and best to avoid altering it
+        # for error windows, dynamically determine fontsize that fits.
+        while availWidth < pageStrW and fontSize > 1:
+            fontSize = fontSize * .9
+            pageStrW = max([stringWidth(x, style.fontName, fontSize) for x in errorMSG])
+
+        doc =  SimpleDocTemplate(labelFileName, 
+                            pagesize= self.customPageSize,
+                            showBoundary=0,
+                            leftMargin=1,
+                            rightMargin=1,
+                            topMargin=1,
+                            bottomMargin=1,
+                            allowSplitting= False,           
+                            title=None,
+                            author=None,
+                            _pageBreakQuick=1,
+                            encrypt=None)
+        style.fontSize = fontSize
+        content = [Paragraph(x, style) for x in errorMSG]
+        #  determine the length of a vert spacer to roughly center the errorMSG  
+        pageStrH = max([x.wrap(self.xPaperSize *.9, 100000)[1] for x in content])
+        spacerHeight = self.yPaperSize * .40 - pageStrH
+        flowables = []
+        flowables.append(Spacer(0, spacerHeight))
+        flowables.extend(content)
+        doc.build(flowables)
+
+        pdfBytes = labelFileName.getvalue()  # save the stream to a variable
+        labelFileName.close()  # close the buffer down
+        return pdfBytes
+
     def stylesheet(self, key):
         
         styles= {
@@ -681,5 +734,14 @@ class LabelPDF():
             alignment=TA_CENTER,
             spaceAfter = 1,
             fontName='Times'
+        )
+        styles['errorMSG'] = ParagraphStyle(
+            'title',
+            parent=styles['default'],
+            fontName='Times-Bold',
+            fontSize= self.relFont * 1.5,
+            textColor='Grey',
+            alignment=TA_CENTER
+
         )
         return styles.get(key)
