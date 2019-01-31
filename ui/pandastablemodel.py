@@ -106,13 +106,13 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         """ adds a new, nearly blank site record to the dataTable """
         df = self.datatable
         try:
-            newSiteNum = max(pd.to_numeric(df['site#'], errors = 'coerce')) + 1
+            newSiteNum = max(pd.to_numeric(df['siteNumber'], errors = 'coerce')) + 1
         except ValueError:
             newSiteNum = 1
         self.addToUndoList(f'added site {newSiteNum}')  # set checkpoint in undostack
         rowData = {'otherCatalogNumbers':f'{newSiteNum}-#', 
-                   'site#':f'{newSiteNum}',
-                   'specimen#':'#'}
+                   'siteNumber':f'{newSiteNum}',
+                   'specimenNumber':'#'}
         defVals = self.parent.form_view.readDefaultNewSiteFields()
         rowData.update(defVals)
         df = df.append(rowData,  ignore_index=True, sort=False)
@@ -128,14 +128,14 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
         if selType in ['site','specimen']:
             try:  # try to make the new row data
-                spNums = df[(df['site#'] == siteNum) &
-                            (df['specimen#'] != '#')]['specimen#']
+                spNums = df[(df['siteNumber'] == siteNum) &
+                            (df['specimenNumber'] != '#')]['specimenNumber']
                 newSpNum = max(pd.to_numeric(spNums, errors='coerce')) + 1
             except ValueError:
                 newSpNum = 1
-            newRowData = df[(df['site#'] == siteNum) &
-                            (df['specimen#'] == '#')].copy()
-            newRowData['specimen#'] = f'{newSpNum}'
+            newRowData = df[(df['siteNumber'] == siteNum) &
+                            (df['specimenNumber'] == '#')].copy()
+            newRowData['specimenNumber'] = f'{newSpNum}'
             catNum =  f'{siteNum}-{newSpNum}'
             self.addToUndoList(f'added specimen {catNum}')  # set checkpoint in undostack
             newRowData['otherCatalogNumbers'] = catNum
@@ -155,14 +155,14 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if selType == 'specimen':
             self.addToUndoList(f'duplicated specimen {siteNum}-{specimenNum}')  # set checkpoint in undostack
             try:  # try to make the new row data
-                spNums = df[(df['site#'] == siteNum) &
-                            (df['specimen#'] != '#')]['specimen#']
+                spNums = df[(df['siteNumber'] == siteNum) &
+                            (df['specimenNumber'] != '#')]['specimenNumber']
                 newSpNum = max(pd.to_numeric(spNums, errors='coerce')) + 1
             except ValueError:
                 newSpNum = 2
-            newRowData = df[(df['site#'] == siteNum) &
-                            (df['specimen#'] == specimenNum)].copy()
-            newRowData['specimen#'] = f'{newSpNum}'
+            newRowData = df[(df['siteNumber'] == siteNum) &
+                            (df['specimenNumber'] == specimenNum)].copy()
+            newRowData['specimenNumber'] = f'{newSpNum}'
             catNum =  f'{siteNum}-{newSpNum}'
             newRowData['otherCatalogNumbers'] = catNum
             df = df.append(newRowData, ignore_index=True, sort=False)
@@ -179,7 +179,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
         if selType == 'site':
             self.addToUndoList(f'removed site {siteNum}')  # set checkpoint in undostack
-            newDF = df[df['site#'] != siteNum].copy()
+            newDF = df[df['siteNumber'] != siteNum].copy()
             newDF = self.sortDF(newDF)
             self.datatable = newDF
             self.update(self.datatable)
@@ -194,7 +194,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
         if selType == 'specimen':
             self.addToUndoList(f'removed specimen {siteNum}-{specimenNum}')  # set checkpoint in undostack
-            newDF = df[~((df['site#'] == siteNum) & (df['specimen#'] == specimenNum))].copy()
+            newDF = df[~((df['siteNumber'] == siteNum) & (df['specimenNumber'] == specimenNum))].copy()
             newDF = self.sortDF(newDF)
             self.datatable = newDF
             self.update(self.datatable)
@@ -212,7 +212,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     
     def columnIndex(self, colName):
         """ given a column name, returns the index of it's location. Called
-        by updateTableView to get the index of "specimen#" for sorting."""
+        by updateTableView to get the index of "specimenNumber" for sorting."""
         result = self.datatable.columns.get_loc(colName)
         return result
     
@@ -233,7 +233,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         for datum in data:
             #datum = {key: value.strip() for key, value in datum.items() if isinstance(value,str)} #dict comprehension!
             datum = {key: value for key, value in datum.items() if isinstance(value,str)} # strip command was preventing spaces from being entered
-            #if datum.get('specimen#') not in ['#','!AddSITE']:   #keep out the site level records!
+            #if datum.get('specimenNumber') not in ['#','!AddSITE']:   #keep out the site level records!
             labelDicts.append(datum)
         return labelDicts
 
@@ -269,8 +269,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                       'minimumElevationInMeters']
         for site in sitesToUpdate:
             #df.loc[df['Col1'].isnull(),['Col1','Col2', 'Col3']] = replace_with_this.values
-            newVals = df.loc[(df['site#'] == site) & (df['specimen#'] == '#')][geoRefCols]
-            df.loc[(df['site#']== site) & (df['specimen#'] != '#'), geoRefCols] = newVals.values.tolist()
+            newVals = df.loc[(df['siteNumber'] == site) & (df['specimenNumber'] == '#')][geoRefCols]
+            df.loc[(df['siteNumber']== site) & (df['specimenNumber'] != '#'), geoRefCols] = newVals.values.tolist()
             QApplication.processEvents()
             self.datatable.update(df)
             self.update(self.datatable)
@@ -286,7 +286,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if assign:
             rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
             dfOrig = self.datatable.iloc[rowsToProcess, ]
-            df = dfOrig.loc[(dfOrig['specimen#'].str.isdigit()) & 
+            df = dfOrig.loc[(dfOrig['specimenNumber'].str.isdigit()) & 
                         (dfOrig['catalogNumber'] == '')].copy()
             if len(df) > 0:
                 catStartingNum = int(self.parent.settings.get('value_catalogNumberStartingNum'))
@@ -307,7 +307,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                     # after adding catnums pull in results and check for uniqueness
                     # TODO Clean this function up! It is pretty awful looking..
                     df = self.datatable.iloc[rowsToProcess, ]
-                    dfUnique = df.loc[(df['specimen#'].str.isdigit()) & 
+                    dfUnique = df.loc[(df['specimenNumber'].str.isdigit()) & 
                                           (df['catalogNumber'] != '')].copy()
                     if not dfUnique['catalogNumber'].is_unique:  # check for duplicated catalog numbers
                         dfNonUnique = dfUnique[dfUnique.duplicated(subset=['catalogNumber'],keep='first')].copy()  # keep the first one as "unique"
@@ -402,11 +402,11 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def getRowsToKeep(self, selType, siteNum = None, specimenNum = None):
         """ Returns list of row indices associated with inputs """
         df = self.datatable
-        #df = df[~df['specimen#'].str.contains('#')]
+        #df = df[~df['specimenNumber'].str.contains('#')]
         if selType == 'site':
-            rowsToKeep = df[df['site#'] == siteNum].index.values.tolist()
+            rowsToKeep = df[df['siteNumber'] == siteNum].index.values.tolist()
         elif selType == 'specimen':
-            rowsToKeep = df[(df['site#'] == siteNum) & (df['specimen#'] == specimenNum)].index.values.tolist()
+            rowsToKeep = df[(df['siteNumber'] == siteNum) & (df['specimenNumber'] == specimenNum)].index.values.tolist()
         else:  # otherwise, keep everything (usually "allRec")
             rowsToKeep = df.index.values.tolist()
         return rowsToKeep
@@ -422,10 +422,10 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         return rowsToHide
 
     def getSiteSpecimens(self):
-        """ Returns a list of tuples for each site# specimen# combination
+        """ Returns a list of tuples for each siteNumber specimenNumber combination
         called from mainWindow's populateTreeWidget"""
         df = self.datatable
-        results = list(zip(df['site#'], df['specimen#']))
+        results = list(zip(df['siteNumber'], df['specimenNumber']))
         return results
 
 
@@ -472,7 +472,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if fileName:  # if a csv was selected, start loading the data.
             df = pd.read_csv(fileName, encoding = 'utf-8',keep_default_na=False, dtype=str)
             df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1) # drop any "unnamed" cols
-            if ~df.columns.isin(['site#']).any():  # if the site# does not exist:
+            if ~df.columns.isin(['siteNumber']).any():  # if the siteNumber does not exist:
                 df = self.inferSiteSpecimenNumbers(df)  # attempt to infer them
             df = self.sortDF(df)
             df.fillna('') # make any nans into empty strings.
@@ -491,7 +491,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save CSV",
                                                                 QtCore.QDir.homePath(), "CSV (*.csv)")
         if fileName:  # if a csv was selected, start loading the data.
-            drop_col_Names = ['site#', 'specimen#']
+            drop_col_Names = ['siteNumber', 'specimenNumber']
             keep_col_Names = [x for x in df.columns if x not in drop_col_Names]
             df = df[keep_col_Names]
             df.fillna('') # make any nans into empty strings.
@@ -500,17 +500,17 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
     def sortDF(self, df):
         """ accepts a dataframe and returns it sorted in an ideal manner. 
-        Expects the dataframe to have site# and specimen# columns """
+        Expects the dataframe to have siteNumber and specimenNumber columns """
 
-        df['sortSpecimen'] = df['specimen#'].str.replace('#','0').astype(int)
-        df['sortSite'] = df['site#'].str.replace('','0').astype(int)
+        df['sortSpecimen'] = df['specimenNumber'].str.replace('#','0').astype(int)
+        df['sortSite'] = df['siteNumber'].str.replace('','0').astype(int)
         df.sort_values(by=['sortSite', 'sortSpecimen'], inplace=True, ascending=True)
         df.drop(columns = ['sortSite', 'sortSpecimen'], inplace = True)
         df.reset_index(drop = True, inplace = True)
         return df
 
     def inferSiteSpecimenNumbers(self, df):
-        """ attempts to infer a site# and specimen# of an incoming df """
+        """ attempts to infer a siteNumber and specimenNumber of an incoming df """
         def specimenNumExtract(catNum):
             try:
                 result = catNum.split('-')[1]
@@ -531,8 +531,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             except (ValueError, IndexError, AttributeError) as e:
                 return ''
         try:
-            df['site#'] = df['otherCatalogNumbers'].transform(lambda x: siteNumExtract(x))
-            df['specimen#'] = df['otherCatalogNumbers'].transform(lambda x: specimenNumExtract(x))
+            df['siteNumber'] = df['otherCatalogNumbers'].transform(lambda x: siteNumExtract(x))
+            df['specimenNumber'] = df['otherCatalogNumbers'].transform(lambda x: specimenNumExtract(x))
         except IndexError:
             pass
 
@@ -551,8 +551,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             if not skipDialog:
                 self.addToUndoList(f'loaded new, blank site data')  # set checkpoint in undostack
             newDFDict = {
-            'site#':['1','1'],
-            'specimen#':['#','1'],
+            'siteNumber':['1','1'],
+            'specimenNumber':['#','1'],
             'otherCatalogNumbers':['1-#','1-1'],
             'catalogNumber':['',''],
             'family':['',''],

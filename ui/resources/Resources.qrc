@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="rc_">
+    <file>search.svg</file>
+    <file>zoom-in.svg</file>
+    <file>zoom-out.svg</file>
     <file>truck.svg</file>
     <file>chevron-right.svg</file>
     <file>play.svg</file>

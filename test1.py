@@ -191,7 +191,7 @@ class MyWindow(QMainWindow):
         """ selects an item on the nav tree_widget. Permits site selection without
         the parenthetical (n) value. ie: 'Site 5' would find 'Site 5 (12)' """
         iterator = QTreeWidgetItemIterator(self.tree_widget, QTreeWidgetItemIterator.All)
-        if name[:5] == 'Site ':  # handle changing record counts at set site#s
+        if name[:5] == 'Site ':  # handle changing record counts at set siteNumbers
             name = name.split('(')[0].strip()
         while iterator.value():
             item = iterator.value()
@@ -333,7 +333,7 @@ class MyWindow(QMainWindow):
                     labelSuccess = self.exportLabels(fileName = pdfFileName)
                     if labelSuccess:
                         outDF = self.m.datatable.iloc[rowsToProcess, ]
-                        outDF = outDF.loc[outDF['specimen#'] != '#']
+                        outDF = outDF.loc[outDF['specimenNumber'] != '#']
                         csvName = csvFileName
                         self.m.save_CSV(df = outDF, fileName = csvFileName)
                         saved = True
@@ -391,6 +391,15 @@ class MyWindow(QMainWindow):
         else:
             pdfBytes = None
         self.pdf_preview.load_preview(pdfBytes)  # starts the loading display process        
+
+    def updatePreviewZoom(self, val):
+        """ changes the value_Zoom setting stored in self.settings, used by
+        pdfviewer.py to determine the size of the preview window. Additionally,
+        updates the label_zoomLevel's text in MainWindow """
+
+        self.settings.setValue('value_zoomLevel', val)  # update settings
+        self.w.label_zoomLevel.setText(f'{str(val).rjust(4," ")}%')  # update the label
+        self.updatePreview()  # update the pdfPreview (this could get cpu intensive)
 
     def updateAutoComplete(self):
         """ updates the Completer's reference text based on the kingdom """

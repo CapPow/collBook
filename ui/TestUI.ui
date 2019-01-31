@@ -11,32 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>collDesk</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-      <item>
-       <widget class="PDFViewer" name="pdf_preview">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>1</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
+     <layout class="QGridLayout" name="gridLayout_7">
+      <item row="0" column="1" rowspan="3">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <property name="topMargin">
          <number>3</number>
@@ -65,7 +46,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="StackedWidgetPage1">
            <property name="sizePolicy">
@@ -84,17 +65,6 @@
             <property name="verticalSpacing">
              <number>3</number>
             </property>
-            <item row="0" column="0">
-             <layout class="QHBoxLayout" name="horizontalLayout_13">
-              <item>
-               <widget class="QPushButton" name="pushButton_newSite">
-                <property name="text">
-                 <string>Add new site</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
             <item row="0" column="1">
              <spacer name="horizontalSpacer_3">
               <property name="orientation">
@@ -107,6 +77,17 @@
                </size>
               </property>
              </spacer>
+            </item>
+            <item row="0" column="0">
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <item>
+               <widget class="QPushButton" name="pushButton_newSite">
+                <property name="text">
+                 <string>Add new site</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item row="2" column="0" colspan="2">
              <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0">
@@ -1359,6 +1340,84 @@
         </item>
        </layout>
       </item>
+      <item row="2" column="0">
+       <widget class="QSlider" name="value_zoomLevel">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTipDuration">
+         <number>2</number>
+        </property>
+        <property name="minimum">
+         <number>10</number>
+        </property>
+        <property name="maximum">
+         <number>200</number>
+        </property>
+        <property name="singleStep">
+         <number>5</number>
+        </property>
+        <property name="pageStep">
+         <number>20</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="invertedAppearance">
+         <bool>false</bool>
+        </property>
+        <property name="invertedControls">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="PDFViewer" name="pdf_preview">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_zoomLevel">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -1724,7 +1783,6 @@
   <tabstop>lineEdit_municipality</tabstop>
   <tabstop>lineEdit_path</tabstop>
   <tabstop>lineEdit_sciNameAuthority</tabstop>
-  <tabstop>table_view</tabstop>
  </tabstops>
  <resources>
   <include location="resources/Resources.qrc"/>
@@ -1858,10 +1916,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>value_zoomLevel</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>updatePreviewZoom(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>85</x>
+     <y>467</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>425</x>
+     <y>-19</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>updatePreview()</slot>
   <slot>updateTableView()</slot>
   <slot>selectTreeWidgetItemByIndex(int)</slot>
+  <slot>updatePreviewZoom(int)</slot>
  </slots>
 </ui>

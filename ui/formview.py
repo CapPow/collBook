@@ -105,7 +105,7 @@ class formView(QtWidgets.QStackedWidget):
         if selectSites:  # if the saveFunc requested only selectedSites
             selectedSites = self.parent.getSelectSitesToApply()
             if len(selectedSites) > 0:  # and if there ARE sites selected
-                df.loc[df['site#'].isin(selectedSites), colName] = value
+                df.loc[df['siteNumber'].isin(selectedSites), colName] = value
             else:  # if requested selected sites ,and none selected. Done.
                 return None
         else:  # if saveFunc did not request selected sites

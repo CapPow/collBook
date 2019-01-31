@@ -70,8 +70,8 @@ class locality():
         country, state, city, etc. from GPS coordinates."""
         # both locality functions would benefit from some systemic methid of determining when to add italics to binomial (scientific) names.
         # such the italic tags "<i> and </i>" would need to be stripped before exporting for database submission.
-        currentRow = f"{currentRowArg['site#']}-{currentRowArg['specimen#']}"
-        currentSiteName = f"Site {currentRowArg['site#']}"
+        currentRow = f"{currentRowArg['siteNumber']}-{currentRowArg['specimenNumber']}"
+        currentSiteName = f"Site {currentRowArg['siteNumber']}"
         currentLocality = currentRowArg['locality']
         latitude = currentRowArg['decimalLatitude']
         longitude = currentRowArg['decimalLongitude']
@@ -143,7 +143,7 @@ class locality():
 #    # both locality functions would benefit from some systemic method of determining when to add italics to binomial (scientific) names.
 #    # such the italic tags "<i> and </i>" would need to be stripped before exporting for database submission.
 #        
-#        currentRow = f"{currentRowArg['site#']}-{currentRowArg['specimen#']}"
+#        currentRow = f"{currentRowArg['siteNumber']}-{currentRowArg['specimenNumber']}"
 #        currentLocality = currentRowArg['locality']
 #        latitude = currentRowArg['decimalLatitude']
 #        longitude = currentRowArg['decimalLongitude']

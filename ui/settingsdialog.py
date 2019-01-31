@@ -25,7 +25,7 @@ class settingsWindow(QMainWindow):
         settingsWindow = Ui_settingsWindow()
         settingsWindow.setupUi(self)
         self.settingsWindow = settingsWindow
-        self.settings = QSettings('pdProject', 'collBook')        
+        self.settings = QSettings('collBook', 'collBook')        
         #self.settingsWindow.value_CollectionName.setPlainText(self.get('value_CollectionName'))
         self.settings.setFallbacksEnabled(False)    # File only, no fallback to registry.
         # before we populate them, verify the file exists
@@ -241,6 +241,9 @@ class settingsWindow(QMainWindow):
         value_LogoOpacity = int(self.get('value_LogoOpacity', 30))
         parent.value_LogoOpacity.setValue(value_LogoOpacity)
         self.opacityChanged(value_LogoOpacity)
+        # note the self.parent.label here, accessing mainwindow.
+        value_zoomLevel = int(self.get('value_zoomLevel', 100))
+        self.parent.w.value_zoomLevel.setValue(value_zoomLevel)
 
         #radiobutton
         value_DarkTheme = self.get('value_DarkTheme', False)
@@ -321,6 +324,8 @@ class settingsWindow(QMainWindow):
         self.setValue('value_LogoScaling', value_LogoScaling)
         value_LogoOpacity = parent.value_LogoOpacity.value()
         self.setValue('value_LogoOpacity', value_LogoOpacity)
+        value_zoomLevel = self.parent.w.value_zoomLevel.value()
+        self.setValue('value_zoomLevel', value_zoomLevel)
         
         #radiobutton
         value_DarkTheme = parent.value_DarkTheme.isChecked()

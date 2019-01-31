@@ -65,7 +65,7 @@ class taxonomicVerification():
         if rowData['scientificName'] in ['', None]:
             return rowData
         
-        rowNum = f"{rowData['site#']}-{rowData['specimen#']}"     
+        rowNum = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"     
         scientificName = rowData['scientificName']
         scientificNameAuthorship = rowData['scientificNameAuthorship'].strip()
         inputSciName = scientificName

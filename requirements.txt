@@ -1,7 +1,7 @@
 QDarkStyle==2.6.5
-python_poppler_qt5==0.25.1
 requests==2.20.1
 numpy==1.15.4
 pandas==0.23.4
+PyMuPDF==1.14.7
 PyQt5==5.11.3
 reportlab==3.5.13
