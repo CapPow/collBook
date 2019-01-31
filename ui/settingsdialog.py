@@ -61,7 +61,7 @@ class settingsWindow(QMainWindow):
             valueToSet = currentZoom
         self.parent.w.value_zoomLevel.setValue(valueToSet)
         self.parent.w.label_zoomLevel.setText(f'{str(valueToSet).rjust(4," ")}%')  # update the label
-            
+        self.settings.setValue('value_zoomLevel', valueToSet)  # update settings
 
     def saveButtonClicked(self):
         """ hides the preferences window and saves the user entries """

@@ -398,8 +398,6 @@ class MyWindow(QMainWindow):
 
         try:
             self.settings.setMaxZoom()
-            self.settings.setValue('value_zoomLevel', val)  # update settings
-            self.w.label_zoomLevel.setText(f'{str(val).rjust(4," ")}%')  # update the label
             self.updatePreview()  # update the pdfPreview (this could get cpu intensive)
         except AttributeError:
             # It gets called too early on start up, this skips it
