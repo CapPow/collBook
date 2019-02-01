@@ -19,7 +19,7 @@ https://docs.google.com/presentation/d/1nAT_hqp6Nm3DC7_e7dxPvbbaXLJTOYzcXJ5dSW2n
 
 ## Contact us
 
-[Caleb Powell](https://github.com/CapPow) - BS Environmental Science, Graduate Student - UTC.
+[Caleb Powell](https://github.com/CapPow) - BS Environmental Science, [Graduate Student - UTC](https://www.utc.edu/biology-geology-environmental-science/profiles/graduate-students/qvd441.php).
 
 [Jacob Motley](https://www.linkedin.com/in/jacob-motley-b627a1152) - BS [Computer Science](https://github.com/j-h-m): Software Systems - UTC.
 
