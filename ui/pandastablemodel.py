@@ -265,8 +265,13 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         geoRefCols = ['country', 'stateProvince', 'county',
                       'municipality', 'path', 'locality',
                       'decimalLatitude', 'decimalLongitude',
-                      'coordinateUncertaintyInMeters', 
+                      'coordinateUncertaintyInMeters',
                       'minimumElevationInMeters']
+
+        for col in geoRefCols:  # verify the column exists before adding to it.
+            if col not in df:
+                df[col] = ""
+
         for site in sitesToUpdate:
             #df.loc[df['Col1'].isnull(),['Col1','Col2', 'Col3']] = replace_with_this.values
             newVals = df.loc[(df['siteNumber'] == site) & (df['specimenNumber'] == '#')][geoRefCols]
