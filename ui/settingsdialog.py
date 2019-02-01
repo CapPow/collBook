@@ -41,6 +41,10 @@ class settingsWindow(QMainWindow):
         # can also later do a check if the version is not up-to-date
 
     def setMaxZoom(self):
+        try:
+            self.parent.updatePreview()
+        except AttributeError:
+            pass
         screenSize = (self.parent.geometry())
         screenX = screenSize.width()
         xMax = screenX * 0.6

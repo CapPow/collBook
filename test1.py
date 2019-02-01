@@ -376,6 +376,7 @@ class MyWindow(QMainWindow):
 
     def updatePreview(self):
         """ updates the pdf preview window """
+        print("UPDATING PREVIEW")
         #TODO modify this to be called from within the pdfviewer class
         rowData = self.getVisibleRowData()
         selType, siteNum, specimenNum = self.getTreeSelectionType()
@@ -393,20 +394,18 @@ class MyWindow(QMainWindow):
         else:  # there is not appropriate row data to preview
             pdfBytes = None
             errorType = 'preview' # display generic "Preview window text"
-        self.pdf_preview.load_preview(pdfBytes, errorType)  # starts the loading display process        
+        self.pdf_preview.load_preview(pdfBytes, errorType)  # starts the loading display process  
+        #self.settings.setMaxZoom()
 
     def updatePreviewZoom(self, val):
         """ changes the value_Zoom setting stored in self.settings, used by
         pdfviewer.py to determine the size of the preview window. Additionally,
         updates the label_zoomLevel's text in MainWindow """
-
         try:
             self.settings.setMaxZoom()
             self.updatePreview()  # update the pdfPreview (this could get cpu intensive)
         except AttributeError:
-            # It gets called too early on start up, this skips it
-            pass
-
+            pass  # It gets called too early on start up, this skips it
 
     def updateAutoComplete(self):
         """ updates the Completer's reference text based on the kingdom """

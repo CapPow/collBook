@@ -65,13 +65,15 @@ class PDFViewer(QLabel):
                 errorText = ["Label Preview Window"]
             pdfBytes = self.parent.p.genErrorLabel(errorText)
             self.document = fitz.open(stream=pdfBytes, filetype='pdf')
+            pdfPage = self.document[0]
         try:
             self.document = fitz.open(stream=pdfBytes, filetype='pdf')  # Try loading from bytes
+            pdfPage = self.document[0]
         except IndexError:
             errorText = ["Label Preview Window"]
             pdfBytes = self.parent.p.genErrorLabel(errorText)
             self.document = fitz.open(stream=pdfBytes, filetype='pdf')
-        pdfPage = self.document[0]
+            pdfPage = self.document[0]
         zoom = int(self.settings.get('value_zoomLevel', 100)) / 100
         mat = fitz.Matrix(zoom, zoom)  # the scaling / transformations
         pix = pdfPage.getPixmap(alpha=False, matrix=mat)
