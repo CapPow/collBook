@@ -1,5 +1,5 @@
 pyrcc5 -o Resources_rc.py ui/resources/Resources.qrc
-pyuic5 -o ui/TestUI.py ui/TestUI.ui
+pyuic5 -o ui/collBookUI.py ui/collBookUI.ui
 pyuic5 -o ui/settingsUI.py ui/settingsUI.ui
 pyuic5 -o ui/associatedtaxaUI.py ui/associatettaxaUI.ui
 pyuic5 -o ui/statusbarUI.py ui/statusBar.ui
