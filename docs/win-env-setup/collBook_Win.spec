@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['test1.py'],
+a = Analysis(['collBook.py'],
              pathex=['C:\\Users\\Shawlab\\Documents\\pdDesk'],
              binaries=[],
              datas=[('C:\\Users\\Shawlab\\Documents\\pdDesk\\key.txt','.')],
