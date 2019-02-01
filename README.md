@@ -17,13 +17,13 @@ plantdigitizationprojectutc@gmail.com
 ## In leiu of proper documentation, here is a slideshow:
 https://docs.google.com/presentation/d/1nAT_hqp6Nm3DC7_e7dxPvbbaXLJTOYzcXJ5dSW2nkHk/edit?usp=sharing
 
-##Contact us
+## Contact us
 
 [Caleb Powell](https://github.com/CapPow) - BS Environmental Science, Graduate Student - UTC.
 
 [Jacob Motley](https://www.linkedin.com/in/jacob-motley-b627a1152) - BS [Computer Science](https://github.com/j-h-m): Software Systems - UTC.
 
-## Credits:
+## Credits
 
 #### Catalog of Life
 Roskov Y., Abucay L., Orrell T., Nicolson D., Bailly N., Kirk P.M., Bourgoin T., DeWalt R.E., Decock W., De Wever A., Nieukerken E. van, Zarucchi J., Penev L., eds. (2018). Species 2000 & ITIS Catalogue of Life, 2018 Annual Checklist. Digital resource at www.catalogueoflife.org/annual-checklist/2018. Species 2000: Naturalis, Leiden, the Netherlands. ISSN 2405-884X.
