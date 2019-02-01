@@ -1,7 +1,9 @@
 QDarkStyle==2.6.5
-requests==2.20.1
-numpy==1.15.4
-pandas==0.23.4
 PyMuPDF==1.14.7
+requests==2.21.0
+pandas==0.23.4
+numpy==1.15.4
+Pillow==5.4.1
 PyQt5==5.11.3
+fitz==0.0.1.dev2
 reportlab==3.5.13
