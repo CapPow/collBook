@@ -24,12 +24,13 @@ __author__ = "Caleb Powell, Jacob Motley"
 __credits__ = ["Caleb Powell, Jacob Motley, Joey Shaw"]
 __email__ = "calebadampowell@gmail.com"
 __status__ = "Alpha"
-__version__ = '0.1.1'
+__version__ = 'v0.1.1-alpha'
 
 
 import sys
 from io import StringIO
 from pathlib import Path
+from datetime import date
 import pandas as pd
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator, QItemDelegate, QCompleter, QInputDialog, QLineEdit
@@ -45,7 +46,6 @@ from ui.settingsdialog import settingsWindow
 from ui.taxonomy import taxonomicVerification
 from ui.associatedtaxa import associatedTaxaMainWindow
 from ui.scinameinputdialog import sciNameDialog
-
 from ui.progressbar import progressBar
 
 #from . import version
@@ -121,7 +121,40 @@ class MyWindow(QMainWindow):
         # update the preview window as dataframe changes
         self.m.dataChanged.connect(self.updatePreview)
         self.updateAutoComplete()
+        self.versionCheck()
         
+    def versionCheck(self):
+        """ checks the github repo's latest release version number against
+        local and offers the user to visit the new release page if different"""
+        #  be sure to only do this once a day.
+        today = str(date.today())
+        lastChecked = self.settings.get('date_versionCheck', today)
+        self.w.date_versionCheck = today
+        if today != lastChecked:
+            import requests
+            import webbrowser
+            apiURL = 'https://api.github.com/repos/CapPow/collBook/releases/latest'
+            try:
+                apiCall = requests.get(apiURL)
+                status = str(apiCall)
+            except ConnectionError:
+                #  if no internet, don't bother the user.
+                pass
+            result = apiCall.json()
+            if '200' in status:  # if the return looks bad, don't bother user
+                url = result['html_url']
+                version = result['tag_name']
+                if version.lower() != self.w.version.lower():
+                    message = f'A new version ( {version} ) of collBook has been released. Would you like to visit the release page?'
+                    title = 'collBook Version'
+                    answer = self.userAsk(message, title, inclHalt = False)
+                    if answer:# == QMessageBox.Yes:
+                        link=url
+                        self.showMinimized() #  hide the app about to pop up.
+                        #  instead display a the new release
+                        webbrowser.open(link,autoraise=1)
+            self.settings.saveSettings()  # save the new version check date
+
     def toggleSettings(self):
         if self.settings.isHidden():
             self.settings.show()

@@ -185,12 +185,12 @@ class settingsWindow(QMainWindow):
         parent = self.settingsWindow
         val = f'({str(Qint)}%)'.rjust(8, ' ')
         parent.label_scalingValue.setText(val)
-    
+
     def opacityChanged(self, Qint):
         parent = self.settingsWindow
         val = f'({str(Qint)}%)'.rjust(8, ' ')
         parent.label_opacityValue.setText(val)
-    
+
     def genDummyCatalogNumber(self):
         """ generates a single dummy catalog number for label previews"""
         incDummy = self.get('value_inc_Barcode', False)
@@ -290,6 +290,12 @@ class settingsWindow(QMainWindow):
         # save the version number
         version = self.parent.w.version
         self.setValue('version', version)
+        # save the laste date we checked the version number
+        try:
+            date_versionCheck = self.parent.w.date_versionCheck
+        except AttributeError:  # first run may not yet have this saved.
+            date_versionCheck = ""
+        self.setValue('date_versionCheck', date_versionCheck)
 
         #QComboBox
         value_AuthChangePolicy = parent.value_AuthChangePolicy.currentText()
