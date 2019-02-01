@@ -10,6 +10,7 @@ Created on Sun Jan  6 10:33:55 2019
 import requests
 from requests import ConnectionError
 from PyQt5.QtWidgets import QMessageBox
+import time
 
 # status codes
 # link -> https://developers.google.com/maps/documentation/geocoding/intro#StatusCodes
@@ -129,11 +130,15 @@ class locality():
        
         else:   # if the Google API call returned error/status string
             apiErrorMessage = address
-            message = f'MISSING GPS at row {currentRow}. Location lookup error at row {currentRow}: Google reverse Geolocate service responded with: "{apiErrorMessage}". This may be internet connection problems, or invalid GPS values.'
-            self.userNotice( message )
-            # could consider a retry option here
-            raise Exception
-
+            if apiErrorMessage == "ZERO_RESULTS":
+                message = f'Location lookup error at {currentSiteName}: service responded with: "{apiErrorMessage}". Does this location exist?'
+                self.parent.userNotice(message, title='GeoLocation')
+            else:
+                message = f'Location lookup error at {currentSiteName}: service responded with: "{apiErrorMessage}". This may be an internet connection issue.'
+                notice = self.parent.userNotice(message, title='GeoLocation', retry = True)
+                if notice == QMessageBox.Retry:  # if clicked retry, do it.
+                    time.sleep(1)
+                    currentRowArg = self.genLocality(currentRowArg)
         return currentRowArg
 
 

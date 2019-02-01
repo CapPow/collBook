@@ -277,17 +277,21 @@ class MyWindow(QMainWindow):
             return "cancel"
 
 
-    def userNotice(self, text, title=''):
+    def userNotice(self, text, title='', retry=False):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
         msg.setText(text)
         #msg.setInformativeText("This is additional information")
         msg.setWindowTitle(title)
         #msg.setDetailedText("The details are as follows:")
-        msg.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
+        if retry:
+            msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Retry)
+        else:
+            msg.setStandardButtons(QMessageBox.Ok)            
         halt = msg.addButton('Halt Process', QtWidgets.QMessageBox.ResetRole)
         halt.clicked.connect(self.statusBar.flipCancelSwitch)
-        msg.exec_()
+        reply = msg.exec_()
+        return reply
         
 
     def exportRecords(self):

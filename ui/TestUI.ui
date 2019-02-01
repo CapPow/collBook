@@ -46,7 +46,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="StackedWidgetPage1">
            <property name="sizePolicy">
@@ -1784,12 +1784,60 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>lineEdit_sciName</tabstop>
+  <tabstop>plainTextEdit_labelProject</tabstop>
+  <tabstop>plainTextEdit_fieldNotes</tabstop>
+  <tabstop>lineEdit_eventRemarks</tabstop>
+  <tabstop>lineEdit_samplingEffort</tabstop>
+  <tabstop>pushButton_newSite</tabstop>
+  <tabstop>lineEdit_recordedBy</tabstop>
+  <tabstop>lineEdit_associatedCollectors</tabstop>
+  <tabstop>button_associatedTaxa</tabstop>
+  <tabstop>lineEdit_associatedTaxa</tabstop>
+  <tabstop>lineEdit_habitat</tabstop>
+  <tabstop>lineEdit_locationNotes</tabstop>
+  <tabstop>toolButton_reverseGeolocate</tabstop>
+  <tabstop>plainTextEdit_locality</tabstop>
+  <tabstop>lineEdit_decimalLatitude</tabstop>
+  <tabstop>lineEdit_decimalLongitude</tabstop>
+  <tabstop>lineEdit_coordinateUncertaintyInMeters</tabstop>
+  <tabstop>lineEdit_minimumElevationInMeters</tabstop>
   <tabstop>lineEdit_stateProvince</tabstop>
   <tabstop>lineEdit_county</tabstop>
   <tabstop>lineEdit_municipality</tabstop>
   <tabstop>lineEdit_path</tabstop>
+  <tabstop>lineEdit_sciName</tabstop>
+  <tabstop>toolButton_verifyTaxonomy</tabstop>
   <tabstop>lineEdit_sciNameAuthority</tabstop>
+  <tabstop>lineEdit_occurrenceRemarks</tabstop>
+  <tabstop>lineEdit_substrate</tabstop>
+  <tabstop>comboBox_reproductiveCondition</tabstop>
+  <tabstop>spinBox_individualCount</tabstop>
+  <tabstop>checkBox_establishmentMeans</tabstop>
+  <tabstop>plainTextEdit_identificationRemarks</tabstop>
+  <tabstop>plainTextEdit_identificationReferences</tabstop>
+  <tabstop>lineEdit_default_recordedBy</tabstop>
+  <tabstop>dateEdit_default_eventDate</tabstop>
+  <tabstop>treeWidget_sitesToApply</tabstop>
+  <tabstop>toolButton_sitesToApply_SelectNone</tabstop>
+  <tabstop>radioButton_applySelectSites</tabstop>
+  <tabstop>toolButton_sitesToApply_SelectAll</tabstop>
+  <tabstop>pushButton_newSpecimen_2</tabstop>
+  <tabstop>pushButton_duplicateSpecimen</tabstop>
+  <tabstop>checkBox_deleteRecord</tabstop>
+  <tabstop>pushButton_deleteRecord</tabstop>
+  <tabstop>lineEdit_otherCatalogNumbers</tabstop>
+  <tabstop>lineEdit_catalogNumber</tabstop>
+  <tabstop>checkBox_delSite</tabstop>
+  <tabstop>dateEdit_eventDate</tabstop>
+  <tabstop>pushButton_deleteSite</tabstop>
+  <tabstop>formView</tabstop>
+  <tabstop>lineEdit_default_associatedCollectors</tabstop>
+  <tabstop>groupBox_newSite_defaults</tabstop>
+  <tabstop>pushButton_newSpecimen</tabstop>
+  <tabstop>radioButton_applyAllRecords</tabstop>
+  <tabstop>value_zoomLevel</tabstop>
+  <tabstop>tree_widget</tabstop>
+  <tabstop>table_view</tabstop>
  </tabstops>
  <resources>
   <include location="resources/Resources.qrc"/>
