@@ -9,6 +9,8 @@ Created on Wed Jan 16 11:23:32 2019
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QDate
 from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QRegExp
+from PyQt5.QtGui import QRegExpValidator
 
 class formView(QtWidgets.QStackedWidget):
 #class formView(QtWidgets.QTabWidget):
@@ -62,6 +64,22 @@ class formView(QtWidgets.QStackedWidget):
                 }
         self.connectFields()
         self.parent = parentInstance
+
+        # Set up input validation on the GPS fields        
+        # LatRe & LonRe Patterns credited to "Jason Rutberg" from http://www.regexlib.com/
+        latRE = QRegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,8}")
+        lat_validator = QRegExpValidator(latRE, self.parentClass.lineEdit_decimalLatitude)
+        self.parentClass.lineEdit_decimalLatitude.setValidator(lat_validator)
+        lonRE = QRegExp("^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,8}")
+        lon_validator = QRegExpValidator(lonRE, self.parentClass.lineEdit_decimalLongitude)
+        self.parentClass.lineEdit_decimalLongitude.setValidator(lon_validator)
+        uncertRE = QRegExp("^\d{1,5}\.{1}\d{1,8}")
+        uncert_validator = QRegExpValidator(uncertRE, self.parentClass.lineEdit_coordinateUncertaintyInMeters)
+        self.parentClass.lineEdit_coordinateUncertaintyInMeters.setValidator(uncert_validator)
+        elevRE = QRegExp("^\d{1,4}\.{1}\d{1,8}")
+        elev_validator = QRegExpValidator(uncertRE, self.parentClass.lineEdit_minimumElevationInMeters)
+        self.parentClass.lineEdit_minimumElevationInMeters.setValidator(elev_validator)
+        
 
     def connectFields(self):
         """ connect formview fields to save functions 
@@ -210,11 +228,4 @@ class formView(QtWidgets.QStackedWidget):
                    'recordedBy':default_recordedBy,
                    'associatedCollectors':default_associatedCollectors}
         return defVals
-
-    def siteFieldChanged(self, fieldName):
-        """ saves changes to site level data """
-
-
-    def specimenFieldChanged(self, fieldName):
-        """ saves changes to specimen level data"""
 

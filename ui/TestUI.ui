@@ -46,7 +46,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="StackedWidgetPage1">
            <property name="sizePolicy">
@@ -907,9 +907,6 @@
                    </property>
                    <item row="1" column="1">
                     <widget class="QLineEdit" name="lineEdit_decimalLongitude">
-                     <property name="inputMask">
-                      <string>#099.9900000000</string>
-                     </property>
                      <property name="alignment">
                       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
                      </property>
@@ -924,9 +921,6 @@
                    </item>
                    <item row="1" column="2">
                     <widget class="QLineEdit" name="lineEdit_coordinateUncertaintyInMeters">
-                     <property name="inputMask">
-                      <string>00009.000</string>
-                     </property>
                      <property name="alignment">
                       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
                      </property>
@@ -941,8 +935,11 @@
                    </item>
                    <item row="1" column="0">
                     <widget class="QLineEdit" name="lineEdit_decimalLatitude">
-                     <property name="inputMask">
-                      <string>#099.9900000000</string>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="frame">
+                      <bool>true</bool>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -965,11 +962,8 @@
                    </item>
                    <item row="1" column="3">
                     <widget class="QLineEdit" name="lineEdit_minimumElevationInMeters">
-                     <property name="inputMask">
-                      <string>0009.00</string>
-                     </property>
                      <property name="text">
-                      <string>.</string>
+                      <string/>
                      </property>
                     </widget>
                    </item>
