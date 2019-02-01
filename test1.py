@@ -376,7 +376,6 @@ class MyWindow(QMainWindow):
 
     def updatePreview(self):
         """ updates the pdf preview window """
-        print("UPDATING PREVIEW")
         #TODO modify this to be called from within the pdfviewer class
         rowData = self.getVisibleRowData()
         selType, siteNum, specimenNum = self.getTreeSelectionType()
