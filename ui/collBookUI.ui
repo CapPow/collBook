@@ -45,8 +45,11 @@
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
           </property>
+          <property name="styleSheet">
+           <string notr="true">font: 12pt &quot;Cantarell&quot;;</string>
+          </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="StackedWidgetPage1">
            <property name="sizePolicy">
@@ -310,7 +313,11 @@
                            </property>
                            <property name="font">
                             <font>
-                             <pointsize>10</pointsize>
+                             <family>Cantarell</family>
+                             <pointsize>12</pointsize>
+                             <weight>50</weight>
+                             <italic>false</italic>
+                             <bold>false</bold>
                             </font>
                            </property>
                            <property name="headerHidden">
@@ -393,7 +400,11 @@
               </property>
               <property name="font">
                <font>
+                <family>Cantarell</family>
+                <pointsize>12</pointsize>
+                <weight>50</weight>
                 <italic>false</italic>
+                <bold>false</bold>
                </font>
               </property>
               <property name="layoutDirection">
@@ -410,10 +421,10 @@
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
                <property name="topMargin">
-                <number>3</number>
+                <number>6</number>
                </property>
                <property name="bottomMargin">
-                <number>0</number>
+                <number>3</number>
                </property>
                <property name="verticalSpacing">
                 <number>3</number>
@@ -576,7 +587,7 @@
                   <number>0</number>
                  </property>
                  <property name="topMargin">
-                  <number>3</number>
+                  <number>6</number>
                  </property>
                  <property name="bottomMargin">
                   <number>0</number>
@@ -702,7 +713,7 @@
                   <number>0</number>
                  </property>
                  <property name="topMargin">
-                  <number>3</number>
+                  <number>6</number>
                  </property>
                  <property name="rightMargin">
                   <number>9</number>
@@ -1064,7 +1075,7 @@
                 <number>3</number>
                </property>
                <property name="topMargin">
-                <number>3</number>
+                <number>6</number>
                </property>
                <item row="0" column="0">
                 <widget class="QLabel" name="label_otherCatalogNumber">
@@ -1479,6 +1490,9 @@
         </property>
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">font: 12pt &quot;Cantarell&quot;;</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::Panel</enum>
