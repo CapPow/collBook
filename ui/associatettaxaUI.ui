@@ -16,6 +16,9 @@
   <property name="windowTitle">
    <string>Associated Taxa</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">font: 12pt &quot;Cantarell&quot;;</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,7,0,0">
    <item row="3" column="0">
     <widget class="QListWidget" name="listWidget_associatedTaxa">

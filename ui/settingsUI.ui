@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>656</width>
-    <height>621</height>
+    <width>780</width>
+    <height>637</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -18,6 +18,9 @@
   </property>
   <property name="windowTitle">
    <string>Preferences</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">font: 12pt &quot;Cantarell&quot;;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
@@ -87,7 +90,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="page">
            <layout class="QGridLayout" name="gridLayout_6">
@@ -276,8 +279,11 @@
                  </property>
                  <property name="font">
                   <font>
-                   <pointsize>9</pointsize>
-                   <italic>true</italic>
+                   <family>Cantarell</family>
+                   <pointsize>12</pointsize>
+                   <weight>50</weight>
+                   <italic>false</italic>
+                   <bold>false</bold>
                   </font>
                  </property>
                  <property name="text">
@@ -847,8 +853,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>656</width>
-     <height>22</height>
+     <width>780</width>
+     <height>26</height>
     </rect>
    </property>
    <property name="defaultUp">

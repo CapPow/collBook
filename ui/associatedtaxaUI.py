@@ -13,6 +13,7 @@ class Ui_associatedTaxaMainWindow(object):
         associatedTaxaMainWindow.setObjectName("associatedTaxaMainWindow")
         associatedTaxaMainWindow.setWindowModality(QtCore.Qt.NonModal)
         associatedTaxaMainWindow.resize(336, 443)
+        associatedTaxaMainWindow.setStyleSheet("font: 12pt \"Cantarell\";")
         self.gridLayout = QtWidgets.QGridLayout(associatedTaxaMainWindow)
         self.gridLayout.setObjectName("gridLayout")
         self.listWidget_associatedTaxa = QtWidgets.QListWidget(associatedTaxaMainWindow)
