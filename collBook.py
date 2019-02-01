@@ -25,7 +25,7 @@ from ui.pandastablemodel import PandasTableModel
 from ui.locality import locality
 from PyQt5.QtCore import QFile, Qt
 import qdarkstyle
-from ui.TestUI import Ui_MainWindow
+from ui.collBookUI import Ui_MainWindow
 from ui.settingsdialog import settingsWindow
 from ui.taxonomy import taxonomicVerification
 from ui.associatedtaxa import associatedTaxaMainWindow
