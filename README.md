@@ -4,11 +4,10 @@ collBook, is the desktop counterpart for the mobile app collNote. Combined they 
 
 ## Development Stage
 
-collBook is in an early testing stage. Unexpected crashes are expected to be frequent, so please take caution with your data and work on copies.
+collBook is in an early testing stage. Unexpected crashes are expected to be frequent, so please take caution with your data and work on copies. Pull requests are welcomed!
 
 #### Known bugs
-- preview window does zoom is not updated at start up.
-  - For now, altering the zoom after start up solves this.
+- Preview window zoom is not properly updated at start up. For now, altering the zoom after start up solves this.
 
 ## Email Us with Suggestions or Issues!
 
