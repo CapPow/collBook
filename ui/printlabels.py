@@ -144,7 +144,10 @@ class LabelPDF():
            defaultFileName = the filename to use as the default when saving the pdf file."""
 
         # strip out the site number rows
-        labelDataInput = [x for x in labelDataInput if "#" not in x.get('otherCatalogNumbers').split('-')[-1]]
+        try:
+            labelDataInput = [x for x in labelDataInput if x.get('specimenNumber') != "#"]
+        except AttributeError:
+            labelDataInput = [x for x in labelDataInput if "#" not in x.get('otherCatalogNumbers').split('-')[-1]]
         if len(labelDataInput) < 1:  # exit early if nothing is left
             return None
 
