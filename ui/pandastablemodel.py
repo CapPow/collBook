@@ -479,6 +479,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1) # drop any "unnamed" cols
             if ~df.columns.isin(['siteNumber']).any():  # if the siteNumber does not exist:
                 df = self.inferSiteSpecimenNumbers(df)  # attempt to infer them
+            if ~df.columns.isin(['otherCatalogNumbers']).any():
+                df = df.apply(self.inferOtherCatalogNumbers, axis=1)
             df = self.sortDF(df)
             df.fillna('') # make any nans into empty strings.
             self.update(df)  # this function actually updates the visible dataframe 
@@ -513,6 +515,14 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df.drop(columns = ['sortSite', 'sortSpecimen'], inplace = True)
         df.reset_index(drop = True, inplace = True)
         return df
+
+    def inferOtherCatalogNumbers(self, rowData):
+        """ assigns otherCatalogNumber based on siteNumber & specimenNumber """
+        try:
+            rowData['otherCatalogNumbers'] = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
+        except IndexError:
+            pass
+        return rowData
 
     def inferSiteSpecimenNumbers(self, df):
         """ attempts to infer a siteNumber and specimenNumber of an incoming df """
