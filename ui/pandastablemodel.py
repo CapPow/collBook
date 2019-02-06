@@ -17,6 +17,7 @@ from reportlab.platypus.doctemplate import LayoutError
 
 
 import pandas as pd
+import numpy as np
 
 class PandasTableModel(QtCore.QAbstractTableModel):
     def __init__(self, parent=None, editable = True, *args):
@@ -291,8 +292,12 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if assign:
             rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
             dfOrig = self.datatable.iloc[rowsToProcess, ]
-            df = dfOrig.loc[(dfOrig['specimenNumber'].str.isdigit()) & 
-                        (dfOrig['catalogNumber'] == '')].copy()
+            try:
+                df = dfOrig.loc[(dfOrig['specimenNumber'].str.isdigit()) & 
+                            (dfOrig['catalogNumber'] == '')].copy()
+            except KeyError:  # address a no catalogNumber condition
+                df = dfOrig.loc[dfOrig['specimenNumber'].str.isdigit()].copy()
+                df['catalogNumber'] = ''
             if len(df) > 0:
                 catStartingNum = int(self.parent.settings.get('value_catalogNumberStartingNum'))
                 catDigits = int(self.parent.settings.get('value_catalogNumberDigits'))
@@ -477,10 +482,13 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if fileName:  # if a csv was selected, start loading the data.
             df = pd.read_csv(fileName, encoding = 'utf-8',keep_default_na=False, dtype=str)
             df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1) # drop any "unnamed" cols
+            # TODO consider popup dialog to handle NO siteNumber, NO catalogNumber, NO otherCatalogNumbers condition.
             if ~df.columns.isin(['siteNumber']).any():  # if the siteNumber does not exist:
                 df = self.inferSiteSpecimenNumbers(df)  # attempt to infer them
             if ~df.columns.isin(['otherCatalogNumbers']).any():
                 df = df.apply(self.inferOtherCatalogNumbers, axis=1)
+            if ~df.columns.isin(['catalogNumber']).any():
+                df['catalogNumber'] = ''
             df = self.sortDF(df)
             df.fillna('') # make any nans into empty strings.
             self.update(df)  # this function actually updates the visible dataframe 
@@ -488,12 +496,15 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.parent.form_view.fillFormFields()
             return True
 
-    def save_CSV(self, fileName = None, df = None):
+    def save_CSV(self, fileName=None, df=None):
         # is triggered by the action_Save:
         if df is None:
             df = self.datatable
         else:
             df = df.copy()
+        # convert empty strings to null values
+        df.replace('', np.nan, inplace=True)
+        df.dropna(axis=1, how='all', inplace=True)
         if fileName is None:
             fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save CSV",
                                                                 QtCore.QDir.homePath(), "CSV (*.csv)")
@@ -501,8 +512,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             drop_col_Names = ['siteNumber', 'specimenNumber']
             keep_col_Names = [x for x in df.columns if x not in drop_col_Names]
             df = df[keep_col_Names]
-            df.fillna('') # make any nans into empty strings.
-            df.to_csv(fileName, encoding = 'utf-8', index = False)
+            df.fillna('', inplace=True)  # convert nullvalues empty strings
+            df.to_csv(fileName, encoding='utf-8', index=False)
             return True
 
     def sortDF(self, df):
