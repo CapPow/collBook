@@ -60,7 +60,8 @@ class locality():
         # api returns OK (query went through, received results)
         if status == 'OK':
             results = apiCall.json()['results']
-            addressComponents = results[0]['address_components']
+            #addressComponents = results[0]['address_components']
+            addressComponents = [x['address_components'] for x in results]
             return addressComponents
         else:  # some error occured
             status = str(status)
@@ -85,41 +86,60 @@ class locality():
                 return currentRowArg
             else:
                 return currentRowArg
-        address = self.reverseGeoCall(latitude, longitude)
+        addresses = self.reverseGeoCall(latitude, longitude)
+        address = addresses[0]  # Prefer the first entry
+        # dig into deeper entries for a "park" type
+        addressComponents = [y for x in addresses for y in x]
+        park = False
+        for component in addressComponents:
+            types = component['types']
+            if 'park' in types:
+                address.append(component) # if park found, add to components.
         if isinstance(address, list):
-            newLocality = []
+            # newLocality is dict as{type : value}
+            newLocality = {}
             for addressComponent in address:
                 if addressComponent['types'][0] == 'route':
                     # path could be Unamed Road
                     # probably don't want this as a result?
-
                     #TODO include a path inclusison uncertainty threshold
                     coordUncertainty = currentRowArg['coordinateUncertaintyInMeters']
                     try:
                         coordUncertainty = int(coordUncertainty)
-                        if coordUncertainty < 200:
+                        if coordUncertainty < 100:
                             path = f"near {addressComponent['long_name']}"
-                            newLocality.append(path)
+                            newLocality['path'] = path
                             currentRowArg['path'] = path
                     except ValueError:
                         pass
+                #  TODO consider also using google's "natural_feature" type.
+                if 'park' in addressComponent['types']:
+                    parkName = addressComponent['short_name']
+                    newLocality['park'] = parkName
                 if addressComponent['types'][0] == 'administrative_area_level_1':
                     stateProvince = addressComponent['long_name']
-                    newLocality.append(stateProvince)
+                    newLocality['stateProvince'] = stateProvince
                     currentRowArg['stateProvince'] = stateProvince
                 if addressComponent['types'][0] == 'administrative_area_level_2':
                     county = addressComponent['long_name']
-                    newLocality.append(county)
+                    newLocality['county'] = county
                     currentRowArg['county'] = county
                 if addressComponent['types'][0] == 'locality':
                     municipality = addressComponent['long_name']
-                    newLocality.append(municipality)
+                    newLocality['municipality'] = municipality
                     currentRowArg['municipality'] = municipality
                 if addressComponent['types'][0] == 'country':
                     country = addressComponent['short_name']
-                    newLocality.append(country)
+                    newLocality['country'] = country
                     currentRowArg['country'] = country
-            newLocality = ', '.join(newLocality[::-1]) # build it in reverse order
+            # construct the locality items with a controlled order        
+            localityList = ['country','stateProvince','county','municipality','park','path']
+            localityItemList = []
+            for item in localityList:
+                newLocalityItem = newLocality.get(item, False)
+                if newLocalityItem:
+                    localityItemList.append(newLocalityItem)
+            newLocality = ', '.join(localityItemList)
             if newLocality not in currentLocality:
                 #TODO make a user preference setting for prepending the generated substring to existing data.
                 newLocality = newLocality + ', ' + currentLocality

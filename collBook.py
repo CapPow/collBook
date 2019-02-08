@@ -345,15 +345,9 @@ class MyWindow(QMainWindow):
     def exportRecords(self):
         """ saves a pdf file of the labels AND a csv of the records prepared for
         SERNEC upload. """
-        saved = False  # have both files successfully saved?
-        #saveDialog = QtWidgets.QFileDialog(self)
-        # the name filters must be a list
-#        saveDialog.setWindowTitle('Export Labels')
- #       saveDialog.setNameFilters(["Labels (*.pdf)"])
- #       saveDialog.selectNameFilter("Labels (*.pdf)")
+        saved = False  # have both files successfully saved? (not yet)
         # show the dialog
         while saved is False:
-            #saveDialog.exec_()
             if not self.testRunLabels():
                 return False
             chosenFileName, _ =  QtWidgets.QFileDialog.getSaveFileName(self, "Export Labels", "", "Label PDFs (*.pdf)")
