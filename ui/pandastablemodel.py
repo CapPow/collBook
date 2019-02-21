@@ -13,8 +13,10 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QDialog
 from reportlab.platypus.doctemplate import LayoutError
 
+from ui.importindexdialog import importDialog
 
 import pandas as pd
 import numpy as np
@@ -367,11 +369,19 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.geoRef()
             if xButton.status:  # check for cancel button
                 break
-            waitingForUser = QtCore.QEventLoop()
-            self.parent.associatedTaxaWindow.associatedMainWin.button_save.clicked.connect(waitingForUser.quit)
-            self.parent.associatedTaxaWindow.associatedMainWin.button_cancel.clicked.connect(waitingForUser.quit)
-            self.parent.toggleAssociated() # call user input window and wait
-            waitingForUser.exec_()
+            # check user policy for associatedTaxa dialog
+            if self.parent.settings.get('value_associatedAlways', True):
+                self.associatedTaxDialog()
+            elif self.parent.settings.get('value_associatedOnly', False):
+                records = self.getRowsToKeep('site', siteNum = site)
+                if len(records) > 2:
+                    self.associatedTaxDialog()
+            elif self.parent.settings.get('value_associatedNever', False):
+                # do nothing
+                pass
+            else:
+                self.associatedTaxDialog()
+            
             if xButton.status:  # check for cancel button
                 break
             QApplication.processEvents()
@@ -380,6 +390,14 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         xButton.status = False
         self.parent.setTreeSelectionByType(selType, siteNum, specimenNum)  # return the selection
             
+    def associatedTaxDialog(self):
+        """ displays the associatedTaxa dialog and waits for user input """
+        waitingForUser = QtCore.QEventLoop()
+        self.parent.associatedTaxaWindow.associatedMainWin.button_save.clicked.connect(waitingForUser.quit)
+        self.parent.associatedTaxaWindow.associatedMainWin.button_cancel.clicked.connect(waitingForUser.quit)
+        self.parent.toggleAssociated() # call user input window and wait
+        waitingForUser.exec_()
+
     def processViewableRecords(self, rowsToProcess, func):
         """ applies a function over each row among rowsToProcess (by index)"""
         #self.parent.statusBar.label_status
@@ -438,7 +456,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         results = list(zip(df['siteNumber'], df['specimenNumber']))
         return results
 
-
     def data(self, index, role=QtCore.Qt.DisplayRole):  # TODO figure out what this def is doing and when it is called
         if role == QtCore.Qt.DisplayRole:
             i = index.row()
@@ -482,16 +499,49 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if fileName:  # if a csv was selected, start loading the data.
             df = pd.read_csv(fileName, encoding = 'utf-8',keep_default_na=False, dtype=str)
             df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1) # drop any "unnamed" cols
-            # TODO consider popup dialog to handle NO siteNumber, NO catalogNumber, NO otherCatalogNumbers condition.
-            if ~df.columns.isin(['siteNumber']).any():  # if the siteNumber does not exist:
+            # If it looks like an iNaturalist export, try to those parse cols
+            try:
+                if df['url'].str.lower().str.contains('inaturalist.org').any():
+                    df = self.convertiNatFormat(df)
+            except KeyError:
+                # probably not an iNaturalist export.
+                pass
+            # Popup dialog to handle NO siteNumber, No specimenNumber, NO otherCatalogNumbers condition.
+            wasAssigned = False  # need to know for a potential usr notice
+            cols = df.columns
+            if not all(x in cols for x in ['siteNumber', 'specimenNumber']):
+                if 'otherCatalogNumbers' not in cols:
+                    assignedDF, dialogStatus = self.getIndexAssignments(df)
+                # if the accept button (titled 'Assign') was pressed, assign df
+                    if dialogStatus== QDialog.Accepted:
+                        df = assignedDF
+                        cols = df.columns
+                        wasAssigned = True
+                    else:
+                        return False
+            if 'siteNumber' not in cols:  # if the siteNumber does not exist
                 df = self.inferSiteSpecimenNumbers(df)  # attempt to infer them
-            if ~df.columns.isin(['otherCatalogNumbers']).any():
+                cols = df.columns
+            if 'otherCatalogNumbers' not in cols:
                 df = df.apply(self.inferOtherCatalogNumbers, axis=1)
-            if ~df.columns.isin(['catalogNumber']).any():
+                cols = df.columns
+            if 'catalogNumber' not in cols:
                 df['catalogNumber'] = ''
-            df = self.sortDF(df)
-            df.fillna('') # make any nans into empty strings.
-            self.update(df)  # this function actually updates the visible dataframe 
+            #  be sure all cols exist which will later be assumed present.
+            df = self.verifyRequiredColsExist(df)
+            #  verify sites have a site record, where specimenNumber=='#'
+            df = self.verifySiteRecordsExist(df)
+            df.fillna('', inplace=True)
+            df = self.sortDF(df)  # returns False given an error
+            if df is False:
+                if wasAssigned:
+                    text = 'Cannot load records, check your index assignments.'
+                else:
+                    text = 'Cannot load records.'
+                title = 'Error loading records.'
+                self.parent.userNotice(text, title)
+                return False
+            self.update(df)  # this function updates the visible dataframe
             self.parent.populateTreeWidget()
             self.parent.form_view.fillFormFields()
             return True
@@ -506,8 +556,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df.replace('', np.nan, inplace=True)
         df.dropna(axis=1, how='all', inplace=True)
         if fileName is None:
-            fileName, _ = QtWidgets.QFileDialog.getSaveFileName(None, "Save CSV",
-                                                                QtCore.QDir.homePath(), "CSV (*.csv)")
+            fileName, _ = QtWidgets.QFileDialog.getSaveFileName(
+                    None, "Save CSV", QtCore.QDir.homePath(), "CSV (*.csv)")
         if fileName:  # if a csv was selected, start loading the data.
             drop_col_Names = ['siteNumber', 'specimenNumber']
             keep_col_Names = [x for x in df.columns if x not in drop_col_Names]
@@ -516,12 +566,143 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             df.to_csv(fileName, encoding='utf-8', index=False)
             return True
 
+    def verifyRequiredColsExist(self, df):
+        """ given a dataFrame, verifies that the expected columns exist."""
+        reqCols = [
+            'scientificName',
+            'scientificNameAuthorship',
+            'taxonRemarks',
+            'identifiedBy',
+            'dateIdentified',
+            'identificationReferences',
+            'identificationRemarks',
+            'collector',
+            'associatedCollectors',
+            'eventDate',
+            'habitat',
+            'substrate',
+            'occurrenceRemarks',
+            'associatedTaxa',
+            'dynamicProperties',
+            'reproductiveCondition',
+            'cultivationStatus',
+            'establishmentMeans',
+            'lifeStage',
+            'individualCount',
+            'country',
+            'stateProvince',
+            'county',
+            'municipality',
+            'path',
+            'locality',
+            'decimalLatitude',
+            'decimalLongitude',
+            'coordinateUncertaintyInMeters',
+            'minimumElevationInMeters',
+            'labelProject']
+        presentCols = df.columns
+        for col in reqCols:
+            #  if a required col is not present, add and fill it with empty str
+            if col not in presentCols:
+                df[col] = ''
+        return df
+
+    def verifySiteRecordsExist(self, df):
+        """ iterates over each site number, and ensures there is a site level
+        record present to hold the site data. """
+        #  If data appears to have been made in collNotes, can skip iteration.
+        siteNums = df['siteNumber'].unique().tolist()
+        siteRecords = df.loc[df['specimenNumber'] == '#']
+        if len(siteRecords) >= len(siteNums):
+            return df
+        # if the # of siteRecords < # of siteNumbers, there is an issue and
+        # it is worth the time to iterate over the DF, and verify each site#
+        newRows = []
+        pb = self.parent.statusBar.progressBar
+        pb.setMinimum(0)
+        pb.setMaximum(len(siteNums))
+
+        for c, siteNum in enumerate(siteNums):
+            siteRecs = df.loc[df['siteNumber'] == siteNum].copy()
+            siteRow = siteRecs.loc[siteRecs['specimenNumber'] == '#']
+            # if there is a siteRow, move on to the next site.
+            if len(siteRow) > 0:
+                continue
+            # otherwise, generate one.
+            strCols = ['eventDate',
+                       'country',
+                       'stateProvince',
+                       'county',
+                       'municipality',
+                       'path',
+                       'locality',
+                       'localitySecurity',
+                       'collector',
+                       'associatedCollectors',
+                       'verbatimEventDate',
+                       'habitat',
+                       'associatedOccurrences',
+                       'associatedTaxa',
+                       'samplingEffort']
+            # strip out site string cols which are not in source data
+            # requird cols are verified as present later.
+            strCols = [x for x in strCols if x in siteRecs.columns]
+
+            numericCols = ['decimalLatitude',
+                           'decimalLongitude',
+                           'coordinateUncertaintyInMeters',
+                           'minimumElevationInMeters']
+
+            if len(siteRecs) > 0:
+                # take the mode of the specimen values
+                newRow = siteRecs[strCols]
+                newRow = newRow.mode()[:1]
+                newRow['specimenNumber'] = '#'
+                newRow['siteNumber'] = siteNum
+                # in the case of coordinate values, take the mean of the group
+                # This could be problematic if they assigned distant sites.
+                # But honestly, they'd have to assign them to the same site manually to ensure that.
+                for numericCol in numericCols:
+                    try:
+                        newVals = siteRecs[numericCol].astype(float).mean().astype(str)
+                    except ValueError:
+                        # probably an empty value
+                        continue
+                    if str(newVals)[::-1].find('.') > 5:
+                        newVals = '{:.5f}'.format(float(newVals))
+                    newRow[numericCol] = newVals
+                newRow = newRow
+                pb.setValue(c + 1)
+                QApplication.processEvents()
+            # add results to the list of rows to be added
+            newRow['specimenNumber'] = '#'
+            newRow['siteNumber'] = siteNum
+            newRows.append(newRow)
+        # if we have any rows to be added to the df, do so
+        if len(newRows) > 0:
+            df = df.append(newRows, ignore_index=True, sort=False)
+        
+        pb.setValue(0)
+        return df            
+
+    def getIndexAssignments(self, df):
+        """ calls the dialog defined in importindexdialog.py and retrieves or
+        generates the user defined siteNumber & specimenNumber columns."""
+        dialog = importDialog(self, df)
+        result = dialog.exec_()
+        resultDF = dialog.indexAssignments()
+        # return the assignedDF and boolean if the dialog status was accepted.
+        return (resultDF, result == QDialog.Accepted)
+
     def sortDF(self, df):
         """ accepts a dataframe and returns it sorted in an ideal manner. 
         Expects the dataframe to have siteNumber and specimenNumber columns """
 
-        df['sortSpecimen'] = df['specimenNumber'].str.replace('#','0').astype(int)
-        df['sortSite'] = df['siteNumber'].str.replace('','0').astype(int)
+        try:
+            df['sortSpecimen'] = df['specimenNumber'].str.replace('#','0').astype(int)
+            df['sortSite'] = df['siteNumber'].str.replace('','0').astype(int)
+        except:
+            return False
         df.sort_values(by=['sortSite', 'sortSpecimen'], inplace=True, ascending=True)
         df.drop(columns = ['sortSite', 'sortSpecimen'], inplace = True)
         df.reset_index(drop = True, inplace = True)
@@ -560,8 +741,47 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             df['siteNumber'] = df['otherCatalogNumbers'].transform(lambda x: siteNumExtract(x))
             df['specimenNumber'] = df['otherCatalogNumbers'].transform(lambda x: specimenNumExtract(x))
         except IndexError:
+            # incase there are no otherCatalogNumbers
             pass
 
+        return df
+
+    def convertiNatFormat(self, df):
+        """converts iNaturalist formatted data into a compatable DWC format.
+        This does not infer site numbers."""
+        
+        colNames = df.columns
+        # private_latitude,private_longitude may be used in place if coordinates_obscured == 'true'
+        if ('coordinates_obscured' in colNames & 
+            df['coordinates_obscured'] == 'true'):
+            # for key value in following dict. where keys are private coordinate columns
+            for k, v in {
+            'private_latitude': 'latitude',
+            'private_longitude': 'longitude',
+            'private_positional_accuracy': 'positional_accuracy'}.items():
+                # essentially, if the private coordinate fields are filled, pull them into the non-private fields 
+                # this allows those fields to be treated similarly in the future.
+                if df[k] != '':
+                    df[v] = df[k]
+            # TODO add dialog, or consideration for "informationWithheld" given this condition
+            # TODO add localitySecurity consideration for this condition
+        # if it was indicated as cultivated in iNat, convert results ahead of renaming.
+        if ('captive_cultivated' in colNames &
+            df['captive_cultivated'] == 'true'):
+            df['captive_cultivated'] = 'cultivated'
+
+        colNameMap = {
+                "observed_on": "eventDate",
+                "url": "associatedMedia",
+                "latitude": "decimalLatitude",
+                "longitude": "decimalLongitude",
+                "positional_accuracy": "coordinateUncertaintyInMeters",
+                "scientific_name": "scientificName",
+                "description": "occurrenceRemarks",
+                "captive_cultivated": "establishmentMeans"
+                }
+        df.rename(colNameMap, axis='columns', inplace=True)
+        
         return df
 
     def new_Records(self, skipDialog = False):

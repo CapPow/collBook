@@ -56,6 +56,11 @@
           </property>
           <item>
            <property name="text">
+            <string>Associated Taxa</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>Catalog Numbers</string>
            </property>
           </item>
@@ -82,7 +87,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QStackedWidget" name="catalogNumberPage">
+         <widget class="QStackedWidget" name="settingsPage">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>2</horstretch>
@@ -90,9 +95,59 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
-          <widget class="QWidget" name="page">
+          <widget class="QWidget" name="associatedTaxaPage">
+           <layout class="QGridLayout" name="gridLayout_9">
+            <item row="0" column="0">
+             <widget class="QGroupBox" name="groupBox_3">
+              <property name="title">
+               <string>Display associated taxa dialog while refining records:</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <widget class="QRadioButton" name="value_associatedAlways">
+                 <property name="text">
+                  <string>Always</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="value_associatedOnly">
+                 <property name="text">
+                  <string>Only for sites with more than  1 specimen</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="value_associatedNever">
+                 <property name="text">
+                  <string>Never</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="catalogNumberPage">
            <layout class="QGridLayout" name="gridLayout_6">
             <item row="0" column="0">
              <widget class="QGroupBox" name="value_assignCatalogNumbers">
@@ -237,7 +292,7 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="page_2">
+          <widget class="QWidget" name="themePage">
            <layout class="QGridLayout" name="gridLayout_7">
             <item row="1" column="0">
              <spacer name="verticalSpacer_2">
@@ -314,7 +369,7 @@
             <item row="0" column="0">
              <widget class="QGroupBox" name="labelDimentionsGroup">
               <property name="title">
-               <string>Dimensions</string>
+               <string>Label dimensions</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
                <item row="0" column="0">
@@ -371,7 +426,7 @@
             <item row="1" column="0">
              <widget class="QGroupBox" name="labelIncludeGroup">
               <property name="title">
-               <string>Include</string>
+               <string>Include on label</string>
               </property>
               <layout class="QFormLayout" name="formLayout_3">
                <item row="2" column="0" colspan="2">
@@ -949,7 +1004,7 @@
   <connection>
    <sender>page_Display</sender>
    <signal>currentRowChanged(int)</signal>
-   <receiver>catalogNumberPage</receiver>
+   <receiver>settingsPage</receiver>
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel">

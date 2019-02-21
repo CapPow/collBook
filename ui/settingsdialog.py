@@ -206,7 +206,7 @@ class settingsWindow(QMainWindow):
         """ uses self.settings to populate the preferences widget's selections"""
         parent = self.settingsWindow
 
-        #QComboBox
+        # QComboBox
         value_AuthChangePolicy = self.get('value_AuthChangePolicy', 'Always ask')
         self.populateQComboBoxSettings( parent.value_AuthChangePolicy, value_AuthChangePolicy)        
         value_NameChangePolicy = self.get('value_NameChangePolicy', 'Always ask')
@@ -215,10 +215,10 @@ class settingsWindow(QMainWindow):
         self.populateQComboBoxSettings( parent.value_TaxAlignSource, value_TaxAlignSource)
         value_Kingdom = self.get('value_Kingdom', 'Plantae')
         self.populateQComboBoxSettings( parent.value_Kingdom, value_Kingdom)
-        value_LogoAlignment = self.get('value_LogoAlignment','Centered')
+        value_LogoAlignment = self.get('value_LogoAlignment', 'Centered')
         self.populateQComboBoxSettings( parent.value_LogoAlignment, value_LogoAlignment)
-        
-        #QLineEdit  .setText
+
+        # QLineEdit
         value_VerifiedBy = self.get('value_VerifiedBy')
         parent.value_VerifiedBy.setText(value_VerifiedBy)
         value_LogoPath = self.get('value_LogoPath')
@@ -226,11 +226,11 @@ class settingsWindow(QMainWindow):
         value_catalogNumberPrefix = self.get('value_catalogNumberPrefix')
         parent.value_catalogNumberPrefix.setText(value_catalogNumberPrefix)
 
-        #QPlainTextEdit .setPlainText        
+        # QPlainTextEdit
         value_CollectionName = self.get('value_CollectionName')
         parent.value_CollectionName.setPlainText(value_CollectionName)
-        
-        #QCheckBox .checkStateSet
+
+        # QCheckBox
         value_inc_Associated = self.convertCheckState(self.get('value_inc_Associated'))
         parent.value_inc_Associated.setCheckState(value_inc_Associated)
         value_inc_Barcode =  self.convertCheckState(self.get('value_inc_Barcode'))
@@ -239,19 +239,19 @@ class settingsWindow(QMainWindow):
         parent.value_inc_CollectionName.setCheckState(value_inc_CollectionName)
         value_inc_VerifiedBy =  self.convertCheckState(self.get('value_inc_VerifiedBy'))
         parent.value_inc_VerifiedBy.setCheckState(value_inc_VerifiedBy)
-        
-        #QGroupbox (checkstate)
+
+        # QGroupbox (checkstate)
         value_inc_Logo = self.convertCheckState(self.get('value_inc_Logo'))
         parent.value_inc_Logo.setChecked(value_inc_Logo)
         value_assignCatalogNumbers = self.convertCheckState(self.get('value_assignCatalogNumbers'))
         parent.value_assignCatalogNumbers.setChecked(value_assignCatalogNumbers)
 
-        #QSpinBox .setValue
+        # QSpinBox
         value_X = int(self.get('value_X', 140))
         parent.value_X.setValue(value_X)
         value_Y = int(self.get('value_Y', 90))
         parent.value_Y.setValue(value_Y)
-        value_RelFont = int(self.get('value_RelFont',12))
+        value_RelFont = int(self.get('value_RelFont', 12))
         parent.value_RelFont.setValue(value_RelFont)
         value_TNRS_Threshold = int(self.get('value_TNRS_Threshold', 85))
         parent.value_TNRS_Threshold.setValue(value_TNRS_Threshold)
@@ -263,8 +263,8 @@ class settingsWindow(QMainWindow):
         parent.value_catalogNumberStartingNum.setValue(value_catalogNumberStartingNum)
         value_max_Associated = int(self.get('value_max_Associated', 10))
         parent.value_max_Associated.setValue(value_max_Associated)
-    
-        #slider
+
+        # slider
         value_LogoScaling = int(self.get('value_LogoScaling', 100))
         parent.value_LogoScaling.setValue(value_LogoScaling)
         self.scalingChanged(value_LogoScaling)
@@ -275,13 +275,19 @@ class settingsWindow(QMainWindow):
         value_zoomLevel = int(self.get('value_zoomLevel', 100))
         self.parent.w.value_zoomLevel.setValue(value_zoomLevel)
 
-        #radiobutton
+        # radiobutton
         value_DarkTheme = self.get('value_DarkTheme', False)
         parent.value_DarkTheme.setChecked(value_DarkTheme)
         value_LightTheme = self.get('value_LightTheme', True)
         parent.value_LightTheme.setChecked(value_LightTheme)
+        value_associatedAlways = self.get('value_associatedAlways', True)
+        parent.value_associatedAlways.setChecked(value_associatedAlways)
+        value_associatedOnly = self.get('value_associatedOnly', False)
+        parent.value_associatedOnly.setChecked(value_associatedOnly)
+        value_associatedNever = self.get('value_associatedNever', False)
+        parent.value_associatedNever.setChecked(value_associatedNever)
 
-        #clean up
+        # clean up
         self.updateCatalogNumberPreview
 
     def saveSettings(self):
@@ -297,11 +303,11 @@ class settingsWindow(QMainWindow):
             date_versionCheck = ""
         self.setValue('date_versionCheck', date_versionCheck)
 
-        #QComboBox
+        # QComboBox
         value_AuthChangePolicy = parent.value_AuthChangePolicy.currentText()
-        self.setValue('value_AuthChangePolicy',value_AuthChangePolicy)
+        self.setValue('value_AuthChangePolicy', value_AuthChangePolicy)
         value_NameChangePolicy = parent.value_NameChangePolicy.currentText()
-        self.setValue('value_NameChangePolicy',value_NameChangePolicy)
+        self.setValue('value_NameChangePolicy', value_NameChangePolicy)
         value_TaxAlignSource = parent.value_TaxAlignSource.currentText()
         self.setValue('value_TaxAlignSource', value_TaxAlignSource)
         value_Kingdom = parent.value_Kingdom.currentText()
@@ -309,39 +315,39 @@ class settingsWindow(QMainWindow):
         value_LogoAlignment = parent.value_LogoAlignment.currentText()
         self.setValue('value_LogoAlignment', value_LogoAlignment)
 
-        #QLineEdit
+        # QLineEdit
         value_VerifiedBy = parent.value_VerifiedBy.text()
-        self.setValue('value_VerifiedBy',value_VerifiedBy)
+        self.setValue('value_VerifiedBy', value_VerifiedBy)
         value_LogoPath = parent.value_LogoPath.text()
-        self.setValue('value_LogoPath',value_LogoPath)
+        self.setValue('value_LogoPath', value_LogoPath)
         value_catalogNumberPrefix = parent.value_catalogNumberPrefix.text()
         self.setValue('value_catalogNumberPrefix', value_catalogNumberPrefix)
 
-        #QPlainTextEdit        
+        # QPlainTextEdit        
         value_CollectionName = parent.value_CollectionName.toPlainText()
         self.setValue('value_CollectionName', value_CollectionName)
 
-        #QCheckBox
+        # QCheckBox
         value_inc_Associated = parent.value_inc_Associated.isChecked()
-        self.setValue('value_inc_Associated',value_inc_Associated)
+        self.setValue('value_inc_Associated', value_inc_Associated)
         value_inc_Barcode = parent.value_inc_Barcode.isChecked()
-        self.setValue('value_inc_Barcode',value_inc_Barcode)
+        self.setValue('value_inc_Barcode', value_inc_Barcode)
         value_inc_CollectionName = parent.value_inc_CollectionName.isChecked()
-        self.setValue('value_inc_CollectionName',value_inc_CollectionName)
+        self.setValue('value_inc_CollectionName', value_inc_CollectionName)
         value_inc_VerifiedBy = parent.value_inc_VerifiedBy.isChecked()
         self.setValue('value_inc_VerifiedBy', value_inc_VerifiedBy)
 
-        #QGroupbox
+        # QGroupbox
         value_inc_Logo = parent.value_inc_Logo.isChecked()
         self.setValue('value_inc_Logo', value_inc_Logo)
         value_assignCatalogNumbers = parent.value_assignCatalogNumbers.isChecked()
         self.setValue('value_assignCatalogNumbers', value_assignCatalogNumbers)
 
-        #QSpinBox
+        # QSpinBox
         value_X = parent.value_X.value()
-        self.setValue('value_X',value_X)
+        self.setValue('value_X', value_X)
         value_Y = parent.value_Y.value()
-        self.setValue('value_Y',value_Y)
+        self.setValue('value_Y', value_Y)
         value_RelFont = parent.value_RelFont.value()
         self.setValue('value_RelFont', value_RelFont)
         value_TNRS_Threshold = parent.value_TNRS_Threshold.value()
@@ -355,17 +361,22 @@ class settingsWindow(QMainWindow):
         value_max_Associated = parent.value_max_Associated.value()
         self.setValue('value_max_Associated', value_max_Associated)
 
-        #slider
+        # slider
         value_LogoScaling = parent.value_LogoScaling.value()
         self.setValue('value_LogoScaling', value_LogoScaling)
         value_LogoOpacity = parent.value_LogoOpacity.value()
         self.setValue('value_LogoOpacity', value_LogoOpacity)
         value_zoomLevel = self.parent.w.value_zoomLevel.value()
         self.setValue('value_zoomLevel', value_zoomLevel)
-        
-        #radiobutton
+
+        # radiobutton
         value_DarkTheme = parent.value_DarkTheme.isChecked()
         self.setValue('value_DarkTheme', value_DarkTheme)
         value_LightTheme = parent.value_LightTheme.isChecked()
         self.setValue('value_LightTheme', value_LightTheme)
-
+        value_associatedAlways = parent.value_associatedAlways.isChecked()
+        self.setValue('value_associatedAlways', value_associatedAlways)
+        value_associatedOnly = parent.value_associatedOnly.isChecked()
+        self.setValue('value_associatedOnly', value_associatedOnly)
+        value_associatedNever = parent.value_associatedNever.isChecked()
+        self.setValue('value_associatedNever', value_associatedNever)
