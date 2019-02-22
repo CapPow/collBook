@@ -499,21 +499,32 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if fileName:  # if a csv was selected, start loading the data.
             df = pd.read_csv(fileName, encoding = 'utf-8',keep_default_na=False, dtype=str)
             df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1) # drop any "unnamed" cols
-            # If it looks like an iNaturalist export, try to those parse cols
+            # check if input is an iNaturalist export
             try:
+                # if so, parse those cols.
                 if df['url'].str.lower().str.contains('inaturalist.org').any():
                     df = self.convertiNatFormat(df)
             except KeyError:
                 # probably not an iNaturalist export.
                 pass
-            # Popup dialog to handle NO siteNumber, No specimenNumber, NO otherCatalogNumbers condition.
-            wasAssigned = False  # need to know for a potential usr notice
             cols = df.columns
+            # a list of cols which indicates the data may be from CollectR
+            colectoRCols = ['Collector', 'Additional collectors',
+                             'Number', 'Infracategory', 'Herbarium Acronym',
+                             'Complete Herb. Name 1', 'Complete Herb. Name 2',
+                             'Project']
+            # check if input is a CollectoR export.
+            if all(x in cols for x in colectoRCols):
+                # if so, parse those cols.
+                df = self.convertColectoRFormat(df)
+                cols = df.columns
+            # check if the indices need manually assigned (with user dialog)
+            wasAssigned = False  # store if assignments were made.
             if not all(x in cols for x in ['siteNumber', 'specimenNumber']):
                 if 'otherCatalogNumbers' not in cols:
                     assignedDF, dialogStatus = self.getIndexAssignments(df)
                 # if the accept button (titled 'Assign') was pressed, assign df
-                    if dialogStatus== QDialog.Accepted:
+                    if dialogStatus == QDialog.Accepted:
                         df = assignedDF
                         cols = df.columns
                         wasAssigned = True
@@ -534,7 +545,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             df.fillna('', inplace=True)
             df = self.sortDF(df)  # returns False given an error
             if df is False:
-                if wasAssigned:
+                if wasAssigned:  # if assignments were made, alter error text.
                     text = 'Cannot load records, check your index assignments.'
                 else:
                     text = 'Cannot load records.'
@@ -781,7 +792,49 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 "captive_cultivated": "establishmentMeans"
                 }
         df.rename(colNameMap, axis='columns', inplace=True)
-        
+
+        return df
+
+    def convertColectoRFormat(self, df):
+        """ converts ColectoR formatted data into a compatable DWC format.
+        This does not infer site numbers. For details on ColectoR see:
+        Maya-Lastra, C.A. 2016, doi:10.3732/apps.1600035 """
+
+        # create eventDate from existing cols        
+        df['eventDate'] = ['-'.join([x,y,z]) for x, y, z in zip(df['Year'], df['Month'], df['Day'])]
+        # strip non-numerics out of GPS accuracy value
+        df['GPS Accuracy'] = df['GPS Accuracy'].str.replace('± ','').str.replace(' m','')        
+        # join multiple terms into scientificName
+        # get all terms into a list
+        taxonTerms = df[['Genus','Species','Infracategory','InfraTaxa']].add(' ').fillna('').values.tolist()
+        # replace empty spaces to NaN
+        sciNames = pd.Series([''.join(x).strip(' ') for x in taxonTerms]).replace('^$', np.nan, regex=True)
+        # replace NaN to ''
+        sciNames = sciNames.where(sciNames.notnull(), '')
+        df['scientificName'] = sciNames
+        # join multiple terms into occurrenceRemarks
+        # get all terms into a list
+        notesTerms = df[['Description','Notes','Additional_notes']].add(' ').fillna('').values.tolist()
+        # replace empty spaces to NaN
+        occNotes = pd.Series([''.join(x).strip(' ') for x in notesTerms]).replace('^$', np.nan, regex=True)
+        # replace NaN to ''
+        occNotes = occNotes.where(occNotes.notnull(), '')
+        df['occurrenceRemarks'] = occNotes
+        # copy Number, so when choosing index names "Number" is still present.
+        df['otherCatalogNumbers'] = df['Number']
+        # assign rename map over directly translatable cols
+        colNameMap = {'Collector': 'recordedBy',
+                      'Additional collectors	': 'associatedCollectors',
+                      'Country': 'country',
+                      'State': 'stateProvince',
+                      'Locality': 'locality',
+                      'Latitude': 'decimalLatitude',
+                      'Longitude': 'decimalLongitude',
+                      'GPS Accuracy': 'coordinateUncertaintyInMeters',
+                      'Altitude': 'minimumElevationInMeters',
+                      'Project': 'labelProject'}
+        df.rename(colNameMap, axis='columns', inplace=True)
+
         return df
 
     def new_Records(self, skipDialog = False):

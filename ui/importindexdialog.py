@@ -12,6 +12,10 @@ from ui.importindexdialogUI import Ui_importIndexDialog
 
 
 class importDialog(QDialog):
+    """ a class to handle the importDialog popup which is displayed when
+    the necessary index fields are missing from a csv file being loaded.
+    Called in pandastablemodel, under the open_CSV function"""
+
     def __init__(self, parent=None, df=False):
         super().__init__()
         self.init_ui(parent, df)
