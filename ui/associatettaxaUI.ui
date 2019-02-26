@@ -89,12 +89,18 @@
      </item>
      <item>
       <widget class="QPushButton" name="buttonAdd">
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Add to list</string>
+       </property>
        <property name="text">
         <string/>
        </property>
        <property name="icon">
         <iconset resource="resources/Resources.qrc">
-         <normaloff>:/rc_/plus-square.svg</normaloff>:/rc_/plus-square.svg</iconset>
+         <normaloff>:/rc_/chevron-up.svg</normaloff>:/rc_/chevron-up.svg</iconset>
        </property>
       </widget>
      </item>

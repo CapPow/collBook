@@ -49,7 +49,7 @@
            <string notr="true">font: 12pt &quot;Cantarell&quot;;</string>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="StackedWidgetPage1">
            <property name="sizePolicy">
@@ -523,6 +523,9 @@
              <layout class="QVBoxLayout" name="verticalLayout_9">
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                <property name="spacing">
+                 <number>18</number>
+                </property>
                 <item>
                  <widget class="QPushButton" name="pushButton_newSpecimen">
                   <property name="text">
@@ -771,6 +774,9 @@
                        <height>0</height>
                       </size>
                      </property>
+                     <property name="toolTip">
+                      <string>Use dialog to add associated taxa to this list</string>
+                     </property>
                      <property name="text">
                       <string/>
                      </property>
@@ -814,6 +820,9 @@
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+                     <property name="toolTip">
+                      <string>Generate locality for this site</string>
                      </property>
                      <property name="text">
                       <string>...</string>
@@ -1016,6 +1025,9 @@
             </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <property name="spacing">
+               <number>18</number>
+              </property>
               <item>
                <widget class="QPushButton" name="pushButton_newSpecimen_2">
                 <property name="text">
@@ -1612,6 +1624,7 @@
    </attribute>
    <addaction name="action_New_Records"/>
    <addaction name="action_Open"/>
+   <addaction name="action_Save_As"/>
    <addaction name="action_Settings"/>
    <addaction name="separator"/>
    <addaction name="action_undo"/>
@@ -1696,6 +1709,12 @@
    </property>
    <property name="text">
     <string>&amp;Save As</string>
+   </property>
+   <property name="toolTip">
+    <string>Save as working file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="action_New_Records">
@@ -1877,8 +1896,8 @@
    <slot>updateTableView()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>216</x>
-     <y>653</y>
+     <x>226</x>
+     <y>633</y>
     </hint>
     <hint type="destinationlabel">
      <x>457</x>
@@ -1893,8 +1912,8 @@
    <slot>updatePreview()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>892</x>
-     <y>634</y>
+     <x>929</x>
+     <y>633</y>
     </hint>
     <hint type="destinationlabel">
      <x>405</x>
@@ -1909,8 +1928,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>182</y>
+     <x>898</x>
+     <y>194</y>
     </hint>
     <hint type="destinationlabel">
      <x>794</x>
@@ -1925,8 +1944,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>182</y>
+     <x>898</x>
+     <y>194</y>
     </hint>
     <hint type="destinationlabel">
      <x>845</x>
@@ -1941,12 +1960,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>182</y>
+     <x>898</x>
+     <y>194</y>
     </hint>
     <hint type="destinationlabel">
-     <x>895</x>
-     <y>306</y>
+     <x>889</x>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -1957,8 +1976,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>182</y>
+     <x>898</x>
+     <y>194</y>
     </hint>
     <hint type="destinationlabel">
      <x>800</x>
@@ -1973,11 +1992,11 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>349</x>
+     <x>322</x>
      <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>349</x>
+     <x>322</x>
      <y>104</y>
     </hint>
    </hints>
@@ -1989,11 +2008,11 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>349</x>
+     <x>322</x>
      <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>349</x>
+     <x>322</x>
      <y>104</y>
     </hint>
    </hints>
@@ -2005,8 +2024,8 @@
    <slot>updatePreviewZoom(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>85</x>
-     <y>467</y>
+     <x>95</x>
+     <y>531</y>
     </hint>
     <hint type="destinationlabel">
      <x>425</x>

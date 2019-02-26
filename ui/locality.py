@@ -87,16 +87,16 @@ class locality():
             else:
                 return currentRowArg
         addresses = self.reverseGeoCall(latitude, longitude)
-        address = addresses[0]  # Prefer the first entry
-        # dig into deeper entries for a "park" type
-        addressComponents = [y for x in addresses for y in x]
-        park = False
-        for component in addressComponents:
-            types = component['types']
-            if 'park' in types:
-                address.append(component) # if park found, add to components.
-        if isinstance(address, list):
-            # newLocality is dict as{type : value}
+        if isinstance(addresses, list):
+            
+            address = addresses[0]  # Prefer the first entry
+            # dig into deeper entries for a "park" type\
+            addressComponents = [y for x in addresses for y in x]
+            park = False
+            for component in addressComponents:
+                types = component['types']
+                if 'park' in types:
+                    address.append(component) # if park found, add to components.
             newLocality = {}
             for addressComponent in address:
                 if addressComponent['types'][0] == 'route':
@@ -149,7 +149,7 @@ class locality():
                 currentRowArg['locality'] = newLocality
        
         else:   # if the Google API call returned error/status string
-            apiErrorMessage = address
+            apiErrorMessage = addresses
             if apiErrorMessage == "ZERO_RESULTS":
                 message = f'Location lookup error at {currentSiteName}: service responded with: "{apiErrorMessage}". Does this location exist?'
                 self.parent.userNotice(message, title='GeoLocation')

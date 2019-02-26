@@ -14,10 +14,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QDialog
+from pathlib import Path
 from reportlab.platypus.doctemplate import LayoutError
-
 from ui.importindexdialog import importDialog
-
 import pandas as pd
 import numpy as np
 
@@ -39,8 +38,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         self.undoList.append(checkPoint)
         self.redoList = []  # if we're adding to undoList, clear redoList
         self.updateUndoRedoButtons()
-        if len(self.undoList) > 20:  # be sure not to grow too big
-            self.undoList = self.undoList[20:]
+        if len(self.undoList) > 40:  # be sure not to grow too big
+            self.undoList = self.undoList[40:]
 
     def redo(self):
         """ restores the underlaying df the most recent redoList point """
@@ -557,10 +556,43 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             self.parent.form_view.fillFormFields()
             return True
 
-    def save_CSV(self, fileName=None, df=None):
-        # is triggered by the action_Save:
+    def save_CSV(self, fileName=False, df=None):
+        """ is triggered by the export records action"""
         if df is None:
-            df = self.datatable
+            df = self.datatable.copy()
+        else:
+            df = df.copy()
+        # convert empty strings to null values
+        df.replace('', np.nan, inplace=True)
+        df.dropna(axis=1, how='all', inplace=True)
+        readyToSave=False
+        if not fileName:
+            fileName, _ = QtWidgets.QFileDialog.getSaveFileName(
+                    None, "Save CSV", QtCore.QDir.homePath(), "CSV (*.csv)")
+        if fileName:  # if a csv was selected, start loading the data.
+            if Path(fileName).suffix == '':
+                fileName = f'{fileName}.csv'
+                readyToSave=True
+                if Path(fileName).is_file():
+                    readyToSave=False
+                    message = f'File named: "{fileName}" already exist! OVERWRITE this file?'
+                    title = 'Save As'
+                    answer = self.parent.userAsk(message, title)
+                    if answer:
+                        readyToSave=True
+
+        if readyToSave:
+            df.fillna('', inplace=True)  # convert nullvalues empty strings
+            df.to_csv(fileName, encoding='utf-8', index=False)
+            return True
+        else:
+            return False
+                
+
+    def export_CSV(self, fileName=None, df=None):
+        """ is triggered by the export records action"""
+        if df is None:
+            df = self.datatable.copy()
         else:
             df = df.copy()
         # convert empty strings to null values

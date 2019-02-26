@@ -47,9 +47,10 @@ class Ui_associatedTaxaMainWindow(object):
         self.lineEdit_newAssociatedTaxa.setObjectName("lineEdit_newAssociatedTaxa")
         self.horizontalLayout_2.addWidget(self.lineEdit_newAssociatedTaxa)
         self.buttonAdd = QtWidgets.QPushButton(associatedTaxaMainWindow)
+        self.buttonAdd.setFocusPolicy(QtCore.Qt.TabFocus)
         self.buttonAdd.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/rc_/plus-square.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/rc_/chevron-up.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.buttonAdd.setIcon(icon)
         self.buttonAdd.setObjectName("buttonAdd")
         self.horizontalLayout_2.addWidget(self.buttonAdd)
@@ -76,6 +77,7 @@ class Ui_associatedTaxaMainWindow(object):
         self.pushButton.setText(_translate("associatedTaxaMainWindow", "select all"))
         self.button_cancel.setText(_translate("associatedTaxaMainWindow", "Cancel"))
         self.button_save.setText(_translate("associatedTaxaMainWindow", "Save"))
+        self.buttonAdd.setToolTip(_translate("associatedTaxaMainWindow", "Add to list"))
         self.label_UserMsg.setText(_translate("associatedTaxaMainWindow", "Select associated taxa."))
 
 import Resources_rc

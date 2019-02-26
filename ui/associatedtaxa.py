@@ -28,6 +28,7 @@ class associatedTaxaMainWindow(QWidget):
         self.associatedMainWin = associatedMainWin
         associatedList = associatedMainWin.listWidget_associatedTaxa
         self.associatedList = associatedList
+        self.associatedMainWin.lineEdit_newAssociatedTaxa.returnPressed.connect(self.addAssociatedTaxa)
 
     def cleanAssociatedTaxa(self, rowData):
         """ Expects a row of data formatted in tWDC. Conditionally called by
@@ -112,13 +113,16 @@ class associatedTaxaMainWindow(QWidget):
         """ adds item from the lineEdit_newAssociatedTaxa to the associatedList """
         entryBar = self.associatedMainWin.lineEdit_newAssociatedTaxa
         text = entryBar.text()
+        if text == '':
+            entryBar.setFocus()
+            return
         item = QListWidgetItem(text, self.associatedList)
         item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
         item.setCheckState(Qt.Checked)
         self.associatedList.addItem(item)
         self.associatedList.sortItems(Qt.AscendingOrder)
         item = self.associatedList.findItems(text, Qt.MatchRegExp)[0]
-        item.setSelected(True)     
+        item.setSelected(True)
         self.associatedList.scrollToItem(item)
         entryBar.clear()
 

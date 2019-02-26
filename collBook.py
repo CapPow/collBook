@@ -378,7 +378,7 @@ class MyWindow(QMainWindow):
                         outDF = self.m.datatable.iloc[rowsToProcess, ]
                         outDF = outDF.loc[outDF['specimenNumber'] != '#']
                         csvName = csvFileName
-                        self.m.save_CSV(df = outDF, fileName = csvFileName)
+                        self.m.export_CSV(df = outDF, fileName = csvFileName)
                         saved = True
             
     def testRunLabels(self):

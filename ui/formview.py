@@ -67,10 +67,12 @@ class formView(QtWidgets.QStackedWidget):
 
         # Set up input validation on the GPS fields        
         # LatRe & LonRe Patterns credited to "Jason Rutberg" from http://www.regexlib.com/
-        latRE = QRegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,8}")
+        latRE = QRegExp("^-?(90|[1-8][0-9]|[1-9])\.{1}\d{1,8}")
+        #latRE = QRegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,8}")
         lat_validator = QRegExpValidator(latRE, self.parentClass.lineEdit_decimalLatitude)
         self.parentClass.lineEdit_decimalLatitude.setValidator(lat_validator)
-        lonRE = QRegExp("^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,8}")
+        lonRE = QRegExp("^-?([1-9]|[1-9][0-9]|[1][0-8][0]|[1][0-7][0-9])\.{1}\d{1,8}")
+        #lonRE = QRegExp("^-?([1]?[0-9][0-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,8}")
         lon_validator = QRegExpValidator(lonRE, self.parentClass.lineEdit_decimalLongitude)
         self.parentClass.lineEdit_decimalLongitude.setValidator(lon_validator)
         uncertRE = QRegExp("^\d{1,5}\.{1}\d{1,8}")
