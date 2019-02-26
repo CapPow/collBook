@@ -316,6 +316,7 @@ class MyWindow(QMainWindow):
         if inclHalt:
             halt = msg.addButton('Halt Process', QtWidgets.QMessageBox.ResetRole)
             halt.clicked.connect(self.statusBar.flipCancelSwitch)
+        msg.setDefaultButton(QMessageBox.No)
         reply = msg.exec_()
         if reply == QMessageBox.Yes:
             return True

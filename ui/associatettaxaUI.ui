@@ -115,6 +115,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_newAssociatedTaxa</tabstop>
+  <tabstop>buttonAdd</tabstop>
+  <tabstop>button_save</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>listWidget_associatedTaxa</tabstop>
+  <tabstop>button_cancel</tabstop>
+ </tabstops>
  <resources>
   <include location="resources/Resources.qrc"/>
  </resources>

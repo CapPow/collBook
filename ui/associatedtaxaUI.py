@@ -68,6 +68,12 @@ class Ui_associatedTaxaMainWindow(object):
         self.pushButton_2.clicked.connect(associatedTaxaMainWindow.selectNone)
         self.pushButton.clicked.connect(associatedTaxaMainWindow.selectAll)
         QtCore.QMetaObject.connectSlotsByName(associatedTaxaMainWindow)
+        associatedTaxaMainWindow.setTabOrder(self.lineEdit_newAssociatedTaxa, self.buttonAdd)
+        associatedTaxaMainWindow.setTabOrder(self.buttonAdd, self.button_save)
+        associatedTaxaMainWindow.setTabOrder(self.button_save, self.pushButton_2)
+        associatedTaxaMainWindow.setTabOrder(self.pushButton_2, self.pushButton)
+        associatedTaxaMainWindow.setTabOrder(self.pushButton, self.listWidget_associatedTaxa)
+        associatedTaxaMainWindow.setTabOrder(self.listWidget_associatedTaxa, self.button_cancel)
 
     def retranslateUi(self, associatedTaxaMainWindow):
         _translate = QtCore.QCoreApplication.translate
