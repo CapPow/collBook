@@ -17,8 +17,6 @@ import time
 import requests
 import json
 
-
-
 class taxonomicVerification():
     def __init__(self, settings, parent, editable = True, *args):
         super(taxonomicVerification, self).__init__()
@@ -26,6 +24,10 @@ class taxonomicVerification():
         self.settings = settings       
         # precompile regex cleaning string to save time.
         self.strNormRegex = re.compile('[^a-z ]')
+        # container to store this session's alignments. Addressing feedback
+        # from Alaina Krakowiak concerning redundant alignment dialogs.
+        # structured as: {'input sci name':('aligned sci name', 'alignedauthority')}
+        self.sessionAlignments = {}
     
     def readTaxonomicSettings(self):
         """ Fetches the most up-to-date taxonomy relevant settings"""
@@ -80,6 +82,13 @@ class taxonomicVerification():
             result = result[-1]
         return result
 
+    def updateSessionAlignments(self, querySciName, results):
+        """ updates the session alignments dict to remember alignments.
+        these sesson alignments are reset when program opens or settings are
+        saved"""
+        
+        self.sessionAlignments[querySciName] = results
+
     def verifyTaxonomy(self, rowData):
         """general method to align taxonomy and retrieve authority.
         accepts a df row argument, treats it as a dictionary and makes
@@ -91,6 +100,14 @@ class taxonomicVerification():
         scientificName = rowData['scientificName']
         scientificNameAuthorship = rowData['scientificNameAuthorship'].strip()
         querySciName = self.normalizeStrInput(scientificName)
+        #  check with the session results before moving on.
+        sessionResults =  self.sessionAlignments.get(querySciName, False)
+        if sessionResults:
+            sessionName, sessionAuth = sessionResults
+            rowData['scientificName'] = sessionName
+            rowData['scientificNameAuthorship'] = sessionAuth
+            return rowData
+
         result = self.retrieveAlignment(querySciName)
         resultSciName, resultAuthor = result
         # Decide how to handle resulting data
@@ -102,7 +119,6 @@ class taxonomicVerification():
             if reply:
                 rowData['scientificName'] = reply
                 rowData = self.verifyTaxonomy(rowData)
-            #self.parent.userNotice(message, 'Taxonomic alignment')
             return rowData
         if resultSciName not in scientificName:
             if self.NameChangePolicy == 'Accept all suggestions':
@@ -110,19 +126,19 @@ class taxonomicVerification():
                 changeAuth = True
                 keptResult = True
             elif self.NameChangePolicy == 'Always ask':
-                 message = f'Change {scientificName} to {resultSciName} at record {rowNum}?'
-                 answer = self.parent.userAsk(message, 'Taxonomic alignment')
-                 if answer:
-                     rowData['scientificName'] = resultSciName
-                     keptResult = True
-                     changeAuth = True
+                message = f'Change {scientificName} to {resultSciName} at record {rowNum}?'
+                answer = self.parent.userAsk(message, 'Taxonomic alignment')
+                if answer:
+                    rowData['scientificName'] = resultSciName
+                    keptResult = True
+                    changeAuth = True
 
         if changeAuth:
             # if the scientificName changed already, update the author
             rowData['scientificNameAuthorship'] = resultAuthor
         else:
             if not keptResult:
-                # condition where we need to get authority for potentially non-accepted name
+                # condition to retrieve get authority for potentially non-accepted name
                 resultAuthor = self.retrieveAlignment(querySciName, retrieveAuth=True)
             if resultAuthor not in [scientificNameAuthorship, None]:
                 # if the authors don't match check user policies
@@ -147,8 +163,12 @@ class taxonomicVerification():
                     answer = self.parent.userAsk(message, 'Authority alignment')
                     if answer:
                         rowData['scientificNameAuthorship'] = resultAuthor
+        # update sessionAlignments to remember these results for this session
+        results = (rowData['scientificName'],
+                   rowData['scientificNameAuthorship'])
+        self.sessionAlignments[querySciName] = results
         return rowData
-        
+
     def normalizeStrInput(self, inputStr, retrieveAuth=False):
         """ returns a normalized a scientificName based on string input.
         is used to prepare queries """
@@ -288,14 +308,3 @@ class taxonomicVerification():
                 result = (acceptedName, acceptedAuthor)
                 
         return result
-
-        #    def cleanSciName(self, sciNameStr):
-#        """partial snipit to remove autonymns"""
-#        
-#        sciNameStr = str(sciNameStr).lower()
-#        sciNameStr = strNormRegex.sub('', sciNameStr)  # strip out non-alpha characters
-#        wordList = sciNameStr.split()
-#        if len(wordList) == 3:
-#        # check for autonym & reduce redunant infraspecific term.
-#            if queryWordList[1] == queryWordList[2]:
-#                del queryWordList[2]

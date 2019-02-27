@@ -78,6 +78,8 @@ class settingsWindow(QMainWindow):
         self.genDummyCatalogNumber()
         self.parent.updatePreview()
         self.parent.updateAutoComplete()
+        # reset tax session's alignments since the settings have changed
+        self.parent.tax.sessionAlignments = {}
         self.hide()
 
     def cancelButtonClicked(self):
