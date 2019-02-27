@@ -163,8 +163,14 @@ class taxonomicVerification():
             return result
         acceptedRow = df[df['tsn'] == tsn_accepted]
         if len(acceptedRow) > 0:
-            acceptedName = acceptedRow['complete_name'].mode()[0]
-            acceptedAuthor = acceptedRow['taxon_author_id'].mode()[0]
+            try:
+                acceptedName = acceptedRow['complete_name'].mode()[0]
+            except IndexError:
+                acceptedName = inputStr
+            try:
+                acceptedAuthor = acceptedRow['taxon_author_id'].mode()[0]
+            except IndexError:
+                acceptedAuthor = ""
             result = (acceptedName, acceptedAuthor)
         return result
 
@@ -182,11 +188,17 @@ class taxonomicVerification():
             return result
         acceptedRow = df[df['Accepted_name'] == acceptedName]
         if len(acceptedRow) > 0:
-            acceptedName = acceptedRow['Accepted_name'].mode()[0]
-            acceptedAuthor = acceptedRow['Authors'].mode()[0]
+            try:
+                acceptedName = acceptedRow['Accepted_name'].mode()[0]
+            except IndexError:
+                acceptedName = inputStr
+            try:
+                acceptedAuthor = acceptedRow['Authors'].mode()[0]
+            except IndexError:
+                acceptedAuthor = ""
             result = (acceptedName, acceptedAuthor)
         return result
-    
+
     def getMycoBankWeb(self, inputStr):
         """http://www.mycobank.org/Services/Generic/Help.aspx?s=searchservice"""
         print('go get mycobank data')
