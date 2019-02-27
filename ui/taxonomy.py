@@ -56,7 +56,30 @@ class taxonomicVerification():
                     stream.close()
                 self.local_Reference = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
 
-    
+    def retrieveAlignment(self, querySciName, retrieveAuth=False):
+        """ parses the settings for the proper alignment policy. 
+        Returns tuple of aligned name and aligned authority.
+        Can optionally be used to retrieve the authority of a potentially 
+        unaccepted taxon. """
+        if self.TaxAlignSource == 'Catalog of Life (web API)':
+            result = self.getCOLWeb(querySciName, retrieveAuth)
+        elif self.TaxAlignSource == 'ITIS (local)':
+            result = self.getITISLocal(querySciName, retrieveAuth)
+        elif self.TaxAlignSource == 'ITIS (web API)':
+            result = self.getITISWeb(querySciName, retrieveAuth)
+        elif self.TaxAlignSource == 'Taxonomic Name Resolution Service (web API)':
+            result = self.getTNRS(querySciName, retrieveAuth)
+        elif self.TaxAlignSource == 'MycoBank (local)':
+            result = self.getMycoBankLocal(querySciName, retrieveAuth)
+        elif self.TaxAlignSource == 'MycoBank (web API)':
+            result = self.getMycoBankWeb(querySciName, retrieveAuth)
+        else:
+            result = (None, None)
+
+        if retrieveAuth:
+            result = result[-1]
+        return result
+
     def verifyTaxonomy(self, rowData):
         """general method to align taxonomy and retrieve authority.
         accepts a df row argument, treats it as a dictionary and makes
@@ -64,33 +87,16 @@ class taxonomicVerification():
 
         if rowData['scientificName'] in ['', None]:
             return rowData
-        
-        rowNum = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"     
+        rowNum = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
         scientificName = rowData['scientificName']
         scientificNameAuthorship = rowData['scientificNameAuthorship'].strip()
-        inputSciName = scientificName
         querySciName = self.normalizeStrInput(scientificName)
-        
-        if self.TaxAlignSource == 'Catalog of Life (web API)':
-            result = self.getCOLWeb(querySciName)
-        elif self.TaxAlignSource == 'ITIS (local)':
-            result = self.getITISLocal(querySciName)
-        elif self.TaxAlignSource == 'ITIS (web API)':
-            result = self.getITISWeb(querySciName)
-        elif self.TaxAlignSource == 'Taxonomic Name Resolution Service (web API)':
-            result = self.getTNRS(querySciName)
-        elif self.TaxAlignSource == 'MycoBank (local)':
-            result = self.getMycoBankLocal(querySciName)
-        elif self.TaxAlignSource == 'MycoBank (web API)':
-            result = self.getMycoBankWeb(querySciName)
-        else:
-            result = (None, None)
-
+        result = self.retrieveAlignment(querySciName)
         resultSciName, resultAuthor = result
         # Decide how to handle resulting data
+        keptResult = False  # flag to det if the alignment result was kept
         changeAuth = False  # flag to determine if the authority needs altered.
-        if result[0] == None:  # if no scientificName was returned
-            #message = f'No {self.value_Kingdom} results for {scientificName} found using {self.TaxAlignSource}. Record {rowNum} is unchanged.'
+        if result[0] is None:  # if no scientificName was returned
             message = f'No {self.value_Kingdom} results for "{scientificName}" (# {rowNum}) found using {self.TaxAlignSource}.\n This may be a typo, would you like to reenter the name?'
             reply = self.parent.userSciNameInput(f'{rowNum}: Taxonomic alignment', message)
             if reply:
@@ -102,42 +108,48 @@ class taxonomicVerification():
             if self.NameChangePolicy == 'Accept all suggestions':
                 rowData['scientificName'] = resultSciName
                 changeAuth = True
+                keptResult = True
             elif self.NameChangePolicy == 'Always ask':
                  message = f'Change {scientificName} to {resultSciName} at record {rowNum}?'
                  answer = self.parent.userAsk(message, 'Taxonomic alignment')
                  if answer:
                      rowData['scientificName'] = resultSciName
+                     keptResult = True
                      changeAuth = True
 
         if changeAuth:
             # if the scientificName changed already, update the author
             rowData['scientificNameAuthorship'] = resultAuthor
-        elif resultAuthor not in [scientificNameAuthorship, None]:
-            # if the authors don't match check user policies
-            # conditional actions based on AuthChangePolicy
-            if self.AuthChangePolicy == 'Accept all suggestions':
-                rowData['scientificNameAuthorship'] = resultAuthor
-
-            elif self.AuthChangePolicy == 'Fill blanks':
-                if scientificNameAuthorship == '':  # if it is blank fill it
+        else:
+            if not keptResult:
+                # condition where we need to get authority for potentially non-accepted name
+                resultAuthor = self.retrieveAlignment(querySciName, retrieveAuth=True)
+            if resultAuthor not in [scientificNameAuthorship, None]:
+                # if the authors don't match check user policies
+                # conditional actions based on AuthChangePolicy
+                if self.AuthChangePolicy == 'Accept all suggestions':
                     rowData['scientificNameAuthorship'] = resultAuthor
-                else:  # if not blank, ask.
-                    message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
+    
+                elif self.AuthChangePolicy == 'Fill blanks':
+                    if scientificNameAuthorship == '':  # if it is blank fill it
+                        rowData['scientificNameAuthorship'] = resultAuthor
+                    else:  # if not blank, ask.
+                        message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
+                        answer = self.parent.userAsk(message, 'Authority alignment')
+                        if answer:
+                            rowData['scientificNameAuthorship'] = resultAuthor
+    
+                elif self.AuthChangePolicy == 'Always ask':
+                    if scientificNameAuthorship == '':  # custom dialog box if the field was empty. 'Always ask' may be annoying!
+                        message = f'Fill in blank author of {rowData["scientificName"]} to {resultAuthor} at record {rowNum}?'
+                    else:
+                        message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
                     answer = self.parent.userAsk(message, 'Authority alignment')
                     if answer:
                         rowData['scientificNameAuthorship'] = resultAuthor
-
-            elif self.AuthChangePolicy == 'Always ask':
-                if scientificNameAuthorship == '':  # custom dialog box if the field was empty. 'Always ask' may be annoying!
-                    message = f'Fill in blank author of {rowData["scientificName"]} to {resultAuthor} at record {rowNum}?'
-                else:
-                    message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
-                answer = self.parent.userAsk(message, 'Authority alignment')
-                if answer:
-                    rowData['scientificNameAuthorship'] = resultAuthor
         return rowData
         
-    def normalizeStrInput(self, inputStr):
+    def normalizeStrInput(self, inputStr, retrieveAuth=False):
         """ returns a normalized a scientificName based on string input.
         is used to prepare queries """
         # Strip non-alpha characters
@@ -152,16 +164,20 @@ class taxonomicVerification():
         
         return outputStr
 
-# still work to do here
-    def getITISLocal(self, inputStr):
+    def getITISLocal(self, inputStr, retrieveAuth=False):
         """ uses local itis reference csv to attempt alignments """
         df = self.local_Reference
         result = (None, None)
-        try:
-            tsn_accepted = df[df['normalized_name'] == inputStr]['tsn_accepted'].mode()[0]
-        except IndexError:
-            return result
-        acceptedRow = df[df['tsn'] == tsn_accepted]
+        
+        if retrieveAuth:
+            acceptedRow = df[df['normalized_name'] == inputStr]
+        else:
+            try:
+                tsn_accepted = df[df['normalized_name'] == inputStr]['tsn_accepted'].mode()[0]
+            except IndexError:
+                return result
+            acceptedRow = df[df['tsn'] == tsn_accepted]
+            
         if len(acceptedRow) > 0:
             try:
                 acceptedName = acceptedRow['complete_name'].mode()[0]
@@ -174,19 +190,23 @@ class taxonomicVerification():
             result = (acceptedName, acceptedAuthor)
         return result
 
-    def getITISWeb(self, inputStr):
+    def getITISWeb(self, inputStr, retrieveAuth=False):
         """ https://www.itis.gov/ws_description.html """
         print('go get ITIS data')
         
-    def getMycoBankLocal(self, inputStr):
+    def getMycoBankLocal(self, inputStr, retrieveAuth=False):
         """ uses local reference csv to attempt alignments """
         df = self.local_Reference
         result = (None, None)
-        try:
-            acceptedName = df[df['normalized_name'] == inputStr]['Accepted_name'].mode()[0]
-        except IndexError:
-            return result
-        acceptedRow = df[df['Accepted_name'] == acceptedName]
+        
+        if retrieveAuth:
+            acceptedRow = df[df['normalized_name'] == inputStr]
+        else:
+            try:
+                acceptedName = df[df['normalized_name'] == inputStr]['Accepted_name'].mode()[0]
+            except IndexError:
+                return result
+            acceptedRow = df[df['Accepted_name'] == acceptedName]
         if len(acceptedRow) > 0:
             try:
                 acceptedName = acceptedRow['Accepted_name'].mode()[0]
@@ -199,11 +219,11 @@ class taxonomicVerification():
             result = (acceptedName, acceptedAuthor)
         return result
 
-    def getMycoBankWeb(self, inputStr):
+    def getMycoBankWeb(self, inputStr, retrieveAuth=False):
         """http://www.mycobank.org/Services/Generic/Help.aspx?s=searchservice"""
         print('go get mycobank data')
 
-    def getCOLWeb(self, inputStr):
+    def getCOLWeb(self, inputStr, retrieveAuth=False):
         """ uses Catalog of life reference to attempt alignments """
         
         result = (None, None)
@@ -220,19 +240,25 @@ class taxonomicVerification():
                 # returns a list of "results" each result is a seperate dict
                 data = response.json().get('results')
                 # list comprehension to navigate the json
-                try:
-                    data = [x for x in data if 
-                            (x.get('name_status','') == 'accepted name') and 
-                            (x.get('classification')[0].get('name','') == self.value_Kingdom)][0]
-                    acceptedName = data.get('name')
-                    acceptedAuthor = data.get('name_html').split('</i> ')[1].strip()
-                    result = (acceptedName, acceptedAuthor)
+                if retrieveAuth:
+                    resultName = data[0].get('name')
+                    resultAuth = data[0].get('author')
+                    result = (resultName, resultAuth)
                     return result
-                except:
-                    pass
+                else:
+                    try:
+                        data = [x for x in data if 
+                                (x.get('name_status','') == 'accepted name') and 
+                                (x.get('classification')[0].get('name','') == self.value_Kingdom)][0]
+                        acceptedName = data.get('name')
+                        acceptedAuthor = data.get('name_html').split('</i> ')[1].strip()
+                        result = (acceptedName, acceptedAuthor)
+                        return result
+                    except:
+                        pass
         return result
 
-    def getTNRS(self, inputStr):
+    def getTNRS(self, inputStr, retrieveAuth=False):
         """ uses the Taxonomic Name Resolution Service API 
         hosted through iPlant."""
 
@@ -246,10 +272,14 @@ class taxonomicVerification():
         if response.status_code == requests.codes.ok:
             data = response.json().get('items', None)[0]
             time.sleep(1)  # use a sleep to be polite to the service
-            acceptance = data.get('acceptance',None)
+            
             try:
-                acceptedName = data.get('acceptedName', None)
-                acceptedAuthor = data.get('acceptedAuthor', None)
+                if retrieveAuth:
+                    acceptedName = data.get('nameScientific', None)
+                    acceptedAuthor = data.get('authorAttributed', None)
+                else:
+                    acceptedName = data.get('acceptedName', None)
+                    acceptedAuthor = data.get('acceptedAuthor', None)
                 score = float(data.get('scientificScore', 0)) # the confidence in the return
             except Exception as e:
                 print(e)
