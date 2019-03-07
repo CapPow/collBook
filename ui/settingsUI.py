@@ -423,7 +423,7 @@ class Ui_settingsWindow(object):
         settingsWindow.setMenuBar(self.menubar)
 
         self.retranslateUi(settingsWindow)
-        self.settingsPage.setCurrentIndex(0)
+        self.settingsPage.setCurrentIndex(3)
         self.value_LogoAlignment.setCurrentIndex(4)
         self.value_Kingdom.setCurrentIndex(1)
         self.value_inc_VerifiedBy.toggled['bool'].connect(self.value_VerifiedBy.setEnabled)
@@ -476,7 +476,7 @@ class Ui_settingsWindow(object):
         self.label_11.setText(_translate("settingsWindow", "Changes applied on next start up."))
         self.labelDimentionsGroup.setTitle(_translate("settingsWindow", "Label dimensions"))
         self.xLabel.setText(_translate("settingsWindow", "width (mm)"))
-        self.relFontLabell.setText(_translate("settingsWindow", "Base font side"))
+        self.relFontLabell.setText(_translate("settingsWindow", "Base font size"))
         self.yLabel.setText(_translate("settingsWindow", "height (mm)"))
         self.labelIncludeGroup.setTitle(_translate("settingsWindow", "Include on label"))
         self.value_inc_Associated.setText(_translate("settingsWindow", "Include associated taxa"))

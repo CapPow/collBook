@@ -95,7 +95,7 @@
            </sizepolicy>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="associatedTaxaPage">
            <layout class="QGridLayout" name="gridLayout_9">
@@ -392,7 +392,7 @@
                <item row="0" column="3">
                 <widget class="QLabel" name="relFontLabell">
                  <property name="text">
-                  <string>Base font side</string>
+                  <string>Base font size</string>
                  </property>
                 </widget>
                </item>
