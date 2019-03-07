@@ -570,9 +570,11 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             fileName, _ = QtWidgets.QFileDialog.getSaveFileName(
                     None, "Save CSV", QtCore.QDir.homePath(), "CSV (*.csv)")
         if fileName:  # if a csv was selected, start loading the data.
+            print(fileName)
             if Path(fileName).suffix == '':
                 fileName = f'{fileName}.csv'
                 readyToSave=True
+                print(fileName)
                 if Path(fileName).is_file():
                     readyToSave=False
                     message = f'File named: "{fileName}" already exist! OVERWRITE this file?'
@@ -580,13 +582,16 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                     answer = self.parent.userAsk(message, title)
                     if answer:
                         readyToSave=True
-
-        if readyToSave:
-            df.fillna('', inplace=True)  # convert nullvalues empty strings
-            df.to_csv(fileName, encoding='utf-8', index=False)
-            return True
-        else:
-            return False
+            else:
+                readyToSave = True
+            print(readyToSave)
+            if readyToSave:
+                print('happened')
+                df.fillna('', inplace=True)  # convert nullvalues empty strings
+                df.to_csv(fileName, encoding='utf-8', index=False)
+                return True
+            else:
+                return False
                 
 
     def export_CSV(self, fileName=None, df=None):
