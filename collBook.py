@@ -306,13 +306,19 @@ class MyWindow(QMainWindow):
         return res
 
     # TODO for simplicity, move all userASK and userNOTIFY functions into mainWindow and alter calls in other modules to use it.
-    def userAsk(self, text, title='', inclHalt = True):
+    def userAsk(self, text, title='', inclHalt=True, retry=False, detailText=None):
         """ a general user dialog with yes / cancel options"""
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Question)
         msg.setText(text)
         msg.setWindowTitle(title)
-        msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+        if retry:
+            msg.setIcon(QMessageBox.Warning)
+            msg.setStandardButtons(QMessageBox.Retry | QMessageBox.Cancel)
+        else:
+            msg.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+        if detailText != None:
+            msg.setDetailedText(detailText)
         if inclHalt:
             halt = msg.addButton('Halt Process', QtWidgets.QMessageBox.ResetRole)
             halt.clicked.connect(self.statusBar.flipCancelSwitch)
@@ -322,23 +328,29 @@ class MyWindow(QMainWindow):
             return True
         elif reply == QMessageBox.No:
             return False
+        elif reply == QMessageBox.Cancel:
+            return False
+        elif reply == QMessageBox.Retry:
+            return True
         else:
             return "cancel"
 
 
-    def userNotice(self, text, title='', retry=False):
+    def userNotice(self, text, title='', detailText = None, retry=False, inclHalt=True):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
         msg.setText(text)
+        if detailText != None:
+            msg.setDetailedText(detailText)
         #msg.setInformativeText("This is additional information")
         msg.setWindowTitle(title)
-        #msg.setDetailedText("The details are as follows:")
         if retry:
             msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Retry)
         else:
             msg.setStandardButtons(QMessageBox.Ok)            
-        halt = msg.addButton('Halt Process', QtWidgets.QMessageBox.ResetRole)
-        halt.clicked.connect(self.statusBar.flipCancelSwitch)
+        if inclHalt:
+            halt = msg.addButton('Halt Process', QtWidgets.QMessageBox.ResetRole)
+            halt.clicked.connect(self.statusBar.flipCancelSwitch)
         reply = msg.exec_()
         return reply
         
@@ -355,7 +367,7 @@ class MyWindow(QMainWindow):
             if chosenFileName == "":  # The user probably pressed Cancel
                 return None
             else:
-                fileName = chosenFileName
+                fileName = chosenFileName               
                 fileExtension = Path(chosenFileName).suffix
                 if fileExtension != '':
                     fileName = fileName.replace(fileExtension,'')
@@ -374,14 +386,31 @@ class MyWindow(QMainWindow):
                 if readyToSave:  # if fileName(s) are settled...
                     self.m.assignCatalogNumbers()  # the assignCatalogNumber function checks user settings before applying
                     rowsToProcess = self.m.getRowsToProcess(*self.getTreeSelectionType())
-                    labelSuccess = self.exportLabels(fileName = pdfFileName)
-                    if labelSuccess:
-                        outDF = self.m.datatable.iloc[rowsToProcess, ]
-                        outDF = outDF.loc[outDF['specimenNumber'] != '#']
-                        csvName = csvFileName
-                        self.m.export_CSV(df = outDF, fileName = csvFileName)
-                        saved = True
-            
+                    # Permission flag handles cases where pdf preview is open, yet user wants to overwrite the open file.
+                    permission = False
+                    while permission == False:
+                        try:
+                            labelSuccess = self.exportLabels(fileName = pdfFileName)
+                            if labelSuccess:
+                                outDF = self.m.datatable.iloc[rowsToProcess, ]
+                                outDF = outDF.loc[outDF['specimenNumber'] != '#']
+                                csvName = csvFileName
+                                self.m.export_CSV(df = outDF, fileName = csvFileName)
+                                saved = True
+                                permission = True
+                        except PermissionError:
+                            #  Note, under this condition the catalog numbers might be assigned yet not used.
+                            title = "Permission Error"
+                            msg = f"Attempting to overwrite a file which is open in another program. Export cannot proceed until you close that program."
+                            details = f'One or both of the following files may be open in another program. It must be closed to proceed with the export.\n{pdfFileName}\n{csvFileName}'
+                            askReply = self.userAsk(msg, title, retry=True, inclHalt=False, detailText=details)
+                            if askReply:
+                                permission = False
+                            else:
+                                # even though not saved or permissed, do this to break loops
+                                permission = True
+                                saved = True
+
     def testRunLabels(self):
         """ Tests generating the labels to ensure the contents all fit.
         Returns True or False depending on test's results."""
