@@ -917,7 +917,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "collDesk"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "collBook"))
         self.pushButton_newSite.setText(_translate("MainWindow", "Add new site"))
         self.gridGroupBox.setTitle(_translate("MainWindow", "Trip"))
         self.label_samplingEffort.setText(_translate("MainWindow", "Sampling Effort "))

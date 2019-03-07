@@ -15,7 +15,7 @@
 
 """
 
-collDesk is the desktop companion to collNote. Combined they are seek to
+collBook is the desktop companion to collNote. Combined they are seek to
 provide a field-to-database solution designed for field biologists to gather
 and format “born digital” field notes into database ready formats.
 
@@ -24,7 +24,7 @@ __author__ = "Caleb Powell, Jacob Motley"
 __credits__ = ["Caleb Powell, Jacob Motley, Joey Shaw"]
 __email__ = "calebadampowell@gmail.com"
 __status__ = "Alpha"
-__version__ = 'v0.1.3-alpha'
+__version__ = 'v0.1.4-alpha'
 
 
 import sys
@@ -33,7 +33,9 @@ from pathlib import Path
 from datetime import date
 import pandas as pd
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QTreeWidgetItem, QTreeWidgetItemIterator, QItemDelegate, QCompleter, QInputDialog, QLineEdit
+from PyQt5.QtWidgets import (QMainWindow, QTreeWidgetItem,
+                             QTreeWidgetItemIterator, QItemDelegate,
+                             QCompleter)
 from PyQt5.QtWidgets import QMessageBox
 from reportlab.platypus.doctemplate import LayoutError
 from ui.printlabels import LabelPDF
@@ -48,7 +50,6 @@ from ui.associatedtaxa import associatedTaxaMainWindow
 from ui.scinameinputdialog import sciNameDialog
 from ui.progressbar import progressBar
 
-#from . import version
 
 class editorDelegate(QItemDelegate):
     """solution to the table_view editor clearing pre-existing cell values
@@ -62,7 +63,6 @@ class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.init_ui()
-
 
     def init_ui(self):
         self.w = Ui_MainWindow()
