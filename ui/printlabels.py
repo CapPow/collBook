@@ -141,13 +141,15 @@ class LabelPDF():
 
     def genPrintLabelPDFs(self, labelDataInput, defaultFileName = None, returnBytes = False):
         """labelDataInput = list of dictionaries formatted as: {DWC Column:'field value'}
-           defaultFileName = the filename to use as the default when saving the pdf file."""
+           defaultFileName = the filename to use as the default when saving the pdf file.
+           returnBytes = If the result should be a bytes object (used for label previews).
+           Otherwise, produces (and attempts to open) a pdf file."""
 
         # strip out the site number rows
         try:
             labelDataInput = [x for x in labelDataInput if x.get('specimenNumber') != "#"]
         except AttributeError:
-            labelDataInput = [x for x in labelDataInput if "#" not in x.get('otherCatalogNumbers').split('-')[-1]]
+            labelDataInput = [x for x in labelDataInput if "#" not in x.get('recordNumber').split('-')[-1]]
         if len(labelDataInput) < 1:  # exit early if nothing is left
             return None
 
@@ -216,14 +218,38 @@ class LabelPDF():
                 return Paragraph('', style = self.stylesheet(styleKey))
     
         def collectedByPara(textfield1,textfield2,styleKey,prefix = ''):
-            if len(dfl(textfield1)) > 0 :
-                if len(dfl(textfield2)) > 0 :
-                    return Paragraph(('<b>{}</b>'.format(prefix)) + dfl(textfield1) + ' with ' + dfl(textfield2), style = self.stylesheet(styleKey))
-                else:
-                    return Paragraph(('<b>{}</b>'.format(prefix)) + dfl(textfield1), style = self.stylesheet(styleKey))
+            # break out the textValues
+            textContent1 = dfl(textfield1)
+            textContent2 = dfl(textfield2)
+            
+            if textContent1 != '': #  if textContent has content
+                if ('|' in textfield1) & (textfield2 == ''): #  if it has a |
+                    splitCollectors = textContent1.split('|',1) # split on |
+                    #  if it is a list & it has 2 elements, assign them 
+                    if len(splitCollectors) == 2:
+                        textContent1, textContent2 = splitCollectors
+            elif textContent2 != '':
+                # if there is no primariy collector, but there are associated collector(s)
+                if ('|' in textfield2):
+                    splitCollectors = textContent2.split('|',1) # split on |
+                    if len(splitCollectors) == 2:
+                        textContent1, textContent2 = splitCollectors
+            # condition of remaining collectors in textContent2 delimited by |
+            if '|' in textContent2:
+                #  split on | delimiter
+                splitCollectors = textContent2.split('|')
+                #  strip out trailing/leading spaces and empty strings.
+                splitCollectors = [x.strip() for x in splitCollectors if x != '']
+                #  rejoin as single, cleaned string.
+                splitCollectors = ', '.join(splitCollectors)
+                        
+            if (isinstance(textContent1, str) & (textContent1 != '') & (textContent2 != '')):
+                return Paragraph(('<b>{}</b>'.format(prefix)) + textContent1 + ' with ' + textContent2, style = self.stylesheet(styleKey))
+            elif (isinstance(textContent1, str) & (textContent1 != '')):
+                return Paragraph(('<b>{}</b>'.format(prefix)) + textContent1, style = self.stylesheet(styleKey))
             else:
                 return Paragraph('', style = self.stylesheet(styleKey))
-    
+
         def cultivationStatusChecker(textfield1, styleKey):
             if str(dfl(textfield1)) == 'cultivated':
                 return Paragraph('<b>Cultivated specimen</b>', style = self.stylesheet(styleKey))
@@ -242,17 +268,7 @@ class LabelPDF():
                     gpsString.append(', <b>Elevation: </b>' + dfl(textfield4) + 'm')
     
                 return Paragraph(''.join(gpsString), style = self.stylesheet(styleKey))
-    
-        #############Logo Work#################################
-        ##############################################################################
-        #
-        #logoPath = 'ucht.jpg'   # This should be determined by the user dialog open option.
-        #
-        #def getLogo(logoPath):
-        #    if logoPath:
-        #        return Image(logoPath, width = 40, height =30.6) #These values should be handled dynamically!
-        ######Barcode work(Catalog Number)######
-    
+
         def newHumanText(self):
             return self.stop and self.encoded[1:-1] or self.encoded
     
@@ -424,7 +440,7 @@ class LabelPDF():
                 gpsParaWidth = 0
                 
             if gpsParaWidth > self.xPaperSize * .65:
-                row8 = Table([[Para('otherCatalogNumbers','default','Field Number: ')]], style = tableSty)
+                row8 = Table([[Para('recordNumber','default','Field Number: ')]], style = tableSty)
                 row9 = Table([[gpsStrElement]],style = tableSty)
                 tableList.append([row8])
     
@@ -435,7 +451,7 @@ class LabelPDF():
                 
             else:
                 row8 = Table([[
-                Para('otherCatalogNumbers','default','Field Number: '),        
+                Para('recordNumber','default','Field Number: '),        
                 gpsStrElement]],            
                 colWidths = (self.xPaperSize * .33, self.xPaperSize * .65), rowHeights = None,style=tableSty)
                 tableList.append([row8])

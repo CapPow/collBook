@@ -112,7 +112,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         except ValueError:
             newSiteNum = 1
         self.addToUndoList(f'added site {newSiteNum}')  # set checkpoint in undostack
-        rowData = {'otherCatalogNumbers':f'{newSiteNum}-#', 
+        rowData = {'recordNumber':f'{newSiteNum}-#', 
                    'siteNumber':f'{newSiteNum}',
                    'specimenNumber':'#'}
         defVals = self.parent.form_view.readDefaultNewSiteFields()
@@ -140,7 +140,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             newRowData['specimenNumber'] = f'{newSpNum}'
             catNum =  f'{siteNum}-{newSpNum}'
             self.addToUndoList(f'added specimen {catNum}')  # set checkpoint in undostack
-            newRowData['otherCatalogNumbers'] = catNum
+            newRowData['recordNumber'] = catNum
             df = df.append(newRowData, ignore_index=True, sort=False)
             df = self.sortDF(df)
             df.fillna('', inplace=True)
@@ -166,7 +166,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                             (df['specimenNumber'] == specimenNum)].copy()
             newRowData['specimenNumber'] = f'{newSpNum}'
             catNum =  f'{siteNum}-{newSpNum}'
-            newRowData['otherCatalogNumbers'] = catNum
+            newRowData['recordNumber'] = catNum
             df = df.append(newRowData, ignore_index=True, sort=False)
             df = self.sortDF(df)
             df.fillna('', inplace=True)
@@ -517,10 +517,14 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 # if so, parse those cols.
                 df = self.convertColectoRFormat(df)
                 cols = df.columns
+            # backwards compatability, following change in index field
+            if ('otherCatalogNumbers' in cols & 'recordNumber' not in cols):
+                df['recordNumber'] = df['otherCatalogNumbers']
+                cols = df.columns
             # check if the indices need manually assigned (with user dialog)
             wasAssigned = False  # store if assignments were made.
             if not all(x in cols for x in ['siteNumber', 'specimenNumber']):
-                if 'otherCatalogNumbers' not in cols:
+                if 'recordNumber' not in cols:
                     assignedDF, dialogStatus = self.getIndexAssignments(df)
                 # if the accept button (titled 'Assign') was pressed, assign df
                     if dialogStatus == QDialog.Accepted:
@@ -532,8 +536,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             if 'siteNumber' not in cols:  # if the siteNumber does not exist
                 df = self.inferSiteSpecimenNumbers(df)  # attempt to infer them
                 cols = df.columns
-            if 'otherCatalogNumbers' not in cols:
-                df = df.apply(self.inferOtherCatalogNumbers, axis=1)
+            if 'recordNumber' not in cols:
+                df = df.apply(self.inferrecordNumber, axis=1)
                 cols = df.columns
             if 'catalogNumber' not in cols:
                 df['catalogNumber'] = ''
@@ -551,6 +555,21 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 title = 'Error loading records.'
                 self.parent.userNotice(text, title)
                 return False
+            # check if recordedBy is symbiota or DWC format.
+            try:
+                recordedBy = df['recordedBy']
+                if '|' in recordedBy:
+                    splitRecordedBy = recordedBy.split('|', 1)
+                    if len(splitRecordedBy) == 2:
+                        primaryCollector, associatedCollectors = splitRecordedBy
+                        associatedCollectors = associatedCollectors.split('|')
+                        associatedCollectors = [x.strip() for x in associatedCollectors if x != '']
+                        #  rejoin as single, cleaned string.
+                        associatedCollectors = ', '.join(associatedCollectors)
+                    #if 'associatedCollectors' in cols:
+                     # TODO check if associatedCollectors can be overwritten safely.   
+            except KeyError:
+                pass
             self.update(df)  # this function updates the visible dataframe
             self.parent.populateTreeWidget()
             self.parent.form_view.fillFormFields()
@@ -752,10 +771,10 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df.reset_index(drop = True, inplace = True)
         return df
 
-    def inferOtherCatalogNumbers(self, rowData):
+    def inferrecordNumber(self, rowData):
         """ assigns otherCatalogNumber based on siteNumber & specimenNumber """
         try:
-            rowData['otherCatalogNumbers'] = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
+            rowData['recordNumber'] = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
         except IndexError:
             pass
         return rowData
@@ -782,10 +801,10 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             except (ValueError, IndexError, AttributeError) as e:
                 return ''
         try:
-            df['siteNumber'] = df['otherCatalogNumbers'].transform(lambda x: siteNumExtract(x))
-            df['specimenNumber'] = df['otherCatalogNumbers'].transform(lambda x: specimenNumExtract(x))
+            df['siteNumber'] = df['recordNumber'].transform(lambda x: siteNumExtract(x))
+            df['specimenNumber'] = df['recordNumber'].transform(lambda x: specimenNumExtract(x))
         except IndexError:
-            # incase there are no otherCatalogNumbers
+            # incase there are no recordNumber
             pass
 
         return df
@@ -854,7 +873,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         occNotes = occNotes.where(occNotes.notnull(), '')
         df['occurrenceRemarks'] = occNotes
         # copy Number, so when choosing index names "Number" is still present.
-        df['otherCatalogNumbers'] = df['Number']
+        df['recordNumber'] = df['Number']
         # assign rename map over directly translatable cols
         colNameMap = {'Collector': 'recordedBy',
                       'Additional collectors	': 'associatedCollectors',
@@ -885,7 +904,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             newDFDict = {
             'siteNumber':['1','1'],
             'specimenNumber':['#','1'],
-            'otherCatalogNumbers':['1-#','1-1'],
+            'recordNumber':['1-#','1-1'],
             'catalogNumber':['',''],
             'family':['',''],
             'scientificName':['',''],

@@ -59,9 +59,9 @@ class taxonomicVerification():
                 self.local_Reference = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
 
     def retrieveAlignment(self, querySciName, retrieveAuth=False):
-        """ parses the settings for the proper alignment policy. 
+        """ parses the settings for the proper alignment policy.
         Returns tuple of aligned name and aligned authority.
-        Can optionally be used to retrieve the authority of a potentially 
+        Can optionally be used to retrieve the authority of a potentially
         unaccepted taxon. """
         if self.TaxAlignSource == 'Catalog of Life (web API)':
             result = self.getCOLWeb(querySciName, retrieveAuth)

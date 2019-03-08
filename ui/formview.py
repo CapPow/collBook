@@ -58,7 +58,7 @@ class formView(QtWidgets.QStackedWidget):
                 'occurrenceRemarks': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_occurrenceRemarks),
                 'substrate': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_substrate),
                 'catalogNumber': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_catalogNumber),
-                'otherCatalogNumbers': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_otherCatalogNumbers),
+                'recordNumber': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_recordNumber),
                 'scientificName': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_sciName),  # breaks naming convention
                 'scientificNameAuthorship':(self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_sciNameAuthority),  # breaks naming convention
                 }
@@ -81,7 +81,6 @@ class formView(QtWidgets.QStackedWidget):
         elevRE = QRegExp("^\d{1,4}\.{1}\d{1,8}")
         elev_validator = QRegExpValidator(uncertRE, self.parentClass.lineEdit_minimumElevationInMeters)
         self.parentClass.lineEdit_minimumElevationInMeters.setValidator(elev_validator)
-        
 
     def connectFields(self):
         """ connect formview fields to save functions 
