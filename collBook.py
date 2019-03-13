@@ -24,7 +24,7 @@ __author__ = "Caleb Powell, Jacob Motley"
 __credits__ = ["Caleb Powell, Jacob Motley, Joey Shaw"]
 __email__ = "calebadampowell@gmail.com"
 __status__ = "Alpha"
-__version__ = 'v0.1.4-alpha'
+__version__ = 'v0.1.5-alpha'
 
 
 import sys
