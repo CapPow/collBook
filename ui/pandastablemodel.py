@@ -555,7 +555,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 title = 'Error loading records.'
                 self.parent.userNotice(text, title)
                 return False
-            # check if recordedBy is symbiota or DWC format.
+            # Handle DWC formatted recordedBy ("|" seperated names)
             if 'recordedBy' in cols:
                 # expand recordedBy to newassociatedCollectors, 
                 # splitting recorded By on first '|'
@@ -572,6 +572,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 df['associatedCollectors'] = df['newAssociatedCollectors'].apply(lambda x: ', '.join([y for y in pd.unique(x) if y != '']))
                 # drop the 'newAssociatedCollectors' col.
                 df.drop(columns=['newAssociatedCollectors'], inplace=True)
+                cols = df.columns
 
             self.update(df)  # this function updates the visible dataframe
             self.parent.populateTreeWidget()
