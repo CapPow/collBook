@@ -15,6 +15,7 @@ from PyQt5.QtCore import QFile
 import datetime
 import time
 import requests
+from requests.exceptions import ReadTimeout
 import json
 
 class taxonomicVerification():
@@ -109,6 +110,9 @@ class taxonomicVerification():
             return rowData
 
         result = self.retrieveAlignment(querySciName)
+        if result is False:
+            # if the alignment failed to respond
+            return rowData
         resultSciName, resultAuthor = result
         # Decide how to handle resulting data
         keptResult = False  # flag to det if the alignment result was kept
@@ -243,7 +247,7 @@ class taxonomicVerification():
         """http://www.mycobank.org/Services/Generic/Help.aspx?s=searchservice"""
         print('go get mycobank data')
 
-    def getCOLWeb(self, inputStr, retrieveAuth=False):
+    def getCOLWeb(self, inputStr, retrieveAuth=False, timeout = 5):
         """ uses Catalog of life reference to attempt alignments """
         
         result = (None, None)
@@ -254,8 +258,19 @@ class taxonomicVerification():
                    f'http://webservice.catalogueoflife.org/annual-checklist/{datetime.datetime.now().year - 1 }/webservice?name={urlInputStr}&format=json&response=full']
 
         for url in urlList:
-            response = requests.get(url, timeout = 3)
-            time.sleep(1)  # use a sleep to be polite to the service
+            try:
+                response = requests.get(url, timeout = timeout)
+                time.sleep(1)  # use a sleep to be polite to the service
+            except ReadTimeout:
+                message = 'Catalog of Life request timed out. This may be an internet connectivity problem, or an issue with the service. No changes have been made.'
+                details = 'Check internet connection, or try a different alignment service. If you do not have internet connectivity, use the local alignment service.'
+                notice = self.parent.userNotice(message, 'Taxonomic alignment', inclHalt=True, retry=True)
+                if notice == QMessageBox.Retry:  # if clicked retry, do it.
+                    timeout += 2
+                    # add to timeout before retrying
+                    return self.getCOLWeb(inputStr, retrieveAuth, timeout = timeout)
+                else:
+                    return False
             if response.status_code == requests.codes.ok:
                 # returns a list of "results" each result is a seperate dict
                 data = response.json().get('results')
@@ -278,7 +293,7 @@ class taxonomicVerification():
                         pass
         return result
 
-    def getTNRS(self, inputStr, retrieveAuth=False):
+    def getTNRS(self, inputStr, retrieveAuth=False, timeout = 5):
         """ uses the Taxonomic Name Resolution Service API 
         hosted through iPlant."""
 
@@ -288,7 +303,19 @@ class taxonomicVerification():
         # TODO add an optional dialog box with a list of the top returned results. Allow user to pick from list.
         #url = f'http://tnrs.iplantc.org/tnrsm-svc/matchNames?retrieve=all&names={urlInputStr}'
         url = f'http://tnrs.iplantc.org/tnrsm-svc/matchNames?retrieve=best&names={urlInputStr}'
-        response = requests.get(url, timeout = 3)
+        print(url)
+        try:
+            response = requests.get(url, timeout = timeout)
+        except ReadTimeout:
+            message = 'Taxonomic Name Resolution Service request timed out. This may be an internet connectivity problem, or an issue with the service. No changes have been made.'
+            details = 'Check internet connection, or try a different alignment service. If you do not have internet connectivity, use the local alignment service.'
+            notice = self.parent.userNotice(message, 'Taxonomic alignment', inclHalt=True, retry=True)
+            if notice == QMessageBox.Retry:  # if clicked retry, do it.
+                timeout += 2
+                # add to timeout before retrying
+                return self.getTNRS(inputStr, retrieveAuth, timeout = timeout)
+            else:
+                return False
         if response.status_code == requests.codes.ok:
             data = response.json().get('items', None)[0]
             time.sleep(1)  # use a sleep to be polite to the service
