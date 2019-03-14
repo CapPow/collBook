@@ -2,20 +2,22 @@
 
 collBook, is the desktop counterpart for the mobile app [collNote](https://github.com/j-h-m/collNotes). Combined they are a field-to-database solution designed for field biologists to gather and format “born digital” field notes into database ready formats. A mobile application, collNote is being developed for Android and iOS devices to gather Darwin Core formatted field notes. A desktop application, collBook is being developed for Linux, OS X, and Windows to refine those field notes into portal ready Darwin Core files and specimen labels. Field note refinements include: reverse geocoding localities, taxonomic alignments, and creation of customizable labels which can optionally include catalog number barcodes.
 
-## Development Stage
+## [Development stage](#Development-stage)
 
 collBook is in an early testing stage. Unexpected crashes are expected to be frequent, so **please take caution with your data and work on copies.** Pull requests are welcomed!
 
-#### Known bugs
+#### [Known bugs](#Known-bugs)
 - Preview window zoom is not properly updated at start up. For now, altering the zoom after start up solves this.
 
-## Installation
+## [Installation](#Installation)
 
-- Windows and Mac binaries are available under [releases](https://github.com/CapPow/collBook/releases). Be sure you unzip the folder before running the program. 
+ - Windows and Mac binaries are available under [releases](https://github.com/CapPow/collBook/releases). Be sure you unzip the folder before running the program. 
+ - If you are interested in running, or building collBook from source you will need to place a Google geocoding API key in a simple textfile named "key.txt". To install the python dependencies, you can use "pip3 install -r requirements.txt" If you're interested in using pyinstaller, there are reference ".spec" files for Mac and Windows in the doc folder.
 
-If you are interested in running, or building collBook from source you will need to place a Google geocoding API key in a simple textfile named "key.txt". To install the python dependencies, you can use "pip3 install -r requirements.txt." If you're interested in using pyinstaller, there are reference ".spec" files for Mac and Windows in the doc folder.
+If you have any troubles, feel free to post in the [Issues section](https://github.com/CapPow/collBook/issues) or [contact us](https://github.com/CapPow/collBook#Contact-us).
 
-## Usage
+
+## [Usage](#Usage)
 
 collBook is designed to be used while formally identifying biological specimens, producing [symbiota](https://github.com/Symbiota/Symbiota) ready records and specimen labels. After opening collBook and customizing the preferences the steps to use collBook generally follow this order:
 1. Load or transcribe field observations
@@ -31,7 +33,7 @@ collBook is designed to be used while formally identifying biological specimens,
 4. Review the label previews for record accuracy, and label preferences.
 5. Export the records using the toolbar button, producing a symbiota ready CSV file and a PDF file containing labels to print. 
 
-## Contact us
+## [Contact us](#Contact-us)
 
 For bug reports, feature requests, and suggestions you may post in the [Issues section](https://github.com/CapPow/collBook/issues), make pull requests, or contact us directly:
 
@@ -39,7 +41,7 @@ For bug reports, feature requests, and suggestions you may post in the [Issues s
 
 [Jacob Motley](https://www.linkedin.com/in/jacob-motley-b627a1152) - BS [Computer Science](https://github.com/j-h-m): Software Systems - UTC.
 
-## Credits
+## [Credits](#Credits)
 
 #### Catalog of Life
 Roskov Y., Abucay L., Orrell T., Nicolson D., Bailly N., Kirk P.M., Bourgoin T., DeWalt R.E., Decock W., De Wever A., Nieukerken E. van, Zarucchi J., Penev L., eds. (2018). Species 2000 & ITIS Catalogue of Life, 2018 Annual Checklist. Digital resource at www.catalogueoflife.org/annual-checklist/2018. Species 2000: Naturalis, Leiden, the Netherlands. ISSN 2405-884X.
