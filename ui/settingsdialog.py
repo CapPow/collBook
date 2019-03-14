@@ -219,6 +219,8 @@ class settingsWindow(QMainWindow):
         self.populateQComboBoxSettings( parent.value_Kingdom, value_Kingdom)
         value_LogoAlignment = self.get('value_LogoAlignment', 'Centered')
         self.populateQComboBoxSettings( parent.value_LogoAlignment, value_LogoAlignment)
+        value_fontName = self.get('value_value_fontName', 'Helvetica')
+        self.populateQComboBoxSettings( parent.value_fontName, value_fontName)
 
         # QLineEdit
         value_VerifiedBy = self.get('value_VerifiedBy')
@@ -316,6 +318,9 @@ class settingsWindow(QMainWindow):
         self.setValue('value_Kingdom', value_Kingdom)
         value_LogoAlignment = parent.value_LogoAlignment.currentText()
         self.setValue('value_LogoAlignment', value_LogoAlignment)
+        value_fontName = parent.value_fontName.currentText()
+        self.setValue('value_fontName', value_fontName)
+        
 
         # QLineEdit
         value_VerifiedBy = parent.value_VerifiedBy.text()

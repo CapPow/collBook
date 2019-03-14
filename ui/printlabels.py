@@ -158,6 +158,7 @@ class LabelPDF():
         self.yPaperSize = int(self.settings.get('value_Y', 90)) * mm
         self.relFont = int(self.settings.get('value_RelFont', 12))
          # TODO explore adding font options which are already bundled with reportlab
+        self.fontName = self.settings.get('value_fontName', 'Helvetica')
          
         self.allowSplitting = 0
         self.xMarginProportion = 0
@@ -582,10 +583,10 @@ class LabelPDF():
         self.yPaperSize = int(self.settings.get('value_Y', 90)) * mm
         self.customPageSize = (self.xPaperSize, self.yPaperSize)
         self.relFont = int(self.settings.get('value_RelFont', 12))
-
+        self.fontName = self.settings.get('value_fontName', 'Helvetica')
         style = ParagraphStyle(
                 name = 'test',
-                fontName='Times-Bold',
+                fontName= f'{self.fontName}-Bold',
                 fontSize= self.relFont * 1.5,
                 textColor='Grey',
                 alignment=TA_CENTER)
@@ -626,11 +627,11 @@ class LabelPDF():
         return pdfBytes
 
     def stylesheet(self, key):
-        
+        usrFont = self.fontName
         styles= {
             'default': ParagraphStyle(
                 'default',
-                fontName='Times-Roman',
+                fontName= f'{usrFont}',
                 fontSize=self.relFont,
                 leading=(self.relFont * 1.1) ,
                 leftIndent=0,
@@ -639,7 +640,7 @@ class LabelPDF():
                 alignment=TA_LEFT,
                 spaceBefore=0,
                 spaceAfter=0,
-                bulletFontName='Times-Roman',
+                bulletFontName=f'{usrFont}',
                 bulletFontSize=10,
                 bulletIndent=0,
                 backColor=None,
@@ -658,30 +659,28 @@ class LabelPDF():
         styles['title'] = ParagraphStyle(
             'title',
             parent=styles['default'],
-            fontName='Times-Bold',
+            fontName= f'{usrFont}-Bold',
             fontSize= self.relFont * 1.2,
             alignment=TA_CENTER,
         )
         styles['collectionNameSTY'] = ParagraphStyle(
             'collectionNameSTY',
             parent=styles['title'],
-            #fontName='Times',
-            fontName='Times-Bold',
-            #fontSize= self.relFont * .8,
+            fontName=f'{usrFont}-Bold',
             fontSize= self.relFont,
             alignment=TA_CENTER,
         )
         styles['labelProjectSTY'] = ParagraphStyle(
             'labelProjectSTY',
             parent=styles['title'],
-            fontName='Times-Bold',
+            fontName=f'{usrFont}-Bold',
             fontSize= self.relFont * 1.18,
             alignment=TA_CENTER,
         )
         styles['dateSTY'] = ParagraphStyle(
             'dateSTY',
             parent=styles['title'],
-            fontName='Times',
+            fontName= f'{usrFont}',
             fontSize= self.relFont * 1.18,
             alignment=TA_RIGHT,
         )
@@ -738,26 +737,26 @@ class LabelPDF():
             parent=styles['default'],
             alignment=TA_LEFT,
             spaceAfter = 1,
-            fontName='Times-Bold'
+            fontName=f'{usrFont}-Bold'
         )
         styles['prefixRightSTY'] = ParagraphStyle(
             'prefixRightSTY',
             parent=styles['default'],
             alignment=TA_RIGHT,
             spaceAfter = 1,
-            fontName='Times-Bold'
+            fontName=f'{usrFont}-Bold',
         )
         styles['countySTY'] = ParagraphStyle(
             'countySTY',
             parent=styles['default'],
             alignment=TA_CENTER,
             spaceAfter = 1,
-            fontName='Times'
+            fontName=f'{usrFont}'
         )
         styles['errorMSG'] = ParagraphStyle(
             'title',
             parent=styles['default'],
-            fontName='Times-Bold',
+            fontName=f'{usrFont}-Bold',
             fontSize= self.relFont * 1.5,
             textColor='Grey',
             alignment=TA_CENTER

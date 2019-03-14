@@ -366,7 +366,7 @@
           </widget>
           <widget class="QWidget" name="labelPrefPage">
            <layout class="QGridLayout" name="gridLayout">
-            <item row="0" column="0">
+            <item row="0" column="1">
              <widget class="QGroupBox" name="labelDimentionsGroup">
               <property name="title">
                <string>Label dimensions</string>
@@ -376,6 +376,13 @@
                 <widget class="QLabel" name="xLabel">
                  <property name="text">
                   <string>width (mm)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QLabel" name="yLabel">
+                 <property name="text">
+                  <string>height (mm)</string>
                  </property>
                 </widget>
                </item>
@@ -389,20 +396,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="3">
-                <widget class="QLabel" name="relFontLabell">
-                 <property name="text">
-                  <string>Base font size</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <widget class="QLabel" name="yLabel">
-                 <property name="text">
-                  <string>height (mm)</string>
-                 </property>
-                </widget>
-               </item>
                <item row="1" column="2">
                 <widget class="QSpinBox" name="value_Y">
                  <property name="minimum">
@@ -413,17 +406,62 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="3">
+              </layout>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QGroupBox" name="labelFontGroup">
+              <property name="title">
+               <string>Label Font</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_10">
+               <item row="1" column="1">
                 <widget class="QSpinBox" name="value_RelFont">
                  <property name="value">
                   <number>12</number>
                  </property>
                 </widget>
                </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="fontNameLabel">
+                 <property name="text">
+                  <string>Font</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="relFontLabel">
+                 <property name="text">
+                  <string>Base font size</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QComboBox" name="value_fontName">
+                 <property name="currentIndex">
+                  <number>1</number>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Courier</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Helvetica</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Times</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
-            <item row="1" column="0">
+            <item row="1" column="0" colspan="2">
              <widget class="QGroupBox" name="labelIncludeGroup">
               <property name="title">
                <string>Include on label</string>

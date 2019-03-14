@@ -28,6 +28,7 @@ class taxonomicVerification():
         # container to store this session's alignments. Addressing feedback
         # from Alaina Krakowiak concerning redundant alignment dialogs.
         # structured as: {'input sci name':('aligned sci name', 'alignedauthority')}
+        self.readTaxonomicSettings()
         self.sessionAlignments = {}
     
     def readTaxonomicSettings(self):
@@ -303,7 +304,6 @@ class taxonomicVerification():
         # TODO add an optional dialog box with a list of the top returned results. Allow user to pick from list.
         #url = f'http://tnrs.iplantc.org/tnrsm-svc/matchNames?retrieve=all&names={urlInputStr}'
         url = f'http://tnrs.iplantc.org/tnrsm-svc/matchNames?retrieve=best&names={urlInputStr}'
-        print(url)
         try:
             response = requests.get(url, timeout = timeout)
         except ReadTimeout:
