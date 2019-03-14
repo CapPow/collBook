@@ -557,22 +557,24 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 return False
             # Handle DWC formatted recordedBy ("|" seperated names)
             if 'recordedBy' in cols:
-                # expand recordedBy to newassociatedCollectors, 
-                # splitting recorded By on first '|'
-                df['newAssociatedCollectors'] = ''
-                df.update(pd.DataFrame(df['recordedBy'].str.split('|', n=1,
-                                  expand=True).values,
-                        columns=['recordedBy', 'newAssociatedCollectors']).fillna(''))
-                # clean up the | which may be left over
-                df['newAssociatedCollectors'] = df.loc[df['newAssociatedCollectors']
-                                    .str.contains('|')]['newAssociatedCollectors'].str.replace('|', ', ').str.replace('  ', ' ')
-                # combine the two fields into one
-                df['newAssociatedCollectors'] = df['associatedCollectors'].str.split(', ') + df['newAssociatedCollectors'].str.split(', ')
-                # In nearly all cases, this will preserve the name order.
-                df['associatedCollectors'] = df['newAssociatedCollectors'].apply(lambda x: ', '.join([y for y in pd.unique(x) if y != '']))
-                # drop the 'newAssociatedCollectors' col.
-                df.drop(columns=['newAssociatedCollectors'], inplace=True)
-                cols = df.columns
+                # check if it is necessary to split on "|"
+                if '|' in df['recordedBy']:
+                    # expand recordedBy to newassociatedCollectors, 
+                    # splitting recorded By on first '|'
+                    df['newAssociatedCollectors'] = ''
+                    df.update(pd.DataFrame(df['recordedBy'].str.split('|', n=1,
+                                      expand=True).values,
+                            columns=['recordedBy', 'newAssociatedCollectors']).fillna(''))
+                    # clean up the | which may be left over
+                    df['newAssociatedCollectors'] = df.loc[df['newAssociatedCollectors']
+                                        .str.contains('|')]['newAssociatedCollectors'].str.replace('|', ', ').str.replace('  ', ' ')
+                    # combine the two fields into one
+                    df['newAssociatedCollectors'] = df['associatedCollectors'].str.split(', ') + df['newAssociatedCollectors'].str.split(', ')
+                    # In nearly all cases, this will preserve the name order.
+                    df['associatedCollectors'] = df['newAssociatedCollectors'].apply(lambda x: ', '.join([y for y in pd.unique(x) if y != '']))
+                    # drop the 'newAssociatedCollectors' col.
+                    df.drop(columns=['newAssociatedCollectors'], inplace=True)
+                    cols = df.columns
 
             self.update(df)  # this function updates the visible dataframe
             self.parent.populateTreeWidget()
