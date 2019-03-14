@@ -4,19 +4,36 @@ collBook, is the desktop counterpart for the mobile app [collNote](https://githu
 
 ## Development Stage
 
-collBook is in an early testing stage. Unexpected crashes are expected to be frequent, so please take caution with your data and work on copies. Pull requests are welcomed!
+collBook is in an early testing stage. Unexpected crashes are expected to be frequent, so **please take caution with your data and work on copies.** Pull requests are welcomed!
 
 #### Known bugs
 - Preview window zoom is not properly updated at start up. For now, altering the zoom after start up solves this.
 
-## Email Us with Suggestions or Issues!
+## Installation
 
-plantdigitizationprojectutc@gmail.com
+- Windows and Mac binaries are available under [releases](https://github.com/CapPow/collBook/releases). Be sure you unzip the folder before running the program. 
 
-## In leiu of proper documentation, here is a slideshow:
-https://docs.google.com/presentation/d/1nAT_hqp6Nm3DC7_e7dxPvbbaXLJTOYzcXJ5dSW2nkHk/edit?usp=sharing
+If you are interested in running, or building collBook from source you will need to place a Google geocoding API key in a simple textfile named "key.txt". To install the python dependencies, you can use "pip3 install -r requirements.txt." If you're interested in using pyinstaller, there are reference ".spec" files for Mac and Windows in the doc folder.
+
+## Usage
+
+collBook is designed to be used while formally identifying biological specimens, producing [symbiota](https://github.com/Symbiota/Symbiota) ready records and specimen labels. After opening collBook and customizing the preferences the steps to use collBook generally follow this order:
+1. Load or transcribe field observations
+    - Data collected in [collNotes](https://github.com/j-h-m/collNotes) can be loaded from the toolbar.
+    - Field notes gathered in [iNaturalist](https://www.inaturalist.org/) or [ColectoR](http://camayal.info/colector.htm) may be loaded using the toolbar and an import dialog box to designate or generate site and specimen index fields.
+    - Field notes gathered using traditional field journals may be directly transcribed into a new, empty, record list created using the toolbar.
+2. Assign an identification for each record.
+3. Refine the records using the toolbar button. The records to be refined are selected by the site navigation tree. Refinement steps are mostly automated and will occur in this order: 
+    - Taxonomic verification, to verify name status and fill in blank or incorrect authorities.
+    - Reverse geolocation, to populate location data from GPS coordinates and improve locality by prepending country, state, county, municipality and when relevant park name and nearest road or trail name.
+    - Associated taxa assignment, to assemble a list of taxa identified from the same site.
+    - Catalog number assignment and barcode generation, when opted for in preferences.
+4. Review the label previews for record accuracy, and label preferences.
+5. Export the records using the toolbar button, producing a symbiota ready CSV file and a PDF file containing labels to print. 
 
 ## Contact us
+
+For bug reports, feature requests, and suggestions you may post in the [Issues section](https://github.com/CapPow/collBook/issues), make pull requests, or contact us directly:
 
 [Caleb Powell](https://github.com/CapPow) - BS Environmental Science, [Graduate Student - UTC](https://www.utc.edu/biology-geology-environmental-science/profiles/graduate-students/qvd441.php).
 
