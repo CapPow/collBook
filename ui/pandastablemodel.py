@@ -496,90 +496,98 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Open CSV",
                                                             QtCore.QDir.homePath(), "CSV (*.csv)")
         if fileName:  # if a csv was selected, start loading the data.
-            df = pd.read_csv(fileName, encoding = 'utf-8',keep_default_na=False, dtype=str)
-            df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1) # drop any "unnamed" cols
-            # check if input is an iNaturalist export
             try:
-                # if so, parse those cols.
-                if df['url'].str.lower().str.contains('inaturalist.org').any():
-                    df = self.convertiNatFormat(df)
-            except KeyError:
-                # probably not an iNaturalist export.
-                pass
-            cols = df.columns
-            # a list of cols which indicates the data may be from CollectR
-            colectoRCols = ['Collector', 'Additional collectors',
-                             'Number', 'Infracategory', 'Herbarium Acronym',
-                             'Complete Herb. Name 1', 'Complete Herb. Name 2',
-                             'Project']
-            # check if input is a CollectoR export.
-            if all(x in cols for x in colectoRCols):
-                # if so, parse those cols.
-                df = self.convertColectoRFormat(df)
+                df = pd.read_csv(fileName, encoding = 'utf-8',keep_default_na=False, dtype=str)
+                df = df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1) # drop any "unnamed" cols
+                # check if input is an iNaturalist export
+                try:
+                    # if so, parse those cols.
+                    if df['url'].str.lower().str.contains('inaturalist.org').any():
+                        df = self.convertiNatFormat(df)
+                except KeyError:
+                    # probably not an iNaturalist export.
+                    pass
                 cols = df.columns
-            # backwards compatability, following change in index field
-            if ('otherCatalogNumbers' in cols) & ('recordNumber' not in cols):
-                df['recordNumber'] = df['otherCatalogNumbers']
-                cols = df.columns
-            # check if the indices need manually assigned (with user dialog)
-            wasAssigned = False  # store if assignments were made.
-            if not all(x in cols for x in ['siteNumber', 'specimenNumber']):
-                if 'recordNumber' not in cols:
-                    assignedDF, dialogStatus = self.getIndexAssignments(df)
-                # if the accept button (titled 'Assign') was pressed, assign df
-                    if dialogStatus == QDialog.Accepted:
-                        df = assignedDF
-                        cols = df.columns
-                        wasAssigned = True
-                    else:
-                        return False
-            if 'siteNumber' not in cols:  # if the siteNumber does not exist
-                df = self.inferSiteSpecimenNumbers(df)  # attempt to infer them
-                cols = df.columns
-            if 'recordNumber' not in cols:
-                df = df.apply(self.inferrecordNumber, axis=1)
-                cols = df.columns
-            if 'catalogNumber' not in cols:
-                df['catalogNumber'] = ''
-            #  be sure all cols exist which will later be assumed present.
-            df = self.verifyRequiredColsExist(df)
-            #  verify sites have a site record, where specimenNumber=='#'
-            df = self.verifySiteRecordsExist(df)
-            df.fillna('', inplace=True)
-            df = self.sortDF(df)  # returns False given an error
-            if df is False:
-                if wasAssigned:  # if assignments were made, alter error text.
-                    text = 'Cannot load records, check your index assignments.'
-                else:
-                    text = 'Cannot load records.'
-                title = 'Error loading records.'
-                self.parent.userNotice(text, title)
-                return False
-            # Handle DWC formatted recordedBy ("|" seperated names)
-            if 'recordedBy' in cols:
-                # check if it is necessary to split on "|"
-                if '|' in df['recordedBy']:
-                    # expand recordedBy to newassociatedCollectors, 
-                    # splitting recorded By on first '|'
-                    df['newAssociatedCollectors'] = ''
-                    df.update(pd.DataFrame(df['recordedBy'].str.split('|', n=1,
-                                      expand=True).values,
-                            columns=['recordedBy', 'newAssociatedCollectors']).fillna(''))
-                    # clean up the | which may be left over
-                    df['newAssociatedCollectors'] = df.loc[df['newAssociatedCollectors']
-                                        .str.contains('|')]['newAssociatedCollectors'].str.replace('|', ', ').str.replace('  ', ' ')
-                    # combine the two fields into one
-                    df['newAssociatedCollectors'] = df['associatedCollectors'].str.split(', ') + df['newAssociatedCollectors'].str.split(', ')
-                    # In nearly all cases, this will preserve the name order.
-                    df['associatedCollectors'] = df['newAssociatedCollectors'].apply(lambda x: ', '.join([y for y in pd.unique(x) if y != '']))
-                    # drop the 'newAssociatedCollectors' col.
-                    df.drop(columns=['newAssociatedCollectors'], inplace=True)
+                # a list of cols which indicates the data may be from CollectR
+                colectoRCols = ['Collector', 'Additional collectors',
+                                 'Number', 'Infracategory', 'Herbarium Acronym',
+                                 'Complete Herb. Name 1', 'Complete Herb. Name 2',
+                                 'Project']
+                # check if input is a CollectoR export.
+                if all(x in cols for x in colectoRCols):
+                    # if so, parse those cols.
+                    df = self.convertColectoRFormat(df)
                     cols = df.columns
-
-            self.update(df)  # this function updates the visible dataframe
-            self.parent.populateTreeWidget()
-            self.parent.form_view.fillFormFields()
-            return True
+                # backwards compatability, following change in index field
+                if ('otherCatalogNumbers' in cols) & ('recordNumber' not in cols):
+                    df['recordNumber'] = df['otherCatalogNumbers']
+                    cols = df.columns
+                # check if the indices need manually assigned (with user dialog)
+                wasAssigned = False  # store if assignments were made.
+                if not all(x in cols for x in ['siteNumber', 'specimenNumber']):
+                    if 'recordNumber' not in cols:
+                        assignedDF, dialogStatus = self.getIndexAssignments(df)
+                    # if the accept button (titled 'Assign') was pressed, assign df
+                        if dialogStatus == QDialog.Accepted:
+                            df = assignedDF
+                            cols = df.columns
+                            wasAssigned = True
+                        else:
+                            return False
+                if 'siteNumber' not in cols:  # if the siteNumber does not exist
+                    df = self.inferSiteSpecimenNumbers(df)  # attempt to infer them
+                    cols = df.columns
+                if 'recordNumber' not in cols:
+                    df = df.apply(self.inferrecordNumber, axis=1)
+                    cols = df.columns
+                if 'catalogNumber' not in cols:
+                    df['catalogNumber'] = ''
+                #  be sure all cols exist which will later be assumed present.
+                df = self.verifyRequiredColsExist(df)
+                #  verify sites have a site record, where specimenNumber=='#'
+                df = self.verifySiteRecordsExist(df)
+                df.fillna('', inplace=True)
+                df = self.sortDF(df)  # returns False given an error
+                if df is False:
+                    if wasAssigned:  # if assignments were made, alter error text.
+                        text = 'Cannot load records, check your index assignments.'
+                    else:
+                        text = 'Cannot load records.'
+                    title = 'Error loading records'
+                    self.parent.userNotice(text, title, inclHalt=False)
+                    return False
+                # Handle DWC formatted recordedBy ("|" seperated names)
+                if 'recordedBy' in cols:
+                    # check if it is necessary to split on "|"
+                    if '|' in df['recordedBy']:
+                        # expand recordedBy to newassociatedCollectors, 
+                        # splitting recorded By on first '|'
+                        df['newAssociatedCollectors'] = ''
+                        df.update(pd.DataFrame(df['recordedBy'].str.split('|', n=1,
+                                          expand=True).values,
+                                columns=['recordedBy', 'newAssociatedCollectors']).fillna(''))
+                        # clean up the | which may be left over
+                        df['newAssociatedCollectors'] = df.loc[df['newAssociatedCollectors']
+                                            .str.contains('|')]['newAssociatedCollectors'].str.replace('|', ', ').str.replace('  ', ' ')
+                        # combine the two fields into one
+                        df['newAssociatedCollectors'] = df['associatedCollectors'].str.split(', ') + df['newAssociatedCollectors'].str.split(', ')
+                        # In nearly all cases, this will preserve the name order.
+                        df['associatedCollectors'] = df['newAssociatedCollectors'].apply(lambda x: ', '.join([y for y in pd.unique(x) if y != '']))
+                        # drop the 'newAssociatedCollectors' col.
+                        df.drop(columns=['newAssociatedCollectors'], inplace=True)
+                        cols = df.columns
+    
+                self.update(df)  # this function updates the visible dataframe
+                self.parent.populateTreeWidget()
+                self.parent.form_view.fillFormFields()
+                return True
+            # generalized exception, may be risky but is broad.
+            except Exception as e:
+                title =  'Error loading records'
+                text = '     Failed to load the selected records.     '
+                details = f'{e}'
+                self.parent.userNotice(text, title=title,detailText=details,
+                                       inclHalt=False)
 
     def save_CSV(self, fileName=False, df=None):
         """ is triggered by the export records action"""
@@ -613,7 +621,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 return True
             else:
                 return False
-                
 
     def export_CSV(self, fileName=None, df=None):
         """ is triggered by the export records action"""
