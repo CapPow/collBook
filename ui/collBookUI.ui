@@ -49,7 +49,7 @@
            <string notr="true">font: 12pt &quot;Cantarell&quot;;</string>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="StackedWidgetPage1">
            <property name="sizePolicy">
@@ -1013,6 +1013,12 @@
            </layout>
           </widget>
           <widget class="QWidget" name="StackedWidgetPage3">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <property name="spacing">
              <number>0</number>
