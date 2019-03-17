@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>940</width>
-    <height>666</height>
+    <width>989</width>
+    <height>710</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1083,7 +1083,7 @@
             <item>
              <widget class="QGroupBox" name="groupBox_specimen">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -1603,7 +1603,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>940</width>
+     <width>989</width>
      <height>22</height>
     </rect>
    </property>
