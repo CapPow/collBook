@@ -559,7 +559,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 # Handle DWC formatted recordedBy ("|" seperated names)
                 if 'recordedBy' in cols:
                     # check if it is necessary to split on "|"
-                    if '|' in df['recordedBy']:
+                    if df['recordedBy'].str.contains('|').any():
                         # expand recordedBy to newassociatedCollectors, 
                         # splitting recorded By on first '|'
                         df['newAssociatedCollectors'] = ''
