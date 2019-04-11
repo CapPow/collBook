@@ -394,6 +394,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         waitingForUser = QtCore.QEventLoop()
         self.parent.associatedTaxaWindow.associatedMainWin.button_save.clicked.connect(waitingForUser.quit)
         self.parent.associatedTaxaWindow.associatedMainWin.button_cancel.clicked.connect(waitingForUser.quit)
+        # update associatedTaxa options before calling the input window.
+        self.parent.associatedTaxaWindow.populateAssociatedTaxa()
         self.parent.toggleAssociated() # call user input window and wait
         waitingForUser.exec_()
 
