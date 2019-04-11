@@ -18,6 +18,7 @@ from ui.settingsUI import Ui_settingsWindow
 class settingsWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
         self.init_ui(parent)
            
     def init_ui(self, parent):
