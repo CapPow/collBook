@@ -197,6 +197,8 @@ class formView(QtWidgets.QStackedWidget):
         if obj in ['cultivated', True, 1]:
             value = "cultivated"
             self.saveChanges(colName, value)
+        else:
+            self.saveChanges(colName,'')
 
     def read_QPlainTextEdit(self, obj, value):
         obj.setPlainText(value)
