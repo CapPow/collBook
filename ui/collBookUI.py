@@ -2,16 +2,17 @@
 
 # Form implementation generated from reading ui file 'ui/collBookUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.12
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(940, 666)
+        MainWindow.resize(989, 710)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -524,7 +525,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_10.addWidget(self.pushButton_deleteRecord)
         self.verticalLayout_4.addLayout(self.horizontalLayout_10)
         self.groupBox_specimen = QtWidgets.QGroupBox(self.StackedWidgetPage3)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_specimen.sizePolicy().hasHeightForWidth())
@@ -634,7 +635,9 @@ class Ui_MainWindow(object):
         self.label_individualCount.setObjectName("label_individualCount")
         self.horizontalLayout_5.addWidget(self.label_individualCount, 0, QtCore.Qt.AlignRight)
         self.spinBox_individualCount = QtWidgets.QSpinBox(self.groupBox_specimen)
-        self.spinBox_individualCount.setMaximum(99999)
+        self.spinBox_individualCount.setInputMethodHints(QtCore.Qt.ImhDigitsOnly)
+        self.spinBox_individualCount.setCorrectionMode(QtWidgets.QAbstractSpinBox.CorrectToNearestValue)
+        self.spinBox_individualCount.setMaximum(999999999)
         self.spinBox_individualCount.setProperty("value", 0)
         self.spinBox_individualCount.setObjectName("spinBox_individualCount")
         self.horizontalLayout_5.addWidget(self.spinBox_individualCount)
@@ -750,7 +753,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.lower_horizontalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 940, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 989, 22))
         self.menubar.setObjectName("menubar")
         self.menu_File = QtWidgets.QMenu(self.menubar)
         self.menu_File.setObjectName("menu_File")
@@ -990,6 +993,7 @@ class Ui_MainWindow(object):
         self.comboBox_reproductiveCondition.setItemText(6, _translate("MainWindow", "    Fruit / seed bearing"))
         self.comboBox_reproductiveCondition.setItemText(7, _translate("MainWindow", "N/A"))
         self.label_individualCount.setText(_translate("MainWindow", "Est. Qty"))
+        self.spinBox_individualCount.setSpecialValueText(_translate("MainWindow", "N/A"))
         self.checkBox_establishmentMeans.setText(_translate("MainWindow", "Cultivated"))
         self.label_identificationRemarks.setText(_translate("MainWindow", "Identification Remarks"))
         self.label_identificationReferences.setText(_translate("MainWindow", "Identification References "))
@@ -1028,6 +1032,7 @@ class Ui_MainWindow(object):
         self.action_Verify_All.setToolTip(_translate("MainWindow", "Refine All Selected Records"))
         self.action_Export_Records.setText(_translate("MainWindow", "&Export Records"))
         self.action_Export_Records.setToolTip(_translate("MainWindow", "Export your records for database upload and label printing"))
+
 
 from ui.formview import formView
 from ui.pdfviewer import PDFViewer

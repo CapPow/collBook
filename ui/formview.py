@@ -181,6 +181,8 @@ class formView(QtWidgets.QStackedWidget):
         sender = self.sender()
         colName = sender.colName
         value = str(obj)
+        if value == '0':
+            value = ''    
         self.saveChanges(colName, value)
 
     def read_establishmentMeans(self, obj, value):
