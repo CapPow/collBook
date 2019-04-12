@@ -171,6 +171,7 @@ class MyWindow(QMainWindow):
         else:
             self.associatedTaxaWindow.associatedList.clear()
             self.associatedTaxaWindow.close()
+
     def getTreeSelectionType(self):
         """ checks the tree_widget's type of selection """
         # TODO alter selType to become a custom attribute of mainWindow, setting it upon changes. This should reduce checks with this function

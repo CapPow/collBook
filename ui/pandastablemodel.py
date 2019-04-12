@@ -114,9 +114,12 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         self.addToUndoList(f'added site {newSiteNum}')  # set checkpoint in undostack
         rowData = {'recordNumber':f'{newSiteNum}-#', 
                    'siteNumber':f'{newSiteNum}',
-                   'specimenNumber':'#'}
+                   'specimenNumber':'#',
+                   'associatedTaxa':''}
         defVals = self.parent.form_view.readDefaultNewSiteFields()
         rowData.update(defVals)
+        # be sure to clear associatedTaxa
+        # TODO determine why it otherwise copies associatedTaxa from other site 
         df = df.append(rowData,  ignore_index=True, sort=False)
         df.fillna('', inplace = True)
         self.update(df)
@@ -130,8 +133,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         selType, siteNum, specimenNum = self.parent.getTreeSelectionType()
         if selType in ['site','specimen']:
             try:  # try to make the new row data
-                spNums = df[(df['siteNumber'] == siteNum) &
-                            (df['specimenNumber'] != '#')]['specimenNumber']
+                spNums = df[df['specimenNumber'] != '#']['specimenNumber']
                 newSpNum = max(pd.to_numeric(spNums, errors='coerce')) + 1
             except ValueError:
                 newSpNum = 1
@@ -157,8 +159,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         if selType == 'specimen':
             self.addToUndoList(f'duplicated specimen {siteNum}-{specimenNum}')  # set checkpoint in undostack
             try:  # try to make the new row data
-                spNums = df[(df['siteNumber'] == siteNum) &
-                            (df['specimenNumber'] != '#')]['specimenNumber']
+                spNums = df[df['specimenNumber'] != '#']['specimenNumber']
                 newSpNum = max(pd.to_numeric(spNums, errors='coerce')) + 1
             except ValueError:
                 newSpNum = 2
@@ -775,10 +776,13 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def sortDF(self, df):
         """ accepts a dataframe and returns it sorted in an ideal manner. 
         Expects the dataframe to have siteNumber and specimenNumber columns """
-
+        # first try and organize 2 temporary "sort on" columns
         try:
             df['sortSpecimen'] = df['specimenNumber'].str.replace('#','0').astype(int)
             df['sortSite'] = df['siteNumber'].str.replace('','0').astype(int)
+            # fill any nans with 0s before sorting on these cols
+            fillValues = {'sortSpecimen': 0, 'sortSite': 0}
+            df = df.fillna(value=fillValues)            
         except:
             return False
         df.sort_values(by=['sortSite', 'sortSpecimen'], inplace=True, ascending=True)
