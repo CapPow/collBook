@@ -46,7 +46,7 @@ class formView(QtWidgets.QStackedWidget):
                 'associatedCollectors': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_associatedCollectors),
                 'associatedTaxa': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_associatedTaxa),
                 'habitat': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_habitat),
-                'locationNotes': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_locationNotes),
+                'locationRemarks': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_locationRemarks),
                 'decimalLatitude': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_decimalLatitude),
                 'decimalLongitude': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_decimalLongitude),
                 'coordinateUncertaintyInMeters': (self.read_QLineEdit, self.save_QLineEdit, self.parent.lineEdit_coordinateUncertaintyInMeters),

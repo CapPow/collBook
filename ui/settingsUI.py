@@ -2,16 +2,17 @@
 
 # Form implementation generated from reading ui file 'ui/settingsUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_settingsWindow(object):
     def setupUi(self, settingsWindow):
         settingsWindow.setObjectName("settingsWindow")
-        settingsWindow.resize(780, 637)
+        settingsWindow.resize(780, 645)
         settingsWindow.setMinimumSize(QtCore.QSize(0, 0))
         settingsWindow.setStyleSheet("font: 12pt \"Cantarell\";")
         self.centralwidget = QtWidgets.QWidget(settingsWindow)
@@ -414,6 +415,7 @@ class Ui_settingsWindow(object):
         self.gridLayout_3.addWidget(self.groupBox, 1, 0, 1, 1)
         self.settingsPage.addWidget(self.TaxPrefPage)
         self.upperHorizontalLayout.addWidget(self.settingsPage)
+        self.upperHorizontalLayout.setStretch(1, 4)
         self.verticalLayout.addLayout(self.upperHorizontalLayout)
         self.lowerHorizontalLayout = QtWidgets.QHBoxLayout()
         self.lowerHorizontalLayout.setObjectName("lowerHorizontalLayout")
@@ -537,5 +539,6 @@ class Ui_settingsWindow(object):
         self.label.setText(_translate("settingsWindow", "scoreThreshold"))
         self.button_Cancel.setText(_translate("settingsWindow", "Cancel"))
         self.button_SaveExit.setText(_translate("settingsWindow", "Save and exit"))
+
 
 import Resources_rc

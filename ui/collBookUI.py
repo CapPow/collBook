@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/collBookUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -441,9 +441,9 @@ class Ui_MainWindow(object):
         self.label_locationNotes = QtWidgets.QLabel(self.groupBox)
         self.label_locationNotes.setObjectName("label_locationNotes")
         self.horizontalLayout_8.addWidget(self.label_locationNotes, 0, QtCore.Qt.AlignRight)
-        self.lineEdit_locationNotes = QtWidgets.QLineEdit(self.groupBox)
-        self.lineEdit_locationNotes.setObjectName("lineEdit_locationNotes")
-        self.horizontalLayout_8.addWidget(self.lineEdit_locationNotes)
+        self.lineEdit_locationRemarks = QtWidgets.QLineEdit(self.groupBox)
+        self.lineEdit_locationRemarks.setObjectName("lineEdit_locationRemarks")
+        self.horizontalLayout_8.addWidget(self.lineEdit_locationRemarks)
         self.gridLayout_3.addLayout(self.horizontalLayout_8, 1, 0, 1, 2)
         self.label_county = QtWidgets.QLabel(self.groupBox)
         self.label_county.setObjectName("label_county")
@@ -710,7 +710,7 @@ class Ui_MainWindow(object):
         self.lower_horizontalLayout = QtWidgets.QHBoxLayout()
         self.lower_horizontalLayout.setObjectName("lower_horizontalLayout")
         self.tree_widget = QtWidgets.QTreeWidget(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tree_widget.sizePolicy().hasHeightForWidth())
@@ -750,6 +750,7 @@ class Ui_MainWindow(object):
         self.table_view.verticalHeader().setCascadingSectionResizes(False)
         self.table_view.verticalHeader().setSortIndicatorShown(False)
         self.lower_horizontalLayout.addWidget(self.table_view)
+        self.lower_horizontalLayout.setStretch(1, 4)
         self.verticalLayout.addLayout(self.lower_horizontalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -860,7 +861,7 @@ class Ui_MainWindow(object):
         self.right_toolBar.addAction(self.action_Exit)
         self.label_associatedTaxa.setBuddy(self.button_associatedTaxa)
         self.label_habitat.setBuddy(self.lineEdit_habitat)
-        self.label_locationNotes.setBuddy(self.lineEdit_locationNotes)
+        self.label_locationNotes.setBuddy(self.lineEdit_locationRemarks)
 
         self.retranslateUi(MainWindow)
         self.formView.setCurrentIndex(2)
@@ -883,8 +884,8 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.lineEdit_associatedCollectors, self.button_associatedTaxa)
         MainWindow.setTabOrder(self.button_associatedTaxa, self.lineEdit_associatedTaxa)
         MainWindow.setTabOrder(self.lineEdit_associatedTaxa, self.lineEdit_habitat)
-        MainWindow.setTabOrder(self.lineEdit_habitat, self.lineEdit_locationNotes)
-        MainWindow.setTabOrder(self.lineEdit_locationNotes, self.toolButton_reverseGeolocate)
+        MainWindow.setTabOrder(self.lineEdit_habitat, self.lineEdit_locationRemarks)
+        MainWindow.setTabOrder(self.lineEdit_locationRemarks, self.toolButton_reverseGeolocate)
         MainWindow.setTabOrder(self.toolButton_reverseGeolocate, self.plainTextEdit_locality)
         MainWindow.setTabOrder(self.plainTextEdit_locality, self.lineEdit_decimalLatitude)
         MainWindow.setTabOrder(self.lineEdit_decimalLatitude, self.lineEdit_decimalLongitude)
@@ -966,7 +967,7 @@ class Ui_MainWindow(object):
         self.toolButton_reverseGeolocate.setText(_translate("MainWindow", "..."))
         self.label_path.setText(_translate("MainWindow", "Path (road or trail name)"))
         self.label_habitat.setText(_translate("MainWindow", "Habitat"))
-        self.label_locationNotes.setText(_translate("MainWindow", "Location Notes"))
+        self.label_locationNotes.setText(_translate("MainWindow", "Location Remarks"))
         self.label_county.setText(_translate("MainWindow", "County"))
         self.label_municipality.setText(_translate("MainWindow", "Municipality"))
         self.label_latitude.setText(_translate("MainWindow", "Latitude (decimal deg)"))
@@ -982,7 +983,7 @@ class Ui_MainWindow(object):
         self.label_sciName.setText(_translate("MainWindow", "Scientific Name"))
         self.toolButton_verifyTaxonomy.setText(_translate("MainWindow", "..."))
         self.label_sciNameAuthority.setText(_translate("MainWindow", "Authority"))
-        self.occurrenceRemarksLabel.setText(_translate("MainWindow", "Occurrence Remarks"))
+        self.occurrenceRemarksLabel.setText(_translate("MainWindow", "Occurrence Remarks "))
         self.label_substrate.setText(_translate("MainWindow", "Substrate"))
         self.label_reproductiveCondition.setText(_translate("MainWindow", "Reproductive Condition"))
         self.comboBox_reproductiveCondition.setItemText(1, _translate("MainWindow", "Vegetative"))

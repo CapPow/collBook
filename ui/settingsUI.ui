@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>780</width>
-    <height>637</height>
+    <height>645</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -42,7 +42,7 @@
        <number>2</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="upperHorizontalLayout">
+       <layout class="QHBoxLayout" name="upperHorizontalLayout" stretch="0,4">
         <item>
          <widget class="QListWidget" name="page_Display">
           <property name="sizePolicy">
