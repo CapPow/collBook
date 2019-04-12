@@ -53,12 +53,15 @@ class taxonomicVerification():
         except AttributeError:  # load the local reference
             self.value_Kingdom = current_value_Kingdom
             if '(local)' in self.TaxAlignSource:       
-                from io import StringIO
-                stream = QFile(f':/rc_/{self.value_Kingdom}_Reference.csv')
-                if stream.open(QFile.ReadOnly):
-                    df = StringIO(str(stream.readAll(), 'utf-8'))
-                    stream.close()
-                self.local_Reference = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
+                self.loadLocalRef()
+
+    def loadLocalRef(self):
+        from io import StringIO
+        stream = QFile(f':/rc_/{self.value_Kingdom}_Reference.csv')
+        if stream.open(QFile.ReadOnly):
+            df = StringIO(str(stream.readAll(), 'utf-8'))
+            stream.close()
+            self.local_Reference = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
 
     def retrieveAlignment(self, querySciName, retrieveAuth=False):
         """ parses the settings for the proper alignment policy.
@@ -191,9 +194,14 @@ class taxonomicVerification():
 
     def getITISLocal(self, inputStr, retrieveAuth=False):
         """ uses local itis reference csv to attempt alignments """
-        df = self.local_Reference
+        try:
+            df = self.local_Reference
+        except AttributeError:
+            self.loadLocalRef()
+            df = self.local_Reference
+
         result = (None, None)
-        
+
         if retrieveAuth:
             acceptedRow = df[df['normalized_name'] == inputStr]
         else:
@@ -221,7 +229,12 @@ class taxonomicVerification():
         
     def getMycoBankLocal(self, inputStr, retrieveAuth=False):
         """ uses local reference csv to attempt alignments """
-        df = self.local_Reference
+        try:
+            df = self.local_Reference
+        except AttributeError:
+            self.loadLocalRef()
+            df = self.local_Reference
+
         result = (None, None)
         
         if retrieveAuth:
