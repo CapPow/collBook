@@ -180,17 +180,17 @@ class LabelPDF():
         # setting these now, to avoid redundant .get calls.
         incAssociated = self.settings.get('value_inc_Associated')
         maxAssociated = int(self.settings.get('value_max_Associated'))
-        if not incAssociated:
-            additionalData['associatedTaxa'] = ''
         for rowData in labelDataInput:
-           if incAssociated:
+            if incAssociated:
                 associatedTaxa = rowData['associatedTaxa']
                 associatedTaxaItems = associatedTaxa.split(', ')
                 if len(associatedTaxaItems) > maxAssociated: #if it is too large, trunicate it, and append "..." to indicate trunication.
                     associatedTaxa =  ', '.join(associatedTaxaItems[:maxAssociated])+' ...'
                     rowData['associatedTaxa'] = associatedTaxa
-                for key, value in additionalData.items():
-                    rowData[key] = value
+            else:
+                rowData['associatedTaxa'] = ''
+            for key, value in additionalData.items():
+                rowData[key] = value
 
         tableSty = [                                    #Default table style
                 ('LEFTPADDING',(0,0),(-1,-1), 0),

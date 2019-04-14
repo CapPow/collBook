@@ -111,12 +111,9 @@ class formView(QtWidgets.QStackedWidget):
             for colName, val in self.formFields.items():
                 readFunc, _, qtObject = val  # break out the value tuple
                 value = rowData.get(colName, '')
-                if colName == 'associatedTaxa':  # don't block signals for associatedTaxa
-                    readFunc(qtObject, value)
-                else:  # blocking signals on populate reduces unnecessary work
-                    qtObject.blockSignals(True)  # Pause data changed signals
-                    readFunc(qtObject, value)
-                    qtObject.blockSignals(False)  # Resume data changed signals
+                qtObject.blockSignals(True)  # Pause data changed signals
+                readFunc(qtObject, value)
+                qtObject.blockSignals(False)  # Resume data changed signals
 
     def saveChanges(self, colName, value, selectSites = False):
         """ Actualy stores the changes. Called by the other save_xxx funcs."""
