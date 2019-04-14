@@ -4,7 +4,7 @@
 <img src="ui/resources/logo-collbook/horizontal.png" width=40%>
 </h1>
 
-collBook, is the desktop counterpart for the mobile app [collNote](https://github.com/j-h-m/collNotes). Combined they are a field-to-database solution designed for field biologists to gather and format “born digital” field notes into database ready formats. A mobile application, collNote is being developed for Android and iOS devices to gather Darwin Core formatted field notes. A desktop application, collBook is being developed for Linux, OS X, and Windows to refine those field notes into portal ready Darwin Core files and specimen labels. Field note refinements include: reverse geocoding localities, taxonomic alignments, and creation of customizable labels which can optionally include catalog number barcodes.
+collBook, is the desktop counterpart for the mobile app [collNotes](https://github.com/j-h-m/collNotes). Combined they are a field-to-database solution designed for field biologists to gather and format “born digital” field notes into database ready formats. A mobile application, collNote is being developed for Android and iOS devices to gather Darwin Core formatted field notes. A desktop application, collBook is being developed for Linux, OS X, and Windows to refine those field notes into portal ready Darwin Core files and specimen labels. Field note refinements include: reverse geocoding localities, taxonomic alignments, and creation of customizable labels which can optionally include catalog number barcodes.
 
 ## [Development stage](#Development-stage)
 
