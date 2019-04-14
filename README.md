@@ -56,6 +56,9 @@ Icons used in collBook are provided by [Feather Icons](https://github.com/feathe
 #### ITIS
 the Integrated Taxonomic Information System (ITIS) (http://www.itis.gov).
 
+#### Logo
+[Project Logos](https://github.com/CapPow/collBook/tree/master/ui/resources/logo-collbook) for [collNotes](https://github.com/j-h-m/collNotes) and [collBook](https://github.com/CapPow/collBook) were designed by [Zularizal](https://github.com/zularizal). You can learn more about the design [here](https://steemit.com/utopian-io/@zularizal/logo-for-collbook-and-collnotes).
+
 #### Mycobank
 Vincent Robert, Duong Vu, Ammar Ben Hadj Amor, Nathalie van de Wiele, Carlo Brouwer, Bernard Jabas, Szaniszlo Szoke, Ahmed Dridi, Maher Triki, Samy ben Daoud, Oussema Chouchen, Lea Vaas, Arthur de Cock, Joost A. Stalpers, Dora Stalpers, Gerard J.M. Verkley, Marizeth Groenewald, Felipe Borges dos Santos, Gerrit Stegehuis, Wei Li, Linhuan Wu, Run Zhang, Juncai Ma, Miaomiao Zhou, Sergio Pérez Gorjón, Lily Eurwilaichitr, Supawadee Ingsriswang, Karen Hansen, Conrad Schoch, Barbara Robbertse, Laszlo Irinyi, Wieland Meyer, Gianluigi Cardinali, David L. Hawksworth, John W. Taylor, and Pedro W. Crous. 2013. MycoBank gearing up for new horizons. IMA Fungus · volume 4 · no 2: 371–379 
 
