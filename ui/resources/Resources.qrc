@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="rc_">
+    <file>logo-collbook/horizontal.png</file>
+    <file>logo-collbook/logomark.png</file>
+    <file>logo-collbook/vertical.png</file>
     <file>map.svg</file>
     <file>search.svg</file>
     <file>zoom-in.svg</file>
