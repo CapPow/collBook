@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_settingsWindow(object):
     def setupUi(self, settingsWindow):
         settingsWindow.setObjectName("settingsWindow")
-        settingsWindow.resize(761, 645)
+        settingsWindow.resize(911, 645)
         settingsWindow.setMinimumSize(QtCore.QSize(0, 0))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/rc_/logo-collbook/logomark.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -420,7 +420,6 @@ class Ui_settingsWindow(object):
         self.gridLayout_3.addWidget(self.groupBox, 1, 0, 1, 1)
         self.settingsPage.addWidget(self.TaxPrefPage)
         self.upperHorizontalLayout.addWidget(self.settingsPage)
-        self.upperHorizontalLayout.setStretch(1, 4)
         self.verticalLayout.addLayout(self.upperHorizontalLayout)
         self.lowerHorizontalLayout = QtWidgets.QHBoxLayout()
         self.lowerHorizontalLayout.setObjectName("lowerHorizontalLayout")
@@ -438,7 +437,7 @@ class Ui_settingsWindow(object):
         self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
         settingsWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(settingsWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 761, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 911, 26))
         self.menubar.setDefaultUp(False)
         self.menubar.setObjectName("menubar")
         settingsWindow.setMenuBar(self.menubar)

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>761</width>
+    <width>911</width>
     <height>645</height>
    </rect>
   </property>
@@ -46,7 +46,7 @@
        <number>2</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="upperHorizontalLayout" stretch="0,4">
+       <layout class="QHBoxLayout" name="upperHorizontalLayout" stretch="0,0">
         <item>
          <widget class="QListWidget" name="page_Display">
           <property name="sizePolicy">
@@ -956,7 +956,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>761</width>
+     <width>911</width>
      <height>26</height>
     </rect>
    </property>
