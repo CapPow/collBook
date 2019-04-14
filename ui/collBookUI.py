@@ -727,6 +727,7 @@ class Ui_MainWindow(object):
         self.tree_widget.setStyleSheet("font: 12pt \"Cantarell\";")
         self.tree_widget.setFrameShape(QtWidgets.QFrame.Panel)
         self.tree_widget.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.tree_widget.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
         self.tree_widget.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.SelectedClicked)
         self.tree_widget.setProperty("showDropIndicator", False)
         self.tree_widget.setAlternatingRowColors(True)
