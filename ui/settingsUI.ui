@@ -46,11 +46,11 @@
        <number>2</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="upperHorizontalLayout" stretch="0,0">
+       <layout class="QHBoxLayout" name="upperHorizontalLayout" stretch="0,4">
         <item>
          <widget class="QListWidget" name="page_Display">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -59,7 +59,7 @@
            <number>1</number>
           </property>
           <property name="sizeAdjustPolicy">
-           <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+           <enum>QAbstractScrollArea::AdjustToContents</enum>
           </property>
           <property name="resizeMode">
            <enum>QListView::Adjust</enum>
