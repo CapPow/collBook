@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['collBook.py'],
-             pathex=['/Users/jacob/Documents/Projects/pdDesk'],
+             pathex=['/Users/caleb/Documents/collbook'],
              binaries=[],
              datas=[],
              hiddenimports=['reportlab.graphics.barcode.code128', 'reportlab.graphics.barcode.code93', 'reportlab.graphics.barcode.usps', 'reportlab.graphics.barcode.usps4s', 'reportlab.graphics.barcode.ecc200datamatrix'],
@@ -23,15 +23,14 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='collBook-0.1.2',
+          name='collBook-0.1.6',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
           runtime_tmpdir=None,
-          console=False , 
-	  icon='/Users/jacob/Documents/Projects/icon.ico')
+          console=False, icon='logomark.icns')
 app = BUNDLE(exe,
-             name='collBook-0.1.3.app',
-             icon='fern.ico',
+             name='collBook-0.1.6.app',
+	     icon='logomark.icns',
              bundle_identifier=None)
