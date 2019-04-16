@@ -562,20 +562,20 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 # Handle DWC formatted recordedBy ("|" seperated names)
                 if 'recordedBy' in cols:
                     # check if it is necessary to split on "|"
-                    if df['recordedBy'].str.contains('|').any():
+                    if df['recordedBy'].str.contains('\|').any():
                         # expand recordedBy to newassociatedCollectors, 
                         # splitting recorded By on first '|'
-                        df['newAssociatedCollectors'] = ''
-                        df.update(pd.DataFrame(df['recordedBy'].str.split('|', n=1,
-                                          expand=True).values,
-                                columns=['recordedBy', 'newAssociatedCollectors']).fillna(''))
+                        expandedCols = df['recordedBy'].str.split('|', n=1, expand=True).fillna('')
+                        # assign expanded columns to dataframe's columns
+                        df['recordedBy'] = expandedCols[0]
+                        df['newAssociatedCollectors'] = expandedCols[1]
                         # clean up the | which may be left over
                         df['newAssociatedCollectors'] = df.loc[df['newAssociatedCollectors']
                                             .str.contains('|')]['newAssociatedCollectors'].str.replace('|', ', ').str.replace('  ', ' ')
                         # combine the two fields into one
                         df['newAssociatedCollectors'] = df['associatedCollectors'].str.split(', ') + df['newAssociatedCollectors'].str.split(', ')
                         # In nearly all cases, this will preserve the name order.
-                        df['associatedCollectors'] = df['newAssociatedCollectors'].apply(lambda x: ', '.join([y for y in pd.unique(x) if y != '']))
+                        df['associatedCollectors'] = df['newAssociatedCollectors'].apply(lambda x: ', '.join([y.strip() for y in pd.unique(x) if y != '']))
                         # drop the 'newAssociatedCollectors' col.
                         df.drop(columns=['newAssociatedCollectors'], inplace=True)
                         cols = df.columns
