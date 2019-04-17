@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>989</width>
-    <height>710</height>
+    <width>986</width>
+    <height>696</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1489,7 +1489,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="lower_horizontalLayout" stretch="0,4">
+     <layout class="QHBoxLayout" name="lower_horizontalLayout" stretch="1,5">
       <item>
        <widget class="QTreeWidget" name="tree_widget">
         <property name="sizePolicy">
@@ -1573,13 +1573,13 @@
       <item>
        <widget class="QTableView" name="table_view">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="sizeAdjustPolicy">
-         <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+         <enum>QAbstractScrollArea::AdjustToContents</enum>
         </property>
         <property name="editTriggers">
          <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
@@ -1619,7 +1619,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>989</width>
+     <width>986</width>
      <height>22</height>
     </rect>
    </property>
