@@ -31,7 +31,7 @@ class formView(QtWidgets.QStackedWidget):
     # set up a map for the fields and objects
     # structured as { columnName : ( read Function, save_Function, object )}
         self.formFields = {
-                'labelProject': (self.read_QPlainTextEdit, self.save_selectSites_QPlainTextEdit, self.parent.plainTextEdit_labelProject),
+                'Label Project': (self.read_QPlainTextEdit, self.save_selectSites_QPlainTextEdit, self.parent.plainTextEdit_labelProject),
                 'fieldNotes': (self.read_QPlainTextEdit, self.save_selectSites_QPlainTextEdit, self.parent.plainTextEdit_fieldNotes),
                 'identificationReferences': (self.read_QPlainTextEdit, self.save_QPlainTextEdit, self.parent.plainTextEdit_identificationReferences),
                 'identificationRemarks': (self.read_QPlainTextEdit, self.save_QPlainTextEdit, self.parent.plainTextEdit_identificationRemarks),
@@ -122,6 +122,7 @@ class formView(QtWidgets.QStackedWidget):
         # all records scope changes.
         df = self.parent.m.datatable
         if selectSites:  # if the saveFunc requested only selectedSites
+            # note self.parent.getSelectSitesToApply, verifies the radio button
             selectedSites = self.parent.getSelectSitesToApply()
             if len(selectedSites) > 0:  # and if there ARE sites selected
                 df.loc[df['siteNumber'].isin(selectedSites), colName] = value
@@ -135,19 +136,6 @@ class formView(QtWidgets.QStackedWidget):
             self.parent.associatedTaxaWindow.isWaitingOnUser = False
         #  it may be worth while to do something similar for associatedCollectors & recordedBy
         self.parent.m.update(df)
-
-    def read_QLineEdit(self, obj, value):
-        obj.setText(value)
-
-    def save_QLineEdit(self, value):
-        sender = self.sender()
-        colName = sender.colName
-        self.saveChanges(colName, value)
-
-    def save_selectSites_QLineEdit(self, value):
-        sender = self.sender()
-        colName = sender.colName
-        self.saveChanges(colName, value, selectSites=True)
 
     def read_QDateEdit(self, obj, value):
         obj.setDate(QDate.fromString(value, "yyyy-MM-dd"))
@@ -202,6 +190,19 @@ class formView(QtWidgets.QStackedWidget):
         else:
             self.saveChanges(colName,'')
 
+    def read_QLineEdit(self, obj, value):
+        obj.setText(value)
+
+    def save_QLineEdit(self, value):
+        sender = self.sender()
+        colName = sender.colName
+        self.saveChanges(colName, value)
+
+    def save_selectSites_QLineEdit(self, value):
+        sender = self.sender()
+        colName = sender.colName
+        self.saveChanges(colName, value, selectSites=True)
+
     def read_QPlainTextEdit(self, obj, value):
         obj.setPlainText(value)
 
@@ -215,7 +216,7 @@ class formView(QtWidgets.QStackedWidget):
         sender = self.sender()
         colName = sender.colName
         value = sender.toPlainText()
-        self.saveChanges(colName, value, selectSites=selectSites)
+        self.saveChanges(colName, value, selectSites=True)
 
     def determineDataLevel(self):
         """ determines the level of data selected according to the table_view"""

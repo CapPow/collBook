@@ -678,7 +678,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             'decimalLongitude',
             'coordinateUncertaintyInMeters',
             'minimumElevationInMeters',
-            'labelProject']
+            'Label Project']
         presentCols = df.columns
         for col in reqCols:
             #  if a required col is not present, add and fill it with empty str
@@ -903,7 +903,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                       'Longitude': 'decimalLongitude',
                       'GPS Accuracy': 'coordinateUncertaintyInMeters',
                       'Altitude': 'minimumElevationInMeters',
-                      'Project': 'labelProject'}
+                      'Project': 'Label Project'}
         df.rename(colNameMap, axis='columns', inplace=True)
 
         return df
@@ -968,7 +968,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             'minimumElevationInMeters':['',''],
             'verbatimElevation':['',''],
             'duplicateQuantity':['',''],
-            'labelProject':['','']}
+            'Label Project':['','']}
     
             df = pd.DataFrame.from_dict(newDFDict)
             df.fillna('') # make any nans into empty strings.

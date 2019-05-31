@@ -309,7 +309,7 @@ class LabelPDF():
                     
     
             row1 = Table([
-                [Para('labelProject','labelProjectSTY')],
+                [Para('Label Project','labelProjectSTY')],
                 [verifiedByPara('verifiedBy','verifiedBySTY')]],
                          colWidths = self.xPaperSize *.98, rowHeights = None,
                          style = [
