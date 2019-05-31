@@ -117,6 +117,9 @@ class formView(QtWidgets.QStackedWidget):
 
     def saveChanges(self, colName, value, selectSites = False):
         """ Actualy stores the changes. Called by the other save_xxx funcs."""
+        
+        # TODO improve "checking if user has "selected sites" chosen for 
+        # all records scope changes.
         df = self.parent.m.datatable
         if selectSites:  # if the saveFunc requested only selectedSites
             selectedSites = self.parent.getSelectSitesToApply()
@@ -212,7 +215,7 @@ class formView(QtWidgets.QStackedWidget):
         sender = self.sender()
         colName = sender.colName
         value = sender.toPlainText()
-        self.saveChanges(colName, value, selectSites=True)
+        self.saveChanges(colName, value, selectSites=selectSites)
 
     def determineDataLevel(self):
         """ determines the level of data selected according to the table_view"""

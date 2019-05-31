@@ -132,6 +132,7 @@ class MyWindow(QMainWindow):
         self.w.date_versionCheck = today
         if today != lastChecked:
             import requests
+            from requests.exceptions import ConnectionError
             import webbrowser
             apiURL = 'https://api.github.com/repos/CapPow/collBook/releases/latest'
             try:
@@ -139,7 +140,7 @@ class MyWindow(QMainWindow):
                 status = str(apiCall)
             except ConnectionError:
                 #  if no internet, don't bother the user.
-                pass
+                return
             result = apiCall.json()
             if '200' in status:  # if the return looks bad, don't bother user
                 url = result['html_url']
