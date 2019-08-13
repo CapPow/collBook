@@ -8,7 +8,7 @@ collBook, is the desktop counterpart for the mobile app [collNotes](https://gith
 
 ## [Development stage](#Development-stage)
 
-collBook is in an early testing stage. Unexpected crashes are expected to be frequent, so **please take caution with your data and work on copies.** Pull requests are welcomed!
+collBook is in a testing stage. **Please take caution with your data, and work on copies.** Pull requests, and comments are encouraged!
 
 #### [Known bugs](#Known-bugs)
 - Preview window zoom is not properly updated at start up. For now, altering the zoom after start up solves this.
