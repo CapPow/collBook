@@ -820,6 +820,11 @@
                    <string>Taxonomic Name Resolution Service (web API)</string>
                   </property>
                  </item>
+                 <item>
+                  <property name="text">
+                   <string>Tropicos</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item row="9" column="0">

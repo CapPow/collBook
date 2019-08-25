@@ -42,7 +42,11 @@ class sciNameDialog(QDialog):
         self.dlg.label.setText(message)
         dlgCompleter = QCompleter(wordList, self.dlg.lineEdit)
         self.dlg.lineEdit.setCompleter(dlgCompleter)
-        answer = self.exec_()
+        try:
+            answer = self.exec_()
+        except KeyboardInterrupt:
+            # if the user escapes the dialog box
+            answer = False
         if answer:
             result = self.dlg.lineEdit.text()
             return result

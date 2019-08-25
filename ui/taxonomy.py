@@ -19,7 +19,7 @@ from requests.exceptions import ReadTimeout
 import json
 
 class taxonomicVerification():
-    def __init__(self, settings, parent, editable = True, *args):
+    def __init__(self, settings, parent, tropicos_API_key, editable = True, *args):
         super(taxonomicVerification, self).__init__()
         self.parent = parent
         self.settings = settings       
@@ -30,6 +30,8 @@ class taxonomicVerification():
         # structured as: {'input sci name':('aligned sci name', 'alignedauthority')}
         self.readTaxonomicSettings()
         self.sessionAlignments = {}
+        # the tropicos key saved in apiKeys.py
+        self.tropicos_API_key = tropicos_API_key
     
     def readTaxonomicSettings(self):
         """ Fetches the most up-to-date taxonomy relevant settings"""
@@ -76,6 +78,8 @@ class taxonomicVerification():
             result = self.getITISWeb(querySciName, retrieveAuth)
         elif self.TaxAlignSource == 'Taxonomic Name Resolution Service (web API)':
             result = self.getTNRS(querySciName, retrieveAuth)
+        elif self.TaxAlignSource == 'Tropicos':
+            result = self.getTropicosWeb(querySciName, retrieveAuth)
         elif self.TaxAlignSource == 'MycoBank (local)':
             result = self.getMycoBankLocal(querySciName, retrieveAuth)
         elif self.TaxAlignSource == 'MycoBank (web API)':
@@ -91,7 +95,7 @@ class taxonomicVerification():
         """ updates the session alignments dict to remember alignments.
         these sesson alignments are reset when program opens or settings are
         saved"""
-        
+
         self.sessionAlignments[querySciName] = results
 
     def verifyTaxonomy(self, rowData):
@@ -121,14 +125,15 @@ class taxonomicVerification():
         # Decide how to handle resulting data
         keptResult = False  # flag to det if the alignment result was kept
         changeAuth = False  # flag to determine if the authority needs altered.
-        if result[0] is None:  # if no scientificName was returned
+        if resultSciName is None:  # if no scientificName was returned
             message = f'No {self.value_Kingdom} results for "{scientificName}" (# {rowNum}) found using {self.TaxAlignSource}.\n This may be a typo, would you like to reenter the name?'
             reply = self.parent.userSciNameInput(f'{rowNum}: Taxonomic alignment', message)
             if reply:
                 rowData['scientificName'] = reply
                 rowData = self.verifyTaxonomy(rowData)
             return rowData
-        if resultSciName not in scientificName:
+        # if the returned result is not the scientificName, check policies
+        if resultSciName.lower() != scientificName.lower():
             if self.NameChangePolicy == 'Accept all suggestions':
                 rowData['scientificName'] = resultSciName
                 changeAuth = True
@@ -140,15 +145,17 @@ class taxonomicVerification():
                     rowData['scientificName'] = resultSciName
                     keptResult = True
                     changeAuth = True
-
+        # the returned result is equal to the scientificName...
+        else:  # treat it as if we kept the returned result
+            keptResult = True
         if changeAuth:
             # if the scientificName changed already, update the author
             rowData['scientificNameAuthorship'] = resultAuthor
         else:
             if not keptResult:
-                # condition to retrieve get authority for potentially non-accepted name
+                # condition to retrieve authority for potentially non-accepted name
                 resultAuthor = self.retrieveAlignment(querySciName, retrieveAuth=True)
-            if resultAuthor not in [scientificNameAuthorship, None]:
+            if resultAuthor.lower() not in [scientificNameAuthorship.lower(), None]:
                 # if the authors don't match check user policies
                 # conditional actions based on AuthChangePolicy
                 if self.AuthChangePolicy == 'Accept all suggestions':
@@ -315,7 +322,6 @@ class taxonomicVerification():
         score = 0
         urlInputStr = inputStr.replace(' ','%20')
         # TODO add an optional dialog box with a list of the top returned results. Allow user to pick from list.
-        #url = f'http://tnrs.iplantc.org/tnrsm-svc/matchNames?retrieve=all&names={urlInputStr}'
         url = f'http://tnrs.iplantc.org/tnrsm-svc/matchNames?retrieve=best&names={urlInputStr}'
         try:
             response = requests.get(url, timeout = timeout)
@@ -332,12 +338,14 @@ class taxonomicVerification():
         if response.status_code == requests.codes.ok:
             data = response.json().get('items', None)[0]
             time.sleep(1)  # use a sleep to be polite to the service
-            
+
             try:
                 if retrieveAuth:
+                    # if authority requested for potentially non-accepted name
                     acceptedName = data.get('nameScientific', None)
                     acceptedAuthor = data.get('authorAttributed', None)
                 else:
+                    # otherwise, retrieve accepted details.
                     acceptedName = data.get('acceptedName', None)
                     acceptedAuthor = data.get('acceptedAuthor', None)
                 score = float(data.get('scientificScore', 0)) # the confidence in the return
@@ -346,5 +354,67 @@ class taxonomicVerification():
                 pass
             if score >= float(self.value_TNRS_Threshold)/100:
                 result = (acceptedName, acceptedAuthor)
-                
+
         return result
+
+    def getTropicosWeb(self, inputStr, retrieveAuth=False, timeout=1):
+        """ uses Tropicos reference to attempt alignments """
+        # see: https://services.tropicos.org/help
+        # empty container to hold the results
+        result = (None, None)
+        # get the nameID code from Tropicos for the given input string
+        urlInputStr = inputStr.replace(' ','%20') #clean up the spaces in the request URL
+        url = f'http://services.tropicos.org/Name/Search?name={inputStr}&type=wildcard&apikey={self.tropicos_API_key}&format=json'
+        try:
+            nameID_response = requests.get(url, timeout=timeout)
+            time.sleep(0.5)  # use a sleep to be polite to the service
+            # if the nameID responded okay then, overwrite the empty results
+            if (nameID_response.status_code == requests.codes.ok):
+                id_response = json.loads(nameID_response.text)
+                # if the service responds with no results for that query...
+                if id_response[0].get('Error', False):
+                    # then return (None, None)
+                    return result
+                # choosing to keep only the first result from the open text search.
+                nameID = [int(x.get('NameId')) for x in id_response][0]
+                query_url = f'http://services.tropicos.org/Name/{nameID}/AcceptedNames?&apikey={self.tropicos_API_key}&format=json'
+                # use name ID to retrieve acceptedNames and authorities
+                time.sleep(0.5)  # Finish 1 second sleep for before the next call
+                response = json.loads(requests.get(query_url, timeout=timeout).text)
+                
+                if retrieveAuth:
+                    # if authority requested for potentially non-accepted name
+                    # then use NameID to verify the result
+                    resultName =  [x.get('ScientificName', inputStr) for x in response if x.get('NameId') == nameID][0]
+                    resultAuthor = [x.get('ScientificNameWithAuthors', '') for x in response if x.get('NameId') == nameID][0]
+                else:  # otherwise, pull the data from the AcceptedName results
+                    # oddly, if an accepted name is queried for AcceptedName in
+                    # Tropicos, it returns [{'Error': 'No accepted names were found'}]
+                    # if this happens, parse the nameID results for name /auth
+                    if response[0].get('Error', False) == "No accepted names were found":
+                        resultName = id_response[0].get('ScientificName', '')
+                        resultAuthor = id_response[0].get('ScientificNameWithAuthors', '')
+                    else:                        
+                        accepted_name_object = [x.get('AcceptedName') for x in response][0] # taking first accepted name
+                        # retrieve the ScientificName from the result
+                        resultName = accepted_name_object.get('ScientificName', '').strip()
+                        # retrieve the authority as ScientificNameWithAuthors
+                        resultAuthor = accepted_name_object.get('ScientificNameWithAuthors', '')
+                        
+                # clean out the ScientificName from the ScientificNameWithAuthors
+                resultAuthor = resultAuthor.replace(resultName, '').strip()
+                result = (resultName, resultAuthor)
+            # return whatever was derived
+            return result
+
+        except ReadTimeout:
+            # If the request times out, build a user dialog to throw
+            message = 'Tropicos request timed out. This may be an internet connectivity problem, or an issue with the service. No changes have been made.'
+            details = 'Check internet connection, or try a different alignment service. If you do not have internet connectivity, use the local alignment service.'
+            notice = self.parent.userNotice(message, 'Taxonomic alignment', inclHalt=True, retry=True)
+            if notice == QMessageBox.Retry:  # if clicked retry, do it.
+                timeout += 2
+                # add to timeout before retrying
+                return self.getTropicosWeb(inputStr, retrieveAuth, timeout=timeout)
+            else:
+                return False

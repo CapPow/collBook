@@ -17,14 +17,12 @@ import time
 # link -> https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding
 
 class locality():
-    def __init__(self, parent=None, editable = True, *args):
+    def __init__(self, parent, google_API_key, editable = True, *args):
         super(locality, self).__init__()
         
         self.parent = parent
-        
-        with open('key.txt', 'r') as keyRing:
-            gAPIkey=keyRing.read()
-        self.gAPIkey = gAPIkey
+        # the google key saved in apiKeys.py
+        self.gAPIkey = google_API_key
 
     def userNotice(self, text):
         msg = QMessageBox()

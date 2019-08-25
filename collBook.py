@@ -49,6 +49,8 @@ from ui.taxonomy import taxonomicVerification
 from ui.associatedtaxa import associatedTaxaMainWindow
 from ui.scinameinputdialog import sciNameDialog
 from ui.progressbar import progressBar
+# simple python script holding the API keys
+from ui import apiKeys
 
 
 class editorDelegate(QItemDelegate):
@@ -84,14 +86,14 @@ class MyWindow(QMainWindow):
         self.table_view = self.w.table_view
         self.table_view.setItemDelegate(editorDelegate(self.table_view))  # use flipped proxy delegate
         self.form_view.init_ui(self, self.w)
-        self.tax = taxonomicVerification(self.settings, self)  # taxonomic verifier
+        self.tax = taxonomicVerification(self.settings, self, apiKeys.tropicos_API_key)  # taxonomic verifier
         self.p = LabelPDF(self.settings)
         self.p.initLogoCanvas()  # alter this to happen based on settings changes
         self.pdf_preview = self.w.pdf_preview
         self.pdf_preview.initViewer(self)
         self.m.new_Records(True)
         self.table_view.setModel(self.m)
-        self.locality = locality(self)
+        self.locality = locality(self, apiKeys.google_API_key)
         self.w.action_Open.triggered.connect(self.m.open_CSV)
         self.w.action_Save_As.triggered.connect(self.m.save_CSV)
         self.w.action_New_Records.triggered.connect(self.m.new_Records)

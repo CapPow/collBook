@@ -166,7 +166,8 @@ class settingsWindow(QMainWindow):
         # conditionally build a list of those which to add.
         # NOTE: keeping Local options in index 0 position
         if kingdom == 'Plantae':
-            toAdd = ['ITIS (local)', 'Catalog of Life (web API)', 'Taxonomic Name Resolution Service (web API)']
+            toAdd = ['ITIS (local)', 'Catalog of Life (web API)',
+                     'Taxonomic Name Resolution Service (web API)','Tropicos']
         elif kingdom == 'Fungi':
             toAdd = ['MycoBank (local)', 'Catalog of Life (web API)']
         source.addItems(toAdd)

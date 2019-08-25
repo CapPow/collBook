@@ -2,9 +2,10 @@
 
 # Form implementation generated from reading ui file 'ui/settingsUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.12.3
 #
 # WARNING! All changes made in this file will be lost!
+
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -383,6 +384,7 @@ class Ui_settingsWindow(object):
         self.value_TaxAlignSource.addItem("")
         self.value_TaxAlignSource.addItem("")
         self.value_TaxAlignSource.addItem("")
+        self.value_TaxAlignSource.addItem("")
         self.formLayout_5.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.value_TaxAlignSource)
         self.label_NameChangePolicy = QtWidgets.QLabel(self.groupBox)
         self.label_NameChangePolicy.setObjectName("label_NameChangePolicy")
@@ -532,6 +534,7 @@ class Ui_settingsWindow(object):
         self.value_TaxAlignSource.setItemText(0, _translate("settingsWindow", "ITIS (local)"))
         self.value_TaxAlignSource.setItemText(1, _translate("settingsWindow", "Catalog of Life (web API)"))
         self.value_TaxAlignSource.setItemText(2, _translate("settingsWindow", "Taxonomic Name Resolution Service (web API)"))
+        self.value_TaxAlignSource.setItemText(3, _translate("settingsWindow", "Tropicos"))
         self.label_NameChangePolicy.setText(_translate("settingsWindow", "Name change policy"))
         self.value_NameChangePolicy.setItemText(0, _translate("settingsWindow", "Accept all suggestions"))
         self.value_NameChangePolicy.setItemText(1, _translate("settingsWindow", "Always ask"))
@@ -543,6 +546,4 @@ class Ui_settingsWindow(object):
         self.label.setText(_translate("settingsWindow", "scoreThreshold"))
         self.button_Cancel.setText(_translate("settingsWindow", "Cancel"))
         self.button_SaveExit.setText(_translate("settingsWindow", "Save and exit"))
-
-
 import Resources_rc
