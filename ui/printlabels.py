@@ -315,9 +315,7 @@ class LabelPDF():
                          style = [
                         ('BOTTOMPADDING',(0,0),(-1,-1), 2)]
                          )
-    #bookmark
-    #ScientificName Row Dynamic Formatting
-        
+            #ScientificName Row Dynamic Formatting
             scientificNameElement = sciName('scientificName','scientificNameAuthorship','sciNameSTY')
             try:            #Test if Scienftific Name can Share a row with Event Date.
                 scientificNameElement.wrap(1400, 1400) #Test wrap the string in a large environment to get it's desired ideal width.
