@@ -45,6 +45,14 @@ For bug reports, feature requests, and suggestions you may post in the [Issues s
 
 [Jacob Motley](https://www.linkedin.com/in/jacob-motley-b627a1152) - BS [Computer Science](https://github.com/j-h-m): Software Systems - UTC.
 
+## [Citing collNotes & collBook](#Citation)
+
+Please cite collNotes and collBook using our paper in *Applications in Plant Sciences*:
+
+https://doi.org/10.1002/aps3.11284
+
+Powell, C., Motley, J., Qin, H., and Shaw, J.. 2019. A born‐digital field‐to‐database solution for collections-based research using collNotes and collBook. *Applications in Plant Sciences* 7(8):e11284.
+
 ## [Credits](#Credits)
 
 #### Catalog of Life
