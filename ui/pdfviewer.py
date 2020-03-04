@@ -79,5 +79,13 @@ class PDFViewer(QLabel):
         pix = pdfPage.getPixmap(alpha=False, matrix=mat)
         fmt = QImage.Format_RGB888
         img = QImage(pix.samples, pix.width, pix.height, pix.stride, fmt)
+        
+        # explicitly crop out the image # mycology mod
+        img_w = img.width() # mycology mod
+        img_h = img.height() # mycology mod
+        img_x = int(img_w * 0.27) # mycology mod
+        img_y = int(img_h * 0.72) # mycology mod
+                        #x, y, w, h
+        img = img.copy(img_x, img_y, img_w - img_x, img_h - img_y)  # mycology mod
         #x,y = self.getZoom(labXY=True)
         self.setPixmap(QPixmap.fromImage(img))

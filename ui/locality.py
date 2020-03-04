@@ -76,13 +76,29 @@ class locality():
         latitude = currentRowArg['decimalLatitude']
         longitude = currentRowArg['decimalLongitude']
         if latitude == '' or longitude == '':
-            message = f'MISSING GPS at {currentSiteName}. Would you like to halt the process to add GPS coordinates to {currentSiteName}?'
-            answer = self.parent.userAsk(message, title='GeoLocation')
-            if answer:
-                self.parent.statusBar.pushButton_Cancel.status = True
-                self.parent.selectTreeWidgetItemByName(currentSiteName)
-                return currentRowArg
-            else:
+        # if no GPS build one based on what does exist
+            #message = f'MISSING GPS at {currentSiteName}. Would you like to halt the process to add GPS coordinates to {currentSiteName}?'
+            #answer = self.parent.userAsk(message, title='GeoLocation')
+            #if answer:
+                #self.parent.statusBar.pushButton_Cancel.status = True
+                #self.parent.selectTreeWidgetItemByName(currentSiteName)
+                #return currentRowArg
+            #else:
+                #return currentRowArg
+            localityList = ['country','stateProvince','county','municipality','park','path']
+            localityItemList = []
+            for item in localityList:
+                newLocalityItem = currentRowArg.get(item, False)
+                if newLocalityItem:
+                    localityItemList.append(newLocalityItem)
+            newLocality = ', '.join(localityItemList)
+            if newLocality not in currentLocality:
+                #TODO make a user preference setting for prepending the generated substring to existing data.
+                newLocality = newLocality + ', ' + currentLocality
+                newLocality = newLocality.rstrip() #clean up the string
+                if newLocality.endswith(','):   #if it ends with a comma, strip the final one out.
+                    newLocality = newLocality.rstrip(',').lstrip(', ')
+                currentRowArg['locality'] = newLocality
                 return currentRowArg
         addresses = self.reverseGeoCall(latitude, longitude)
         if isinstance(addresses, list):
