@@ -28,6 +28,7 @@ __version__ = 'v0.1.7-alpha'
 
 
 import sys
+import logging
 from io import StringIO
 from pathlib import Path
 from datetime import date
@@ -588,10 +589,23 @@ class MyWindow(QMainWindow):
         # return to the selection (if it exists)
         self.selectTreeWidgetItemByName(text)
     
-app = QtWidgets.QApplication(sys.argv)
-w = MyWindow()
-if w.settings.get('value_DarkTheme', False):
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-w.show()
 
-sys.exit(app.exec_())
+# set up exception logger
+# stores only more recent exceptions to "crash_info.log"
+logging.basicConfig(format = '%(asctime)s %(message)s',
+                    datefmt = '%m/%d/%Y %I:%M:%S %p',
+                    filename = 'crash_info.log',
+                    filemode='w',
+                    level=logging.ERROR)
+# wrap main loop with the exception logger
+try:
+    app = QtWidgets.QApplication(sys.argv)
+    w = MyWindow()
+    if w.settings.get('value_DarkTheme', False):
+        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    w.show()
+    sys.exit(app.exec_())
+except Exception:
+    # given an exception, log it then raise it for normal handling
+    logging.error("Fatal error in main loop", exc_info=True)
+    raise
