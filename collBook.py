@@ -24,34 +24,64 @@ __author__ = "Caleb Powell, Jacob Motley"
 __credits__ = ["Caleb Powell, Jacob Motley, Joey Shaw"]
 __email__ = "calebadampowell@gmail.com"
 __status__ = "Alpha"
-__version__ = 'v0.1.7-alpha'
-
+__version__ = 'v0.1.8-alpha'
 
 import sys
-from io import StringIO
-from pathlib import Path
-from datetime import date
-import pandas as pd
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import (QMainWindow, QTreeWidgetItem,
-                             QTreeWidgetItemIterator, QItemDelegate,
-                             QCompleter)
-from PyQt5.QtWidgets import QMessageBox
-from reportlab.platypus.doctemplate import LayoutError
-from ui.printlabels import LabelPDF
-from ui.pandastablemodel import PandasTableModel
-from ui.locality import locality
-from PyQt5.QtCore import QFile, Qt
-import qdarkstyle
-from ui.collBookUI import Ui_MainWindow
-from ui.settingsdialog import settingsWindow
-from ui.taxonomy import taxonomicVerification
-from ui.associatedtaxa import associatedTaxaMainWindow
-from ui.scinameinputdialog import sciNameDialog
-from ui.progressbar import progressBar
-# simple python script holding the API keys
-from ui import apiKeys
+# define a static crash logging function
+def log_crash():
+    # imports only necessary for crash logging
+    from os import path as os_path
+    import logging
+    import platform
+    # determine if python environment is frozen by pyinstaller
+    if getattr( sys, 'frozen', False ):
+        # identify the application's location
+        application_path = os.path.dirname(sys.executable)
+        log_fn = os_path.join(application_path, 'crash_info.log')
+    else:
+        # running live
+        log_fn = Path('crash_info.log')
+    # additional contextual informantion
+    context_info = {'cb_version':__version__,
+                    'running_os':f'{platform.system()} {platform.release()}'}
+    logging.basicConfig(format = '%(asctime)s, %(cb_version)s, %(running_os)s: %(message)s',
+                        datefmt = '%m/%d/%Y %I:%M:%S %p',
+                        filename = log_fn,
+                        filemode='w',
+                        level=logging.ERROR)
 
+    # given an exception, log it then raise it for normal handling
+    logging.error("Fatal error in main loop", exc_info=True, extra=context_info)
+
+# wrap the rest of the imports with the exception logger
+try:
+    from io import StringIO
+    from pathlib import Path
+    from datetime import date
+    import pandas as pd
+    from PyQt5 import QtWidgets
+    from PyQt5.QtWidgets import (QMainWindow, QTreeWidgetItem,
+                                 QTreeWidgetItemIterator, QItemDelegate,
+                                 QCompleter)
+    from PyQt5.QtWidgets import QMessageBox
+    from reportlab.platypus.doctemplate import LayoutError
+    from ui.printlabels import LabelPDF
+    from ui.pandastablemodel import PandasTableModel
+    from ui.locality import locality
+    from PyQt5.QtCore import QFile, Qt
+    import qdarkstyle
+    from ui.collBookUI import Ui_MainWindow
+    from ui.settingsdialog import settingsWindow
+    from ui.taxonomy import taxonomicVerification
+    from ui.associatedtaxa import associatedTaxaMainWindow
+    from ui.scinameinputdialog import sciNameDialog
+    from ui.progressbar import progressBar
+    # simple python script holding the API keys
+    from ui import apiKeys
+except Exception:
+    # given an exception, log it then handle normally.
+    log_crash()
+    raise
 
 class editorDelegate(QItemDelegate):
     """solution to the table_view editor clearing pre-existing cell values
@@ -588,10 +618,16 @@ class MyWindow(QMainWindow):
         # return to the selection (if it exists)
         self.selectTreeWidgetItemByName(text)
     
-app = QtWidgets.QApplication(sys.argv)
-w = MyWindow()
-if w.settings.get('value_DarkTheme', False):
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-w.show()
 
-sys.exit(app.exec_())
+# wrap GUI's main loop with the exception logger
+try:
+    app = QtWidgets.QApplication(sys.argv)
+    w = MyWindow()
+    if w.settings.get('value_DarkTheme', False):
+        app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
+    w.show()
+    sys.exit(app.exec_())
+except Exception:
+    # given an exception, log it then handle normally.
+    log_crash()
+    raise
