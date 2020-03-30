@@ -16,7 +16,7 @@ collBook is in a testing stage. **Please take caution with your data, and work o
 ## [Installation](#Installation)
 
  - Windows and Mac binaries are available under [releases](https://github.com/CapPow/collBook/releases). Be sure you unzip the folder before running the program. 
- - If you are interested in running, or building collBook from source you will need to place a Google geocoding API key in a simple textfile named "key.txt". To install the python dependencies, you can use "pip3 install -r requirements.txt" If you're interested in using pyinstaller, there are reference ".spec" files for Mac and Windows in the doc folder.
+ - If you are interested in running, or building collBook from source you will need to place a Google geocoding API key in the following python file: "ui/apiKeys.py". To install the python dependencies, you can use "pip3 install -r requirements.txt" If you're interested in using pyinstaller, there are reference ".spec" files for Mac and Windows in the doc folder.
 
 If you have any troubles, feel free to post in the [Issues section](https://github.com/CapPow/collBook/issues) or [contact us](https://github.com/CapPow/collBook#Contact-us).
 
