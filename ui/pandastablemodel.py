@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QDialog
 from pathlib import Path
+from shortuuid import uuid
 from reportlab.platypus.doctemplate import LayoutError
 from ui.importindexdialog import importDialog
 import pandas as pd
@@ -291,6 +292,9 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         # Could webscrape a requests return from something like: http://sernecportal.org/portal/collections/list.php?db=311&catnum=UCHT999900%20-%20UCHT999991&othercatnum=1
         # the checkbox for enabling the "Assign catalog numbers" group box.
         assign = self.parent.settings.get('value_assignCatalogNumbers', False)
+        uuidCat = self.parent.settings.get('value_use_UUIDCatalogNumbers', True)
+        patCat = self.parent.settings.get('value_use_PatternCatalogNumbers', False)
+
         if assign:
             rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
             dfOrig = self.datatable.iloc[rowsToProcess, ]
@@ -301,41 +305,50 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 df = dfOrig.loc[dfOrig['specimenNumber'].str.isdigit()].copy()
                 df['catalogNumber'] = ''
             if len(df) > 0:
-                catStartingNum = int(self.parent.settings.get('value_catalogNumberStartingNum'))
-                catDigits = int(self.parent.settings.get('value_catalogNumberDigits'))
-                catPrefix = self.parent.settings.get('value_catalogNumberPrefix')
+                #check what type of catalogNumbers to assign
                 newCatNums = []
-                for i in range(len(df.index)):
-                    newCatNum = f'{catPrefix}{str(catStartingNum).zfill(catDigits)}'
-                    newCatNums.append(newCatNum)
-                    catStartingNum += 1 # add 1 to the starting catNumber  
-                answer = self.parent.userAsk(f'Assign catalog numbers: {newCatNums[0]} - {newCatNums[-1]} ?', 'Assigning Catalog Numbers')
-                if answer is True:  # if the user agreed to assign the catalog numbers
-                    df['catalogNumber'] = newCatNums
-                    self.datatable.update(df)
-                    self.update(self.datatable)
-                    self.parent.updateTableView()
-                    self.parent.settings.updateStartingCatalogNumber(catStartingNum)
-                    # after adding catnums pull in results and check for uniqueness
-                    # TODO Clean this function up! It is pretty awful looking..
-                    df = self.datatable.iloc[rowsToProcess, ]
-                    dfUnique = df.loc[(df['specimenNumber'].str.isdigit()) & 
-                                          (df['catalogNumber'] != '')].copy()
-                    if not dfUnique['catalogNumber'].is_unique:  # check for duplicated catalog numbers
-                        dfNonUnique = dfUnique[dfUnique.duplicated(subset=['catalogNumber'],keep='first')].copy()  # keep the first one as "unique"
-                        newCatNums = []
-                        for i in range(len(dfNonUnique.index)):  # generate a range of additional new catNums to apply to non-uniques
-                            newCatNum = f'{catPrefix}{str(catStartingNum).zfill(catDigits)}'
-                            newCatNums.append(newCatNum)
-                            catStartingNum += 1
-                        answer = self.parent.userAsk(f'Duplicate catalog numbers found! Assign additional {newCatNums[0]} - {newCatNums[-1]} ? Selecting "NO" will keep the duplicate catalog numbers as they are.', 'Assigning Catalog Numbers')
-                        if answer is True:  # if the user agreed to assign the catalog numbers
-                            dfNonUnique['catalogNumber'] = newCatNums
-                            self.datatable.update(dfNonUnique)
-                            self.datatable.update(dfNonUnique)
-                            self.update(self.datatable)
-                            self.parent.updateTableView()
-                            self.parent.settings.updateStartingCatalogNumber(catStartingNum)
+                if uuidCat: # if generating them on the fly...
+                    #uuid possible alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+                    # trunicated to 13 symbols long requires approx 35,040,000,000 specimens for a 1% chance of collision
+                    for _ in range(len(df.index)):
+                        trunicated_uuid = uuid()[:13]
+                        newCatNums.append(uuid())
+                elif patCat: # otherwise use pattern
+                    catStartingNum = int(self.parent.settings.get('value_catalogNumberStartingNum'))
+                    catDigits = int(self.parent.settings.get('value_catalogNumberDigits'))
+                    catPrefix = self.parent.settings.get('value_catalogNumberPrefix')
+                    newCatNums = []
+                    for i in range(len(df.index)):
+                        newCatNum = f'{catPrefix}{str(catStartingNum).zfill(catDigits)}'
+                        newCatNums.append(newCatNum)
+                        catStartingNum += 1 # add 1 to the starting catNumber  
+                    answer = self.parent.userAsk(f'Assign catalog numbers: {newCatNums[0]} - {newCatNums[-1]} ?', 'Assigning Catalog Numbers')
+                    if answer is True:  # if the user agreed to assign the catalog numbers
+                        df['catalogNumber'] = newCatNums
+                        self.datatable.update(df)
+                        self.update(self.datatable)
+                        self.parent.updateTableView()
+                        self.parent.settings.updateStartingCatalogNumber(catStartingNum)
+                        # after adding catnums pull in results and check for uniqueness
+                        # TODO Clean this function up! It is pretty awful looking..
+                        df = self.datatable.iloc[rowsToProcess, ]
+                        dfUnique = df.loc[(df['specimenNumber'].str.isdigit()) & 
+                                              (df['catalogNumber'] != '')].copy()
+                        if not dfUnique['catalogNumber'].is_unique:  # check for duplicated catalog numbers
+                            dfNonUnique = dfUnique[dfUnique.duplicated(subset=['catalogNumber'],keep='first')].copy()  # keep the first one as "unique"
+                            newCatNums = []
+                            for i in range(len(dfNonUnique.index)):  # generate a range of additional new catNums to apply to non-uniques
+                                newCatNum = f'{catPrefix}{str(catStartingNum).zfill(catDigits)}'
+                                newCatNums.append(newCatNum)
+                                catStartingNum += 1
+                            answer = self.parent.userAsk(f'Duplicate catalog numbers found! Assign additional {newCatNums[0]} - {newCatNums[-1]} ? Selecting "NO" will keep the duplicate catalog numbers as they are.', 'Assigning Catalog Numbers')
+                            if answer is True:  # if the user agreed to assign the catalog numbers
+                                dfNonUnique['catalogNumber'] = newCatNums
+                                self.datatable.update(dfNonUnique)
+                                self.datatable.update(dfNonUnique)
+                                self.update(self.datatable)
+                                self.parent.updateTableView()
+                                self.parent.settings.updateStartingCatalogNumber(catStartingNum)
 
     def verifyTaxButton(self):
         """ applies verifyTaxonomy over each visible row."""
@@ -579,7 +592,10 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                         # drop the 'newAssociatedCollectors' col.
                         df.drop(columns=['newAssociatedCollectors'], inplace=True)
                         cols = df.columns
-    
+                # after parsing the cols, round elevation values to reasonable floating point
+                if 'minimumElevationInMeters' in df.columns:
+                    df['minimumElevationInMeters'] = df['minimumElevationInMeters'].astype(float).round(1).astype(str)
+
                 self.update(df)  # this function updates the visible dataframe
                 self.parent.populateTreeWidget()
                 self.parent.form_view.fillFormFields()
@@ -650,6 +666,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         reqCols = [
             'scientificName',
             'scientificNameAuthorship',
+            'family',
             'taxonRemarks',
             'identifiedBy',
             'dateIdentified',

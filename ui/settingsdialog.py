@@ -199,9 +199,17 @@ class settingsWindow(QMainWindow):
         """ generates a single dummy catalog number for label previews"""
         incDummy = self.get('value_inc_Barcode', False)
         if incDummy:
-            catDigits = int(self.get('value_catalogNumberDigits'))
-            catPrefix = self.get('value_catalogNumberPrefix')
-            dummyCatNumber = f'{catPrefix}{str(0).zfill(catDigits)}'
+            #check what type of catalogNumbers to assign
+            uuidCat = self.get('value_use_UUIDCatalogNumbers', True)
+            patCat = self.get('value_use_PatternCatalogNumbers', False)
+            if uuidCat: # if generating uuids
+                dummyCatNumber = '7aFE46SG5zcKP'
+            elif patCat:
+                catDigits = int(self.get('value_catalogNumberDigits'))
+                catPrefix = self.get('value_catalogNumberPrefix')
+                dummyCatNumber = f'{catPrefix}{str(0).zfill(catDigits)}'
+            else: # if somehow neither are selected
+                dummyCatNumber = False
         else:
             dummyCatNumber = False
         self.dummyCatNumber = dummyCatNumber
@@ -245,6 +253,12 @@ class settingsWindow(QMainWindow):
         parent.value_inc_CollectionName.setCheckState(value_inc_CollectionName)
         value_inc_VerifiedBy =  self.convertCheckState(self.get('value_inc_VerifiedBy'))
         parent.value_inc_VerifiedBy.setCheckState(value_inc_VerifiedBy)
+        value_inc_FamilyName = self.convertCheckState(self.get('value_inc_FamilyName', 'true'))
+        parent.value_inc_FamilyName.setCheckState(value_inc_FamilyName )
+        value_inc_TripName = self.convertCheckState(self.get('value_inc_TripName', 'false'))
+        parent.value_inc_TripName.setCheckState(value_inc_TripName)
+        value_italicize_Associated = self.convertCheckState(self.get('value_italicize_Associated', 'false'))
+        parent.value_italicize_Associated.setCheckState(value_italicize_Associated)
 
         # QGroupbox (checkstate)
         value_inc_Logo = self.convertCheckState(self.get('value_inc_Logo'))
@@ -292,6 +306,10 @@ class settingsWindow(QMainWindow):
         parent.value_associatedOnly.setChecked(value_associatedOnly)
         value_associatedNever = self.get('value_associatedNever', False)
         parent.value_associatedNever.setChecked(value_associatedNever)
+        value_use_UUIDCatalogNumbers = self.get('value_use_UUIDCatalogNumbers', True)
+        parent.value_use_UUIDCatalogNumbers.setChecked(value_use_UUIDCatalogNumbers)
+        value_use_PatternCatalogNumbers = self.get('value_use_PatternCatalogNumbers', False)
+        parent.value_use_PatternCatalogNumbers.setChecked(value_use_PatternCatalogNumbers)
 
         # clean up
         self.updateCatalogNumberPreview
@@ -345,6 +363,12 @@ class settingsWindow(QMainWindow):
         self.setValue('value_inc_CollectionName', value_inc_CollectionName)
         value_inc_VerifiedBy = parent.value_inc_VerifiedBy.isChecked()
         self.setValue('value_inc_VerifiedBy', value_inc_VerifiedBy)
+        value_inc_FamilyName = parent.value_inc_FamilyName.isChecked()
+        self.setValue('value_inc_FamilyName', value_inc_FamilyName)
+        value_inc_TripName = parent.value_inc_TripName.isChecked()
+        self.setValue('value_inc_TripName', value_inc_TripName)
+        value_italicize_Associated = parent.value_italicize_Associated.isChecked()
+        self.setValue('value_italicize_Associated', value_italicize_Associated)
 
         # QGroupbox
         value_inc_Logo = parent.value_inc_Logo.isChecked()
@@ -389,3 +413,7 @@ class settingsWindow(QMainWindow):
         self.setValue('value_associatedOnly', value_associatedOnly)
         value_associatedNever = parent.value_associatedNever.isChecked()
         self.setValue('value_associatedNever', value_associatedNever)
+        value_use_UUIDCatalogNumbers = parent.value_use_UUIDCatalogNumbers.isChecked()
+        self.setValue('value_use_UUIDCatalogNumbers', value_use_UUIDCatalogNumbers)
+        value_use_PatternCatalogNumbers = parent.value_use_PatternCatalogNumbers.isChecked()
+        self.setValue('value_use_PatternCatalogNumbers', value_use_PatternCatalogNumbers)

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>911</width>
-    <height>645</height>
+    <height>717</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -161,20 +161,49 @@
            <layout class="QGridLayout" name="gridLayout_6">
             <item row="0" column="0">
              <widget class="QGroupBox" name="value_assignCatalogNumbers">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
               <property name="title">
                <string>Assign Catalog Numbers</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
               </property>
               <property name="checkable">
                <bool>true</bool>
               </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
               <layout class="QFormLayout" name="formLayout">
-               <property name="labelAlignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <item row="1" column="0" colspan="2">
+               <item row="0" column="0" colspan="2">
                 <widget class="QCheckBox" name="value_inc_Barcode">
                  <property name="text">
                   <string>Include dummy barcode in label previews</string>
+                 </property>
+                 <property name="checked">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0" colspan="2">
+                <widget class="QRadioButton" name="value_use_UUIDCatalogNumbers">
+                 <property name="text">
+                  <string>Generate 13-character long GUID based catalog numbers</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                 <property name="autoExclusive">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0" colspan="2">
+                <widget class="QRadioButton" name="value_use_PatternCatalogNumbers">
+                 <property name="text">
+                  <string>Generate pattern based catalog numbers</string>
                  </property>
                 </widget>
                </item>
@@ -189,6 +218,9 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
                  <item>
                   <widget class="QLineEdit" name="value_catalogNumberPrefix">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
                    </property>
@@ -203,6 +235,9 @@
                  </item>
                  <item>
                   <widget class="QSpinBox" name="value_catalogNumberDigits">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
                    </property>
@@ -227,6 +262,9 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_5">
                  <item>
                   <widget class="QSpinBox" name="value_catalogNumberStartingNum">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
                    </property>
@@ -284,7 +322,7 @@
                  </item>
                 </layout>
                </item>
-               <item row="10" column="0">
+               <item row="7" column="1">
                 <spacer name="verticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -296,6 +334,37 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="2" column="0" colspan="2">
+                <widget class="QLabel" name="label_12">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <family>Cantarell</family>
+                   <pointsize>12</pointsize>
+                   <weight>50</weight>
+                   <italic>false</italic>
+                   <bold>false</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>( 1% chance of ID collision at approx. 35,040,000,000 specimens )</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="margin">
+                  <number>0</number>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -432,17 +501,17 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="fontNameLabel">
-                 <property name="text">
-                  <string>Font</string>
-                 </property>
-                </widget>
-               </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="relFontLabel">
                  <property name="text">
                   <string>Base font size</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="fontNameLabel">
+                 <property name="text">
+                  <string>Font</string>
                  </property>
                 </widget>
                </item>
@@ -476,79 +545,22 @@
               <property name="title">
                <string>Include on label</string>
               </property>
-              <layout class="QFormLayout" name="formLayout_3">
-               <item row="2" column="0" colspan="2">
-                <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="2,2,1,1">
-                 <item>
-                  <widget class="QCheckBox" name="value_inc_Associated">
-                   <property name="text">
-                    <string>Include associated taxa</string>
-                   </property>
-                   <property name="checked">
-                    <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_9">
-                   <property name="text">
-                    <string>Max Taxa:</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="value_max_Associated">
-                   <property name="minimum">
-                    <number>1</number>
-                   </property>
-                   <property name="value">
-                    <number>10</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer_4">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </item>
-               <item row="3" column="0">
-                <widget class="QCheckBox" name="value_inc_VerifiedBy">
-                 <property name="text">
-                  <string>Include verified by</string>
-                 </property>
-                </widget>
-               </item>
+              <layout class="QGridLayout" name="gridLayout_11">
                <item row="4" column="0" colspan="2">
-                <widget class="QLineEdit" name="value_VerifiedBy"/>
-               </item>
-               <item row="5" column="0">
-                <widget class="QCheckBox" name="value_inc_CollectionName">
-                 <property name="text">
-                  <string>Include collection name</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="0" colspan="2">
                 <widget class="QPlainTextEdit" name="value_CollectionName">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
                 </widget>
                </item>
-               <item row="7" column="0">
+               <item row="1" column="0">
+                <widget class="QCheckBox" name="value_inc_FamilyName">
+                 <property name="text">
+                  <string>Include family name</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="0" colspan="2">
                 <widget class="QGroupBox" name="value_inc_Logo">
                  <property name="title">
                   <string>Include collection logo</string>
@@ -730,6 +742,80 @@
                    </layout>
                   </item>
                  </layout>
+                </widget>
+               </item>
+               <item row="6" column="1">
+                <widget class="QLineEdit" name="value_VerifiedBy"/>
+               </item>
+               <item row="0" column="0" colspan="2">
+                <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="2,0,2,1">
+                 <item>
+                  <widget class="QCheckBox" name="value_inc_Associated">
+                   <property name="text">
+                    <string>Include associated taxa</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="value_italicize_Associated">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="text">
+                    <string>Italicize</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_9">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="text">
+                    <string>Max Taxa:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="value_max_Associated">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="minimum">
+                    <number>1</number>
+                   </property>
+                   <property name="value">
+                    <number>10</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="6" column="0">
+                <widget class="QCheckBox" name="value_inc_VerifiedBy">
+                 <property name="text">
+                  <string>Include verified by</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0" colspan="2">
+                <widget class="QCheckBox" name="value_inc_CollectionName">
+                 <property name="text">
+                  <string>Include collection name</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="0" colspan="2">
+                <widget class="QCheckBox" name="value_inc_TripName">
+                 <property name="text">
+                  <string>Include trip name</string>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -962,7 +1048,7 @@
      <x>0</x>
      <y>0</y>
      <width>911</width>
-     <height>26</height>
+     <height>32</height>
     </rect>
    </property>
    <property name="defaultUp">
@@ -981,12 +1067,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>320</x>
-     <y>224</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>564</x>
-     <y>257</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
    </hints>
   </connection>
@@ -997,12 +1083,12 @@
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>320</x>
-     <y>224</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>564</x>
-     <y>257</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
    </hints>
   </connection>
@@ -1013,12 +1099,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>351</x>
-     <y>285</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>564</x>
-     <y>371</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
    </hints>
   </connection>
@@ -1029,12 +1115,12 @@
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>351</x>
-     <y>285</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>564</x>
-     <y>371</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
    </hints>
   </connection>
@@ -1045,8 +1131,8 @@
    <slot>toggleTNRSSettings(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>483</x>
-     <y>163</y>
+     <x>623</x>
+     <y>236</y>
     </hint>
     <hint type="destinationlabel">
      <x>321</x>
@@ -1077,8 +1163,8 @@
    <slot>kingdomChanged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>386</x>
-     <y>91</y>
+     <x>485</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
      <x>361</x>
@@ -1093,8 +1179,8 @@
    <slot>scalingChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>461</x>
-     <y>493</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>408</x>
@@ -1109,8 +1195,8 @@
    <slot>opacityChanged(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>461</x>
-     <y>522</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
      <x>430</x>
@@ -1125,8 +1211,8 @@
    <slot>updateCatalogNumberPreview(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>532</x>
-     <y>141</y>
+     <x>782</x>
+     <y>201</y>
     </hint>
     <hint type="destinationlabel">
      <x>424</x>
@@ -1141,8 +1227,8 @@
    <slot>updateCatalogNumberPreview(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>624</x>
-     <y>140</y>
+     <x>886</x>
+     <y>201</y>
     </hint>
     <hint type="destinationlabel">
      <x>288</x>
@@ -1157,8 +1243,8 @@
    <slot>updateCatalogNumberPreview(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>426</x>
-     <y>175</y>
+     <x>636</x>
+     <y>243</y>
     </hint>
     <hint type="destinationlabel">
      <x>348</x>
@@ -1173,8 +1259,8 @@
    <slot>updateStartingCatalogNumber(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>624</x>
-     <y>140</y>
+     <x>886</x>
+     <y>201</y>
     </hint>
     <hint type="destinationlabel">
      <x>387</x>
@@ -1193,8 +1279,8 @@
      <y>313</y>
     </hint>
     <hint type="destinationlabel">
-     <x>559</x>
-     <y>94</y>
+     <x>887</x>
+     <y>103</y>
     </hint>
    </hints>
   </connection>
@@ -1205,12 +1291,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>289</x>
-     <y>178</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>447</x>
-     <y>179</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
    </hints>
   </connection>
@@ -1221,12 +1307,92 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>238</x>
-     <y>184</y>
+     <x>436</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>522</x>
-     <y>180</y>
+     <x>436</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_inc_Associated</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>value_italicize_Associated</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>436</x>
+     <y>70</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>436</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_use_PatternCatalogNumbers</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>value_catalogNumberPrefix</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>508</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>550</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_use_PatternCatalogNumbers</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>value_catalogNumberStartingNum</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>437</x>
+     <y>162</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>554</x>
+     <y>239</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_use_PatternCatalogNumbers</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>value_catalogNumberDigits</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>415</x>
+     <y>152</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>854</x>
+     <y>190</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>value_assignCatalogNumbers</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>value_inc_Barcode</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>605</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>390</x>
+     <y>97</y>
     </hint>
    </hints>
   </connection>

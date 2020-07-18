@@ -85,10 +85,10 @@ class taxonomicVerification():
         elif self.TaxAlignSource == 'MycoBank (web API)':
             result = self.getMycoBankWeb(querySciName, retrieveAuth)
         else:
-            result = (None, None)
+            result = (None, None, None)
 
         if retrieveAuth:
-            result = result[-1]
+            result = result[1]
         return result
 
     def updateSessionAlignments(self, querySciName, results):
@@ -121,7 +121,7 @@ class taxonomicVerification():
         if result is False:
             # if the alignment failed to respond
             return rowData
-        resultSciName, resultAuthor = result
+        resultSciName, resultAuthor, resultFam = result
         # Decide how to handle resulting data
         keptResult = False  # flag to det if the alignment result was kept
         changeAuth = False  # flag to determine if the authority needs altered.
@@ -136,6 +136,7 @@ class taxonomicVerification():
         if resultSciName.lower() != scientificName.lower():
             if self.NameChangePolicy == 'Accept all suggestions':
                 rowData['scientificName'] = resultSciName
+                rowData['family'] = resultFam
                 changeAuth = True
                 keptResult = True
             elif self.NameChangePolicy == 'Always ask':
@@ -143,11 +144,13 @@ class taxonomicVerification():
                 answer = self.parent.userAsk(message, 'Taxonomic alignment')
                 if answer:
                     rowData['scientificName'] = resultSciName
+                    rowData['family'] = resultFam
                     keptResult = True
                     changeAuth = True
         # the returned result is equal to the scientificName...
         else:  # treat it as if we kept the returned result
             keptResult = True
+            rowData['family'] = resultFam
         if changeAuth:
             # if the scientificName changed already, update the author
             rowData['scientificNameAuthorship'] = resultAuthor
@@ -180,7 +183,8 @@ class taxonomicVerification():
                         rowData['scientificNameAuthorship'] = resultAuthor
         # update sessionAlignments to remember these results for this session
         results = (rowData['scientificName'],
-                   rowData['scientificNameAuthorship'])
+                   rowData['scientificNameAuthorship'],
+                   rowData['family'])
         self.sessionAlignments[querySciName] = results
         return rowData
 
@@ -207,27 +211,31 @@ class taxonomicVerification():
             self.loadLocalRef()
             df = self.local_Reference
 
-        result = (None, None)
+        result = (None, None, None)
 
         if retrieveAuth:
             acceptedRow = df[df['normalized_name'] == inputStr]
         else:
             try:
-                tsn_accepted = df[df['normalized_name'] == inputStr]['tsn_accepted'].mode()[0]
+                tsn_accepted = df[df['normalized_name'] == inputStr]['tsn_accepted'].values[0]
             except IndexError:
                 return result
             acceptedRow = df[df['tsn'] == tsn_accepted]
             
         if len(acceptedRow) > 0:
             try:
-                acceptedName = acceptedRow['complete_name'].mode()[0]
+                acceptedName = acceptedRow['complete_name'].values[0]
             except IndexError:
                 acceptedName = inputStr
             try:
-                acceptedAuthor = acceptedRow['taxon_author_id'].mode()[0]
+                acceptedAuthor = acceptedRow['taxon_author_id'].values[0]
             except IndexError:
                 acceptedAuthor = ""
-            result = (acceptedName, acceptedAuthor)
+            try:
+                family = acceptedRow['family'].values[0]
+            except IndexError:
+                family = ""
+            result = (acceptedName, acceptedAuthor, family)
         return result
 
     def getITISWeb(self, inputStr, retrieveAuth=False):
@@ -242,26 +250,30 @@ class taxonomicVerification():
             self.loadLocalRef()
             df = self.local_Reference
 
-        result = (None, None)
+        result = (None, None, None)
         
         if retrieveAuth:
             acceptedRow = df[df['normalized_name'] == inputStr]
         else:
             try:
-                acceptedName = df[df['normalized_name'] == inputStr]['Accepted_name'].mode()[0]
+                acceptedName = df[df['normalized_name'] == inputStr]['Accepted_name'][0]
             except IndexError:
                 return result
             acceptedRow = df[df['Accepted_name'] == acceptedName]
         if len(acceptedRow) > 0:
             try:
-                acceptedName = acceptedRow['Accepted_name'].mode()[0]
+                acceptedName = acceptedRow['Accepted_name'][0]
             except IndexError:
                 acceptedName = inputStr
             try:
-                acceptedAuthor = acceptedRow['Authors'].mode()[0]
+                acceptedAuthor = acceptedRow['Authors'][0]
             except IndexError:
                 acceptedAuthor = ""
-            result = (acceptedName, acceptedAuthor)
+            try:
+                family = acceptedRow['family'][0]
+            except IndexError:
+                family = ""
+            result = (acceptedName, acceptedAuthor, family)
         return result
 
     def getMycoBankWeb(self, inputStr, retrieveAuth=False):
@@ -269,9 +281,12 @@ class taxonomicVerification():
         print('go get mycobank data')
 
     def getCOLWeb(self, inputStr, retrieveAuth=False, timeout = 5):
-        """ uses Catalog of life reference to attempt alignments """
+        """ uses Catalog of life reference to attempt alignments
+        retrieveAuth: boolean, forces retrieval of authorship regardless of name status"""
         
         result = (None, None)
+        #result = (None, None, None)
+        
         # a list of urls for col, starting with most recent and then specifying current year, then current year -1
         urlInputStr = inputStr.replace(' ','%20')
         urlList = [f'http://webservice.catalogueoflife.org/col/webservice?name={urlInputStr}&format=json&response=full',
@@ -295,22 +310,43 @@ class taxonomicVerification():
             if response.status_code == requests.codes.ok:
                 # returns a list of "results" each result is a seperate dict
                 data = response.json().get('results')
-                # list comprehension to navigate the json
+                # restrict results to the best answer for the appropriate kingdom regardless of accepted_name status
+                # COL returns classifications for accepted names, otherwise it is nested under the key "accepted_name"
+                print(len(data))
+                data = [x for x in data if
+                               x.get('classification', [{}])[0].get('name', '') == self.value_Kingdom or
+                               x.get('accepted_name', {}).get('classification', [{}])[0].get('name', '') == self.value_Kingdom][0]
+
                 if retrieveAuth:
-                    resultName = data[0].get('name')
-                    resultAuth = data[0].get('author')
-                    result = (resultName, resultAuth)
+                    resultName = data.get('name')
+                    resultAuth = data.get('author')
+                    family = None
+                    result = (resultName, resultAuth, family)
                     return result
                 else:
                     try:
-                        data = [x for x in data if 
-                                (x.get('name_status','') == 'accepted name') and 
-                                (x.get('classification')[0].get('name','') == self.value_Kingdom)][0]
+                        # if there is an 'accepted_name' key, retrieve that entry
+                        if data.get('accepted_name', False):
+                            data = data.get('accepted_name')
+                            print('name was not accepted')
+                        # otherwise the existing 'data' should already hold the accepted name
+                        if data.get('name_status','') != 'accepted name':
+                            # verify to be sure, raise exception if something managed to fail here
+                            raise Exception
+                        classifications = data.get('classification', False)
+                        if classifications:
+                            # if there are classifications, retrieve the family name
+                            family = [x for x in classifications if x.get('rank', '') == 'Family'][0].get('name', '')
+                        else:
+                            family = None
                         acceptedName = data.get('name')
                         acceptedAuthor = data.get('name_html').split('</i> ')[1].strip()
-                        result = (acceptedName, acceptedAuthor)
+                        
+                        result = (acceptedName, acceptedAuthor, family)
+                        #result = (acceptedName, acceptedAuthor)
                         return result
-                    except:
+                    except Exception as e:
+                        print(e)
                         pass
         return result
 
@@ -318,7 +354,8 @@ class taxonomicVerification():
         """ uses the Taxonomic Name Resolution Service API 
         hosted through iPlant."""
 
-        result = (None, None)
+        #result = (None, None)
+        result = (None, None, None)
         score = 0
         urlInputStr = inputStr.replace(' ','%20')
         # TODO add an optional dialog box with a list of the top returned results. Allow user to pick from list.
@@ -344,16 +381,18 @@ class taxonomicVerification():
                     # if authority requested for potentially non-accepted name
                     acceptedName = data.get('nameScientific', None)
                     acceptedAuthor = data.get('authorAttributed', None)
+                    family = None
                 else:
                     # otherwise, retrieve accepted details.
                     acceptedName = data.get('acceptedName', None)
                     acceptedAuthor = data.get('acceptedAuthor', None)
+                    family = data.get('family', None)
                 score = float(data.get('scientificScore', 0)) # the confidence in the return
             except Exception as e:
                 print(e)
                 pass
             if score >= float(self.value_TNRS_Threshold)/100:
-                result = (acceptedName, acceptedAuthor)
+                result = (acceptedName, acceptedAuthor, family)
 
         return result
 
@@ -365,6 +404,7 @@ class taxonomicVerification():
         # get the nameID code from Tropicos for the given input string
         urlInputStr = inputStr.replace(' ','%20') #clean up the spaces in the request URL
         url = f'http://services.tropicos.org/Name/Search?name={inputStr}&type=wildcard&apikey={self.tropicos_API_key}&format=json'
+        print(url)
         try:
             nameID_response = requests.get(url, timeout=timeout)
             time.sleep(0.5)  # use a sleep to be polite to the service
@@ -378,6 +418,7 @@ class taxonomicVerification():
                 # choosing to keep only the first result from the open text search.
                 nameID = [int(x.get('NameId')) for x in id_response][0]
                 query_url = f'http://services.tropicos.org/Name/{nameID}/AcceptedNames?&apikey={self.tropicos_API_key}&format=json'
+                print(query_url)
                 # use name ID to retrieve acceptedNames and authorities
                 time.sleep(0.5)  # Finish 1 second sleep for before the next call
                 response = json.loads(requests.get(query_url, timeout=timeout).text)

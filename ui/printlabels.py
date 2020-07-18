@@ -6,14 +6,10 @@ from reportlab.platypus.paragraph import Paragraph
 from reportlab.platypus.doctemplate import LayoutError
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
-from reportlab.graphics.barcode import code39 #Note, overriding a function from this import in barcode section
+from reportlab.graphics.barcode import code128
 from reportlab.lib.units import mm
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase.pdfmetrics import stringWidth
-
-
-#from reportlab.platypus import Image as rlImage 
-#from ui.customdocteplate import BaseDocTemplate
 from PIL import Image, ImageFilter
 import math
 import os
@@ -179,16 +175,23 @@ class LabelPDF():
             additionalData['collectionName'] = ''
         # setting these now, to avoid redundant .get calls.
         incAssociated = self.settings.get('value_inc_Associated')
+        italicizeAssociated = self.settings.get('value_italicize_Associated')
         maxAssociated = int(self.settings.get('value_max_Associated'))
+        tripName = self.settings.get('value_inc_TripName', False)
         for rowData in labelDataInput:
             if incAssociated:
                 associatedTaxa = rowData['associatedTaxa']
                 associatedTaxaItems = associatedTaxa.split(', ')
                 if len(associatedTaxaItems) > maxAssociated: #if it is too large, trunicate it, and append "..." to indicate trunication.
                     associatedTaxa =  ', '.join(associatedTaxaItems[:maxAssociated])+' ...'
-                    rowData['associatedTaxa'] = associatedTaxa
+                if italicizeAssociated:
+                    associatedTaxa = f"<i>{associatedTaxa}</i>"
+                rowData['associatedTaxa'] = associatedTaxa
             else:
                 rowData['associatedTaxa'] = ''
+            if not tripName:
+                # label project is already handed in, nullify it if user opted against it on label.
+                rowData['Label Project'] = ''
             for key, value in additionalData.items():
                 rowData[key] = value
 
@@ -197,7 +200,7 @@ class LabelPDF():
                 ('RIGHTPADDING',(0,0),(-1,-1), 0),
                 ('TOPPADDING',(0,0),(-1,-1), 0),
                 ('BOTTOMPADDING',(0,0),(-1,-1), 0)]
-    
+
         #helper functions to keep the 'flowables' code more legible.
     
         def Para(textField1,styleKey,prefix = '',suffix = ''):
@@ -279,10 +282,9 @@ class LabelPDF():
             else:
                 barcodeValue =  self.settings.dummyCatNumber
             if barcodeValue:
-                code39._Code39Base._humanText = newHumanText  #Note, overriding the human text from this library to omit the stopcode ('+')
-                barcode39Std = code39.Standard39(barcodeValue,barHeight=(self.yPaperSize * .10  ), barWidth=((self.xPaperSize * 0.28)/(len(barcodeValue)*13+35)), humanReadable=True, quiet = False, checksum=0)
-                                                 #^^^Note width is dynamic, but I don't know the significe of *13+35 beyond making it work.
-                return barcode39Std
+                barcode128  = code128.Code128(barcodeValue,barHeight=(self.yPaperSize * .10  ), barWidth=((self.xPaperSize * 0.28)/(len(barcodeValue)*13+35)), humanReadable=True, quiet = False, checksum=0)
+                                    #^^^Note width is dynamic, but I don't know the significe of *13+35 beyond making it work.
+                return barcode128  
             else:
                 return ''
         elements = []      # a list to dump the flowables into for pdf generation
@@ -305,7 +307,9 @@ class LabelPDF():
                         ('ALIGN',(1,0),(1,0),'RIGHT'),
                          ])
             else:
-                row0 = Para('collectionName','collectionNameSTY')
+                row0 = Table([
+                        [Para('collectionName','collectionNameSTY')],
+                        [Para('family', 'familyNameSTY')]])
                     
     
             row1 = Table([
@@ -667,6 +671,14 @@ class LabelPDF():
             fontName=f'{usrFont}-Bold',
             fontSize= self.relFont,
             alignment=TA_CENTER,
+        )
+        styles['familyNameSTY'] = ParagraphStyle(
+            'familyNameSTY',
+            parent=styles['title'],
+            fontName=f'{usrFont}',
+            fontSize= self.relFont,
+            alignment=TA_CENTER,
+            textTransform='uppercase'
         )
         styles['labelProjectSTY'] = ParagraphStyle(
             'labelProjectSTY',

@@ -198,7 +198,7 @@ class MyWindow(QMainWindow):
         if self.associatedTaxaWindow.isHidden():
             self.associatedTaxaWindow.populateAssociatedTaxa()
             selType, siteNum, specimenNum = self.getTreeSelectionType()
-            self.associatedTaxaWindow.setWindowTitle(f'Associated taxa')
+            self.associatedTaxaWindow.setWindowTitle('Associated taxa')
             self.associatedTaxaWindow.associatedMainWin.label_UserMsg.setText(f'Select associated taxa for site {siteNum}')
             self.associatedTaxaWindow.show()
         else:
