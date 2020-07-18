@@ -167,7 +167,8 @@ class settingsWindow(QMainWindow):
         # NOTE: keeping Local options in index 0 position
         if kingdom == 'Plantae':
             toAdd = ['ITIS (local)', 'Catalog of Life (web API)',
-                     'Taxonomic Name Resolution Service (web API)','Tropicos']
+                     'Plants of the World (web API)',
+                     'Taxonomic Name Resolution Service (web API)']
         elif kingdom == 'Fungi':
             toAdd = ['MycoBank (local)', 'Catalog of Life (web API)']
         source.addItems(toAdd)
@@ -254,7 +255,7 @@ class settingsWindow(QMainWindow):
         value_inc_VerifiedBy =  self.convertCheckState(self.get('value_inc_VerifiedBy'))
         parent.value_inc_VerifiedBy.setCheckState(value_inc_VerifiedBy)
         value_inc_FamilyName = self.convertCheckState(self.get('value_inc_FamilyName', 'true'))
-        parent.value_inc_FamilyName.setCheckState(value_inc_FamilyName )
+        parent.value_inc_FamilyName.setCheckState(value_inc_FamilyName)
         value_inc_TripName = self.convertCheckState(self.get('value_inc_TripName', 'false'))
         parent.value_inc_TripName.setCheckState(value_inc_TripName)
         value_italicize_Associated = self.convertCheckState(self.get('value_italicize_Associated', 'false'))

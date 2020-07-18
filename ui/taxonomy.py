@@ -11,6 +11,8 @@ import re
 import Resources_rc
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QFile
+import pykew.powo as powo
+from pykew.powo_terms import Name as powoName
 
 import datetime
 import time
@@ -19,7 +21,7 @@ from requests.exceptions import ReadTimeout
 import json
 
 class taxonomicVerification():
-    def __init__(self, settings, parent, tropicos_API_key, editable = True, *args):
+    def __init__(self, settings, parent, editable = True, *args):
         super(taxonomicVerification, self).__init__()
         self.parent = parent
         self.settings = settings       
@@ -30,8 +32,6 @@ class taxonomicVerification():
         # structured as: {'input sci name':('aligned sci name', 'alignedauthority')}
         self.readTaxonomicSettings()
         self.sessionAlignments = {}
-        # the tropicos key saved in apiKeys.py
-        self.tropicos_API_key = tropicos_API_key
     
     def readTaxonomicSettings(self):
         """ Fetches the most up-to-date taxonomy relevant settings"""
@@ -78,8 +78,8 @@ class taxonomicVerification():
             result = self.getITISWeb(querySciName, retrieveAuth)
         elif self.TaxAlignSource == 'Taxonomic Name Resolution Service (web API)':
             result = self.getTNRS(querySciName, retrieveAuth)
-        elif self.TaxAlignSource == 'Tropicos':
-            result = self.getTropicosWeb(querySciName, retrieveAuth)
+        elif self.TaxAlignSource == 'Plants of the World (web API)':
+            result = self.getPoWOWeb(querySciName, retrieveAuth)
         elif self.TaxAlignSource == 'MycoBank (local)':
             result = self.getMycoBankLocal(querySciName, retrieveAuth)
         elif self.TaxAlignSource == 'MycoBank (web API)':
@@ -112,9 +112,10 @@ class taxonomicVerification():
         #  check with the session results before moving on.
         sessionResults =  self.sessionAlignments.get(querySciName, False)
         if sessionResults:
-            sessionName, sessionAuth = sessionResults
+            sessionName, sessionAuth, sessionFamily = sessionResults
             rowData['scientificName'] = sessionName
             rowData['scientificNameAuthorship'] = sessionAuth
+            rowData['family'] = sessionFamily
             return rowData
 
         result = self.retrieveAlignment(querySciName)
@@ -157,13 +158,13 @@ class taxonomicVerification():
         else:
             if not keptResult:
                 # condition to retrieve authority for potentially non-accepted name
+                # in favor of simplicity, the family name will not be updated under this condition
                 resultAuthor = self.retrieveAlignment(querySciName, retrieveAuth=True)
             if resultAuthor.lower() not in [scientificNameAuthorship.lower(), None]:
                 # if the authors don't match check user policies
                 # conditional actions based on AuthChangePolicy
                 if self.AuthChangePolicy == 'Accept all suggestions':
                     rowData['scientificNameAuthorship'] = resultAuthor
-    
                 elif self.AuthChangePolicy == 'Fill blanks':
                     if scientificNameAuthorship == '':  # if it is blank fill it
                         rowData['scientificNameAuthorship'] = resultAuthor
@@ -223,6 +224,7 @@ class taxonomicVerification():
             acceptedRow = df[df['tsn'] == tsn_accepted]
             
         if len(acceptedRow) > 0:
+            print(acceptedRow)
             try:
                 acceptedName = acceptedRow['complete_name'].values[0]
             except IndexError:
@@ -396,66 +398,37 @@ class taxonomicVerification():
 
         return result
 
-    def getTropicosWeb(self, inputStr, retrieveAuth=False, timeout=1):
-        """ uses Tropicos reference to attempt alignments """
-        # see: https://services.tropicos.org/help
-        # empty container to hold the results
-        result = (None, None)
-        # get the nameID code from Tropicos for the given input string
-        urlInputStr = inputStr.replace(' ','%20') #clean up the spaces in the request URL
-        url = f'http://services.tropicos.org/Name/Search?name={inputStr}&type=wildcard&apikey={self.tropicos_API_key}&format=json'
-        print(url)
+    def getPoWOWeb(self, inputStr, retrieveAuth=False, timeout=1):
+        """ uses Plants of the World reference to attempt alignments """
+        # see: http://www.plantsoftheworldonline.org/search-help
+        # build the query with specified kingdom
+        query = { powoName.full_name: inputStr, powoName.kingdom: self.value_Kingdom }
+        results = powo.search(query)  #produces iterator full of dicts
+        # build dummy target_record in case no appropriate entries are found
+        target_record = {'name':None, 'author':None, 'family':None}
+        # iterate over results until appropriate target_record is found
         try:
-            nameID_response = requests.get(url, timeout=timeout)
-            time.sleep(0.5)  # use a sleep to be polite to the service
-            # if the nameID responded okay then, overwrite the empty results
-            if (nameID_response.status_code == requests.codes.ok):
-                id_response = json.loads(nameID_response.text)
-                # if the service responds with no results for that query...
-                if id_response[0].get('Error', False):
-                    # then return (None, None)
-                    return result
-                # choosing to keep only the first result from the open text search.
-                nameID = [int(x.get('NameId')) for x in id_response][0]
-                query_url = f'http://services.tropicos.org/Name/{nameID}/AcceptedNames?&apikey={self.tropicos_API_key}&format=json'
-                print(query_url)
-                # use name ID to retrieve acceptedNames and authorities
-                time.sleep(0.5)  # Finish 1 second sleep for before the next call
-                response = json.loads(requests.get(query_url, timeout=timeout).text)
-                
+            for entry in results:
                 if retrieveAuth:
-                    # if authority requested for potentially non-accepted name
-                    # then use NameID to verify the result
-                    resultName =  [x.get('ScientificName', inputStr) for x in response if x.get('NameId') == nameID][0]
-                    resultAuthor = [x.get('ScientificNameWithAuthors', '') for x in response if x.get('NameId') == nameID][0]
-                else:  # otherwise, pull the data from the AcceptedName results
-                    # oddly, if an accepted name is queried for AcceptedName in
-                    # Tropicos, it returns [{'Error': 'No accepted names were found'}]
-                    # if this happens, parse the nameID results for name /auth
-                    if response[0].get('Error', False) == "No accepted names were found":
-                        resultName = id_response[0].get('ScientificName', '')
-                        resultAuthor = id_response[0].get('ScientificNameWithAuthors', '')
-                    else:                        
-                        accepted_name_object = [x.get('AcceptedName') for x in response][0] # taking first accepted name
-                        # retrieve the ScientificName from the result
-                        resultName = accepted_name_object.get('ScientificName', '').strip()
-                        # retrieve the authority as ScientificNameWithAuthors
-                        resultAuthor = accepted_name_object.get('ScientificNameWithAuthors', '')
-                        
-                # clean out the ScientificName from the ScientificNameWithAuthors
-                resultAuthor = resultAuthor.replace(resultName, '').strip()
-                result = (resultName, resultAuthor)
-            # return whatever was derived
-            return result
-
-        except ReadTimeout:
-            # If the request times out, build a user dialog to throw
-            message = 'Tropicos request timed out. This may be an internet connectivity problem, or an issue with the service. No changes have been made.'
-            details = 'Check internet connection, or try a different alignment service. If you do not have internet connectivity, use the local alignment service.'
-            notice = self.parent.userNotice(message, 'Taxonomic alignment', inclHalt=True, retry=True)
-            if notice == QMessageBox.Retry:  # if clicked retry, do it.
-                timeout += 2
-                # add to timeout before retrying
-                return self.getTropicosWeb(inputStr, retrieveAuth, timeout=timeout)
-            else:
-                return False
+                    # if seeking authorship of a potentially un-accepted query
+                    target_record = entry
+                    break
+                else:
+                    if entry.get('accepted', False):
+                        # if entry is accepted
+                        target_record = entry
+                        break
+                    else:
+                        # otherwise check the entry for a synonymOf entry
+                        syn_record = entry.get('synonymOf', False)
+                        if isinstance(syn_record , dict) and syn_record.get('accepted', False):
+                            target_record = syn_record
+                            # if synonymOf entry looks complete
+                            break
+        except AttributeError:
+            # no results returned from the query
+            pass
+        resultName = target_record.get('name', None)
+        resultAuthor = target_record.get('author', None)
+        resultFamily = target_record.get('family', None)
+        return (resultName, resultAuthor, resultFamily)

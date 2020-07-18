@@ -903,12 +903,12 @@
                  </item>
                  <item>
                   <property name="text">
-                   <string>Taxonomic Name Resolution Service (web API)</string>
+                   <string>Plants of the World (web API)</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>Tropicos</string>
+                   <string>Taxonomic Name Resolution Service (web API)</string>
                   </property>
                  </item>
                 </widget>

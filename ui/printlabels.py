@@ -178,6 +178,7 @@ class LabelPDF():
         italicizeAssociated = self.settings.get('value_italicize_Associated')
         maxAssociated = int(self.settings.get('value_max_Associated'))
         tripName = self.settings.get('value_inc_TripName', False)
+        familyName = self.settings.get('value_inc_FamilyName', True)
         for rowData in labelDataInput:
             if incAssociated:
                 associatedTaxa = rowData['associatedTaxa']
@@ -192,6 +193,9 @@ class LabelPDF():
             if not tripName:
                 # label project is already handed in, nullify it if user opted against it on label.
                 rowData['Label Project'] = ''
+            if not familyName:
+                # family name is already handed in, nullify it if user opted against it on label.
+                rowData['family'] = ''
             for key, value in additionalData.items():
                 rowData[key] = value
 
@@ -308,11 +312,11 @@ class LabelPDF():
                          ])
             else:
                 row0 = Table([
-                        [Para('collectionName','collectionNameSTY')],
-                        [Para('family', 'familyNameSTY')]])
+                        [Para('collectionName','collectionNameSTY')]])
                     
-    
+            
             row1 = Table([
+                [Para('family', 'familyNameSTY')],
                 [Para('Label Project','labelProjectSTY')],
                 [verifiedByPara('verifiedBy','verifiedBySTY')]],
                          colWidths = self.xPaperSize *.98, rowHeights = None,

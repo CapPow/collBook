@@ -120,7 +120,7 @@ def mergeITISCsvs(csvDir, kingdomID):
                 return family_name
         except IndexError:
             print(f"Index Error at: TSN:{tsn}, tsnData:{tsnData}")
-            raise Exception
+            return ""
 
     #tax_sample = tax.sample(500)
     tax['family'] = tax['tsn'].transform(lookupFamily)
