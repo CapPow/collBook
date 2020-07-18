@@ -64,7 +64,7 @@ PDF Support Provided by: [PyMuPDF](https://github.com/pymupdf/PyMuPDF) and [Repo
 UUID Generation Provided by: [shortuuid](https://github.com/skorokithakis/shortuuid)
 ___
 ### Taxonomic Alignment Services Provided By:
-Although collBook makes numerious taxonomic alignment services available to the user, it is neither affiliation or endorced by any.
+Although collBook makes numerous taxonomic alignment services available to the user, it is neither affiliated or endorsed by any.
 
 #### Catalog of Life
 Roskov Y., Abucay L., Orrell T., Nicolson D., Bailly N., Kirk P.M., Bourgoin T., DeWalt R.E., Decock W., De Wever A., Nieukerken E. van, Zarucchi J., Penev L., eds. (2018). Species 2000 & ITIS Catalogue of Life, 2018 Annual Checklist. Digital resource at www.catalogueoflife.org/annual-checklist/2018. Species 2000: Naturalis, Leiden, the Netherlands. ISSN 2405-884X.
