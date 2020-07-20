@@ -299,6 +299,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             rowsToProcess = self.getRowsToProcess(*self.parent.getTreeSelectionType())
             dfOrig = self.datatable.iloc[rowsToProcess, ]
             try:
+                #be sure to only assign catalog numbers to empty fields
                 df = dfOrig.loc[(dfOrig['specimenNumber'].str.isdigit()) & 
                             (dfOrig['catalogNumber'] == '')].copy()
             except KeyError:  # address a no catalogNumber condition
@@ -887,7 +888,6 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         """ converts ColectoR formatted data into a compatable DWC format.
         This does not infer site numbers. For details on ColectoR see:
         Maya-Lastra, C.A. 2016, doi:10.3732/apps.1600035 """
-
         # create eventDate from existing cols        
         df['eventDate'] = ['-'.join([x,y,z]) for x, y, z in zip(df['Year'], df['Month'], df['Day'])]
         # strip non-numerics out of GPS accuracy value
@@ -910,9 +910,11 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         df['occurrenceRemarks'] = occNotes
         # copy Number, so when choosing index names "Number" is still present.
         df['recordNumber'] = df['Number']
+        # nullify "Project" named if data appears to be a private variable
+        df.loc[df["Project"] == "_toProyecto_", "Project"] = ""
         # assign rename map over directly translatable cols
         colNameMap = {'Collector': 'recordedBy',
-                      'Additional collectors	': 'associatedCollectors',
+                      'Additional collectors': 'associatedCollectors',
                       'Country': 'country',
                       'State': 'stateProvince',
                       'Locality': 'locality',
@@ -921,8 +923,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                       'GPS Accuracy': 'coordinateUncertaintyInMeters',
                       'Altitude': 'minimumElevationInMeters',
                       'Project': 'Label Project'}
-        df.rename(colNameMap, axis='columns', inplace=True)
-
+        df.rename(colNameMap, axis='columns', inplace=True)        
         return df
 
     def new_Records(self, skipDialog = False):

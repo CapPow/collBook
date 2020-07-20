@@ -62,7 +62,8 @@ try:
     from PyQt5 import QtWidgets
     from PyQt5.QtWidgets import (QMainWindow, QTreeWidgetItem,
                                  QTreeWidgetItemIterator, QItemDelegate,
-                                 QCompleter)
+                                 QCompleter, QDialog, QPushButton, QScrollArea,
+                                 QWidget, QGridLayout, QLabel)
     from PyQt5.QtWidgets import QMessageBox
     from reportlab.platypus.doctemplate import LayoutError
     from ui.printlabels import LabelPDF
@@ -76,6 +77,8 @@ try:
     from ui.associatedtaxa import associatedTaxaMainWindow
     from ui.scinameinputdialog import sciNameDialog
     from ui.progressbar import progressBar
+    from ui import aboutdialogUI
+    
     # simple python script holding the API keys
     from ui import apiKeys
 except Exception:
@@ -89,6 +92,58 @@ class editorDelegate(QItemDelegate):
     def setEditorData(self, editor, index):
         editor.setAutoFillBackground(True)
         editor.setText(str(index.data()))
+
+
+class aboutDialog(QDialog):
+    """ a class to handle the about dialog"""
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
+           
+    def init_ui(self):
+        ab = aboutdialogUI.Ui_Dialog()
+        ab.setupUi(self)
+        ab.label_collBookVersion.setText(f"version: {__version__}")
+    
+    def showLicense(self):
+        """ used if the license button is pressed """
+        ld = licenseDialog()        
+
+
+class ScrollMessageBox(QMessageBox):
+   def __init__(self, *args, **kwargs):
+      QMessageBox.__init__(self, *args, **kwargs)
+      chldn = self.children()
+      scrll = QScrollArea(self)
+      scrll.setWidgetResizable(True)
+      grd = self.findChild(QGridLayout)
+      lbl = QLabel(chldn[1].text(), self)
+      lbl.setWordWrap(True)
+      scrll.setWidget(lbl)
+      scrll.setMinimumSize (500,300)
+      grd.addWidget(scrll,0,1)
+      chldn[1].setText('')
+      self.exec_()
+
+class licenseDialog(QWidget):
+   def __init__(self):
+      super(licenseDialog,self).__init__()
+      self.message = ("""collBook is free software; you can redistribute it and/or  \
+modify it under the terms of the GNU General Public License  \
+as published by the Free Software Foundation; either version 3  \
+of the License, or (at your option) any later version.  \
+
+
+collBook is distributed in the hope that it will be useful,  \
+but WITHOUT ANY WARRANTY; without even the implied warranty of  \
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  \
+GNU General Public License for more details.  \
+
+
+You should have received a copy of the GNU General Public License  \
+along with this program; if not, write to the Free Software  \
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA""")
+      _ = ScrollMessageBox(QMessageBox.Information,"collBook license",self.message)
 
 
 class MyWindow(QMainWindow):
@@ -129,6 +184,9 @@ class MyWindow(QMainWindow):
         self.w.action_New_Records.triggered.connect(self.m.new_Records)
         self.w.action_undo.triggered.connect(self.m.undo)
         self.w.action_redo.triggered.connect(self.m.redo)
+
+        self.w.action_About_collBook.triggered.connect(self.callAboutDialog)
+        
         self.w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))
         self.w.action_Settings.triggered.connect(self.toggleSettings)
         self.w.button_associatedTaxa.clicked.connect(self.toggleAssociated)
@@ -187,6 +245,11 @@ class MyWindow(QMainWindow):
                         #  instead display a the new release
                         webbrowser.open(link,autoraise=1)
             self.settings.saveSettings()  # save the new version check date
+
+    def callAboutDialog(self):
+        ab = aboutDialog()
+        ab.exec_()
+        #result = dialog.exec_()
 
     def toggleSettings(self):
         if self.settings.isHidden():
