@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>986</width>
-    <height>696</height>
+    <height>702</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,9 @@
   <property name="windowIcon">
    <iconset resource="resources/Resources.qrc">
     <normaloff>:/rc_/logo-collbook/logomark.png</normaloff>:/rc_/logo-collbook/logomark.png</iconset>
+  </property>
+  <property name="whatsThis">
+   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
@@ -45,6 +48,9 @@
           </property>
           <property name="focusPolicy">
            <enum>Qt::StrongFocus</enum>
+          </property>
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The form view is where data pertinent to the selected class (e.g., “Site 1”, or &amp;quot;Specimen 1-4&amp;quot;) is edited. The fields available for editing change according to the type of class selected. Edits made in this field are applied to all subordinate records. For example: if you select &amp;quot;Site 3&amp;quot; and add &amp;quot;Location Remarks&amp;quot; in the form view, every specimen collected from Site 3 will have those new location remarks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
@@ -1040,6 +1046,9 @@
               </property>
               <item>
                <widget class="QPushButton" name="pushButton_newSpecimen_2">
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Generate a blank specimen level record which inherits all of the site and trip level data from the selected site.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
                 <property name="text">
                  <string>Add specimen to this site</string>
                 </property>
@@ -1047,6 +1056,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_duplicateSpecimen">
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clone the selected record. Useful for making multiple records which share much of the same data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
                 <property name="text">
                  <string>Duplicate this record</string>
                 </property>
@@ -1067,6 +1079,9 @@
               </item>
               <item>
                <widget class="QCheckBox" name="checkBox_deleteRecord">
+                <property name="whatsThis">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A safety toggle which must be selected before &amp;quot;Delete record&amp;quot; becomes available.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
                 <property name="text">
                  <string/>
                 </property>
@@ -1119,6 +1134,9 @@
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
+                   <property name="whatsThis">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Field number is used to match collected material to the record. The field number follows the format of &amp;quot;Site#- Specimen#.&amp;quot; In the mobile application collNotes, this value is generated for you in the field. Stored as &amp;quot;recordNumber.&amp;quot; &lt;/p&gt;&lt;p&gt;Darwin Core reference link: &lt;a href=&quot;http://rs.tdwg.org/dwc/terms/recordNumber&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://rs.tdwg.org/dwc/terms/recordNumber&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                   </widget>
                  </item>
                  <item alignment="Qt::AlignRight">
@@ -1129,7 +1147,11 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_catalogNumber"/>
+                  <widget class="QLineEdit" name="lineEdit_catalogNumber">
+                   <property name="whatsThis">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Catalog number provides a record with a unique identity in a collection. The settings menu has options for generating these values, and producing the barcodes on export.&lt;br/&gt;&lt;/p&gt;&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;2&quot; cellpadding=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;p&gt;Darwin Core reference link:&lt;/p&gt;&lt;/td&gt;&lt;td&gt;&lt;p&gt;&lt;a href=&quot;http://rs.tdwg.org/dwc/terms/catalogNumber&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://rs.tdwg.org/dwc/terms/catalogNumber&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -1155,6 +1177,9 @@
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
+                   </property>
+                   <property name="whatsThis">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verify the taxonomy of a single record's name. The &amp;quot;Refine All Selected Records&amp;quot; button is more appropriate to use when records are being prepared for export.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="text">
                     <string>...</string>
@@ -1205,6 +1230,9 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="whatsThis">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The authority for a given Scientific Name. This information is included during taxonomic verification. Stored as &amp;quot;scientificNameAuthorship.&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Darwin Core reference: &lt;a href=&quot;http://rs.tdwg.org/dwc/terms/scientificNameAuthorship&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://rs.tdwg.org/dwc/terms/scientificNameAuthorship&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -1219,7 +1247,11 @@
                <item row="3" column="1">
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_occurrenceRemarks"/>
+                  <widget class="QLineEdit" name="lineEdit_occurrenceRemarks">
+                   <property name="whatsThis">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remarks about the occurrence. Stored as &amp;quot;occurrenceRemarks.&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;2&quot; cellpadding=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;p&gt;Darwin Core reference: &lt;/p&gt;&lt;/td&gt;&lt;td&gt;&lt;p&gt;&lt;a href=&quot;http://rs.tdwg.org/dwc/terms/occurrenceRemarks&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://rs.tdwg.org/dwc/terms/occurrenceRemarks&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                  </widget>
                  </item>
                  <item alignment="Qt::AlignRight">
                   <widget class="QLabel" name="label_substrate">
@@ -1229,7 +1261,11 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="lineEdit_substrate"/>
+                  <widget class="QLineEdit" name="lineEdit_substrate">
+                   <property name="whatsThis">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The surface that the specimen was collected from. Stored as &amp;quot;substrate.&amp;quot; This field is combined with habitat in the Darwin Core, but left distinct in Symbiota.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Symbiota reference: &lt;a href=&quot;http://symbiota.org/docs/symbiota-occurrence-data-fields-2/#substrate&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://symbiota.org/docs/symbiota-occurrence-data-fields-2/#substrate&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -1244,6 +1280,9 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,1,0,1">
                  <item>
                   <widget class="QComboBox" name="comboBox_reproductiveCondition">
+                   <property name="whatsThis">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The reproductive state of the specimen. Stored as &amp;quot;reproductiveCondition.&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Darwin Core reference: &lt;a href=&quot;http://rs.tdwg.org/dwc/terms/reproductiveCondition&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://rs.tdwg.org/dwc/terms/reproductiveCondition&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <item>
                     <property name="text">
                      <string/>
@@ -1295,6 +1334,9 @@
                  </item>
                  <item>
                   <widget class="QSpinBox" name="spinBox_individualCount">
+                   <property name="whatsThis">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A population size estimate at the location and time it the specimen collected. Stored as &amp;quot;individualCount.&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Darwin Core reference: &lt;a href=&quot;http://rs.tdwg.org/dwc/terms/individualCount&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://rs.tdwg.org/dwc/terms/individualCount&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="inputMethodHints">
                     <set>Qt::ImhDigitsOnly</set>
                    </property>
@@ -1314,6 +1356,9 @@
                  </item>
                  <item>
                   <widget class="QCheckBox" name="checkBox_establishmentMeans">
+                   <property name="whatsThis">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Was the specimen collected from cultivation? If checked, the term &amp;quot;Cultivated&amp;quot; is stored in the &amp;quot;establishmentMeans&amp;quot; field.&lt;/p&gt;&lt;p&gt;Darwin Core reference: &lt;a href=&quot;http://rs.tdwg.org/dwc/iri/establishmentMeans&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://rs.tdwg.org/dwc/iri/establishmentMeans&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="text">
                     <string>Cultivated</string>
                    </property>
@@ -1341,6 +1386,9 @@
                    <width>16777215</width>
                    <height>50</height>
                   </size>
+                 </property>
+                 <property name="whatsThis">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Remarks about the identification. Stored as &amp;quot;identificationRemarks.&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Darwin Core reference: &lt;a href=&quot;http://rs.tdwg.org/dwc/terms/identificationRemarks&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://rs.tdwg.org/dwc/terms/identificationRemarks&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                 </widget>
                </item>
@@ -1370,6 +1418,9 @@
                    <width>16777215</width>
                    <height>50</height>
                   </size>
+                 </property>
+                 <property name="whatsThis">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;References used in the identification. Recommended to separate multiple references with horizontal bars (i.e., &amp;quot;&lt;span style=&quot; font-family:'Noto Mono';&quot;&gt;|&amp;quot;). Stored as &amp;quot;&lt;/span&gt;identificationReferences.&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Darwin Core reference: &lt;a href=&quot;http://rs.tdwg.org/dwc/terms/identificationReferences&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;http://rs.tdwg.org/dwc/terms/identificationReferences&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                  </property>
                 </widget>
                </item>
@@ -1411,6 +1462,9 @@
         </property>
         <property name="toolTipDuration">
          <number>2</number>
+        </property>
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use this slider to zoom on the label preview.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="minimum">
          <number>10</number>
@@ -1467,6 +1521,9 @@
           <width>0</width>
           <height>0</height>
          </size>
+        </property>
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The label preview window presents previews of labels. If a site is selected, the first record from that site is previewed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string/>
@@ -1528,6 +1585,9 @@
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The site navigator is used to select one, or many records based on their hierarchical relationship. Which records are selected affects editing, refining, and exporting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="styleSheet">
          <string notr="true">font: 12pt &quot;Cantarell&quot;;</string>
         </property>
@@ -1578,6 +1638,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The table view provides an overview of the selected record(s) and allows unrestricted edits to the data. Unlike the form view which uses data validation, the table has no such safeguards. This is intended as an alternative when the collBook features are obstructing your work. Edits to orgizational fields such as site or specimen numbers may have unstable results, so save your work before you go experimenting out of bounds.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="sizeAdjustPolicy">
          <enum>QAbstractScrollArea::AdjustToContents</enum>
         </property>
@@ -1620,7 +1683,7 @@
      <x>0</x>
      <y>0</y>
      <width>986</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -1630,12 +1693,19 @@
     <addaction name="action_Open"/>
     <addaction name="action_New_Records"/>
     <addaction name="separator"/>
+    <addaction name="action_Save_As"/>
+    <addaction name="action_Export_Records"/>
+    <addaction name="separator"/>
+    <addaction name="action_Settings"/>
     <addaction name="action_Exit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="separator"/>
+    <addaction name="action_Context_Help"/>
+    <addaction name="action_About_collBook"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuHelp"/>
@@ -1660,6 +1730,9 @@
    <addaction name="separator"/>
    <addaction name="action_Verify_All"/>
    <addaction name="action_Export_Records"/>
+   <addaction name="separator"/>
+   <addaction name="action_About_collBook"/>
+   <addaction name="action_Context_Help"/>
   </widget>
   <widget class="QToolBar" name="right_toolBar">
    <property name="sizePolicy">
@@ -1736,7 +1809,7 @@
      <normaloff>:/rc_/save.svg</normaloff>:/rc_/save.svg</iconset>
    </property>
    <property name="text">
-    <string>&amp;Save As</string>
+    <string>&amp;Save As Working File</string>
    </property>
    <property name="toolTip">
     <string>Save as working file</string>
@@ -1840,6 +1913,32 @@
     <string>Export your records for database upload and label printing</string>
    </property>
   </action>
+  <action name="action_About_collBook">
+   <property name="icon">
+    <iconset>
+     <normalon>:/rc_/book.svg</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>About collBook</string>
+   </property>
+   <property name="toolTip">
+    <string>Citation, Licensing, and Version</string>
+   </property>
+  </action>
+  <action name="action_Context_Help">
+   <property name="icon">
+    <iconset>
+     <normalon>:/rc_/help-circle.svg</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Context Help</string>
+   </property>
+   <property name="toolTip">
+    <string>click another object to learn more</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1924,8 +2023,8 @@
    <slot>updateTableView()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>226</x>
-     <y>633</y>
+     <x>167</x>
+     <y>671</y>
     </hint>
     <hint type="destinationlabel">
      <x>457</x>
@@ -1956,12 +2055,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>898</x>
-     <y>194</y>
+     <x>842</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
-     <x>794</x>
-     <y>300</y>
+     <x>841</x>
+     <y>247</y>
     </hint>
    </hints>
   </connection>
@@ -1972,12 +2071,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>898</x>
-     <y>194</y>
+     <x>842</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
-     <x>845</x>
-     <y>211</y>
+     <x>847</x>
+     <y>253</y>
     </hint>
    </hints>
   </connection>
@@ -1988,12 +2087,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>898</x>
-     <y>194</y>
+     <x>842</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
-     <x>889</x>
-     <y>322</y>
+     <x>948</x>
+     <y>344</y>
     </hint>
    </hints>
   </connection>
@@ -2004,12 +2103,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>898</x>
-     <y>194</y>
+     <x>842</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
-     <x>800</x>
-     <y>306</y>
+     <x>848</x>
+     <y>344</y>
     </hint>
    </hints>
   </connection>
@@ -2020,12 +2119,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>322</x>
-     <y>104</y>
+     <x>859</x>
+     <y>110</y>
     </hint>
     <hint type="destinationlabel">
-     <x>322</x>
-     <y>104</y>
+     <x>905</x>
+     <y>109</y>
     </hint>
    </hints>
   </connection>
@@ -2036,12 +2135,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>322</x>
-     <y>104</y>
+     <x>839</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
-     <x>322</x>
-     <y>104</y>
+     <x>970</x>
+     <y>117</y>
     </hint>
    </hints>
   </connection>
@@ -2052,8 +2151,8 @@
    <slot>updatePreviewZoom(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>95</x>
-     <y>531</y>
+     <x>102</x>
+     <y>576</y>
     </hint>
     <hint type="destinationlabel">
      <x>425</x>

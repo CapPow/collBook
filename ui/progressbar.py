@@ -37,7 +37,6 @@ class progressBar(QWidget):
         self.progressBar.setObjectName("progressBar")
     
         
-        #self.pushButton_Cancel = QtWidgets.QPushButton(self)
         self.pushButton_Cancel = QtWidgets.QToolButton(self)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
@@ -49,9 +48,6 @@ class progressBar(QWidget):
         icon.addPixmap(QtGui.QPixmap(":/rc_/x-circle.svg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.pushButton_Cancel.setIcon(icon)
         self.pushButton_Cancel.setIconSize(QtCore.QSize(15, 15))
-        #self.pushButton_Cancel.setAutoDefault(False)
-        #self.pushButton_Cancel.setDefault(False)
-        #self.pushButton_Cancel.setFlat(False)
         self.pushButton_Cancel.setObjectName("pushButton_Cancel")
         self.pushButton_Cancel.setEnabled(False)
         
@@ -70,6 +66,12 @@ class progressBar(QWidget):
         
         parent.addWidget(widgetBox, 1)
         parent.setSizeGripEnabled(False)
+                # set the what's this
+        msg = """A progress bar used for while refining and exporting records. \
+Text on the bottom left of the progress bar states which type of class \
+is currently selected (E.g., "specimen view" when a single specimen is \
+selected)."""
+        self.progressBar.setWhatsThis(msg) 
         
     def flipCancelSwitch(self):
         self.pushButton_Cancel.status = True

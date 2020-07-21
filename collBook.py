@@ -62,9 +62,10 @@ try:
     from PyQt5 import QtWidgets
     from PyQt5.QtWidgets import (QMainWindow, QTreeWidgetItem,
                                  QTreeWidgetItemIterator, QItemDelegate,
-                                 QCompleter, QDialog, QPushButton, QScrollArea,
-                                 QWidget, QGridLayout, QLabel)
+                                 QCompleter, QDialog, QScrollArea, QWidget,
+                                 QGridLayout, QLabel, QWhatsThis)
     from PyQt5.QtWidgets import QMessageBox
+    from PyQt5.QtGui import QWhatsThisClickedEvent
     from reportlab.platypus.doctemplate import LayoutError
     from ui.printlabels import LabelPDF
     from ui.pandastablemodel import PandasTableModel
@@ -146,6 +147,25 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA""")
       _ = ScrollMessageBox(QMessageBox.Information,"collBook license",self.message)
 
 
+class MyMainWindow(QMainWindow):
+    """
+    A subclass of the QMainWindow with the eventFilter method.
+    from: https://gist.github.com/stevenliebregt/8e4211937b671ac637b610650a11914f
+    """
+
+    def __init__(self, parent=None):
+        super(MyMainWindow, self).__init__(parent)
+
+    def eventFilter(self, obj, event):
+        if event.type() == QWhatsThisClickedEvent:  # Catch the TouchBegin event.
+            print('We have a touch begin')
+            return True
+        elif event.type() == QEvent.TouchEnd:  # Catch the TouchEnd event.
+            print('We have a touch end')
+            return True
+
+        return super(MyMainWindow, self).eventFilter(obj, event)
+
 class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -184,8 +204,9 @@ class MyWindow(QMainWindow):
         self.w.action_New_Records.triggered.connect(self.m.new_Records)
         self.w.action_undo.triggered.connect(self.m.undo)
         self.w.action_redo.triggered.connect(self.m.redo)
-
         self.w.action_About_collBook.triggered.connect(self.callAboutDialog)
+        
+        self.w.action_Context_Help.triggered.connect(QWhatsThis.enterWhatsThisMode)
         
         self.w.action_Exit.triggered.connect(lambda: sys.exit(app.exec_()))
         self.w.action_Settings.triggered.connect(self.toggleSettings)
@@ -582,7 +603,7 @@ class MyWindow(QMainWindow):
         if value_Kingdom == 'Plantae':
             nameCol = 'complete_name'
         if value_Kingdom == 'Fungi':
-            nameCol = 'Taxon_name'
+            nameCol = 'normalized_name'
         stream = QFile(f':/rc_/{value_Kingdom}_Reference.csv')
         if stream.open(QFile.ReadOnly):
             df = StringIO(str(stream.readAll(), 'utf-8'))
@@ -594,12 +615,15 @@ class MyWindow(QMainWindow):
  #       completer.activated.connect(self.cleartext,type=Qt.QueuedConnection)
         
         wordList = pd.read_csv(df, encoding = 'utf-8', dtype = 'str')
-        self.wordList = sorted(wordList[nameCol].tolist())      
+        wordList = wordList[nameCol].str.capitalize().tolist()
+        self.wordList = sorted(wordList)
         
         completer = QCompleter(self.wordList, self.lineEdit_sciName)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.lineEdit_sciName.setCompleter(completer)
 
         completerAssociated = QCompleter(self.wordList, self.associatedTaxaWindow.lineEdit_newAssociatedTaxa)
+        completerAssociated .setCaseSensitivity(Qt.CaseInsensitive)
         self.associatedTaxaWindow.associatedMainWin.lineEdit_newAssociatedTaxa.setCompleter(completerAssociated)
        
     def getSelectSitesToApply(self):

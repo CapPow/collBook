@@ -105,6 +105,8 @@ class taxonomicVerification():
 
         if rowData['scientificName'] in ['', None]:
             return rowData
+        # ensure the first word is capitalized regardless
+        rowData['scientificName'] = rowData['scientificName'].capitalize()
         rowNum = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
         scientificName = rowData['scientificName']
         scientificNameAuthorship = rowData['scientificNameAuthorship'].strip()
@@ -258,23 +260,24 @@ class taxonomicVerification():
             acceptedRow = df[df['normalized_name'] == inputStr]
         else:
             try:
-                acceptedName = df[df['normalized_name'] == inputStr]['Accepted_name'][0]
+                acceptedName = df[df['normalized_name'] == inputStr]['Accepted_name'].values[0]
             except IndexError:
                 return result
             acceptedRow = df[df['Accepted_name'] == acceptedName]
         if len(acceptedRow) > 0:
             try:
-                acceptedName = acceptedRow['Accepted_name'][0]
+                acceptedName = acceptedRow['Accepted_name'].values[0]
             except IndexError:
                 acceptedName = inputStr
             try:
-                acceptedAuthor = acceptedRow['Authors'][0]
+                acceptedAuthor = acceptedRow['Authors'].values[0]
             except IndexError:
                 acceptedAuthor = ""
             try:
-                family = acceptedRow['family'][0]
+                family = acceptedRow['family'].values[0]
             except IndexError:
                 family = ""
+            acceptedName = acceptedName.capitalize()
             result = (acceptedName, acceptedAuthor, family)
         return result
 
