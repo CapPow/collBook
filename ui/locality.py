@@ -12,6 +12,9 @@ from requests import ConnectionError
 from PyQt5.QtWidgets import QMessageBox
 import time
 
+import numpy as np
+from math import radians, cos, sin, asin, sqrt, atan2, degrees
+
 # status codes
 # link -> https://developers.google.com/maps/documentation/geocoding/intro#StatusCodes
 # link -> https://developers.google.com/maps/documentation/geocoding/intro#ReverseGeocoding
@@ -96,19 +99,36 @@ class locality():
                 if 'park' in types:
                     address.append(component) # if park found, add to components.
             newLocality = {}
+
+            coordUncertainty = currentRowArg['coordinateUncertaintyInMeters']
+            try:
+                coordUncertainty = float(coordUncertainty)
+                if coordUncertainty < 50:
+                    npBearing, npDist, npName = self.getNearestPlace(latitude, longitude)
+                    #Given an error, npDist should == 100000
+                    if npDist < 5000: # keep bearings to ~5km
+                        nearest_str = f"{int(round(npDist, 0))}m bearing {round(npBearing)}° from {npName}"
+                        newLocality['path'] = nearest_str
+                        currentRowArg['path'] = nearest_str
+            except:
+                pass
+
             for addressComponent in address:
                 if addressComponent['types'][0] == 'route':
-                    # path could be Unamed Road
-                    # probably don't want this as a result?
-                    #TODO include a path inclusison uncertainty threshold
-                    coordUncertainty = currentRowArg['coordinateUncertaintyInMeters']
                     try:
-                        coordUncertainty = int(coordUncertainty)
-                        if coordUncertainty < 100:
+                        route_name = addressComponent.get('long_name', False)
+                        # filter out any unnamed routes
+                        if "unnamed" in route_name.lower():
+                            route_name = False
+                        if coordUncertainty < 50 and route_name:
                             path = f"near {addressComponent['long_name']}"
+                            #check if a bearing was already derived
+                            existing_path = newLocality.get('path', False)
+                            if existing_path:
+                                path = f"{existing_path}, {path}"
                             newLocality['path'] = path
                             currentRowArg['path'] = path
-                    except ValueError:
+                    except:
                         pass
                 #  TODO consider also using google's "natural_feature" type.
                 if 'park' in addressComponent['types']:
@@ -159,6 +179,88 @@ class locality():
                     currentRowArg = self.genLocality(currentRowArg)
         return currentRowArg
 
+    # Temporary hardcoded list of acceptablePlaces
+    acceptablePlaces = ['airport', 'bank', 'bus_station',
+                        'campground', 'cemetery', 'church',
+                        'city_hall', 'courthouse', 'embassy',
+                        'fire_station', 'hindu_temple', 'hospital',
+                        'library', 'light_rail_station',
+                        'local_government_office', 'mosque', 'museum',
+                        'park', 'place_of_worship', 'police',
+                        'post_office', 'primary_school', 'school',
+                        'secondary_school', 'stadium', 'subway_station',
+                        'synagogue', 'tourist_attraction', 'train_station',
+                        'transit_station', 'university', 'zoo']
+
+    def getNearestPlace(self,lat,lon):
+        """
+        Retrieves the bearing and distance of the nearest "google place" to a point
+        """
+        # results will be bearing, distance(m), location name
+        results = (None, 100000, None)
+        apiUrl = f'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={str(lat)},{str(lon)}&rankby=distance&fields=name,types,geometry/location&key={self.gAPIkey}'
+        try:
+            apiCall = requests.get(apiUrl)
+        except ConnectionError:
+            return False
+        status = apiCall.json()['status']
+        # api returns OK (query went through, received results)
+        if status == 'OK':
+            nearestPlaces = apiCall.json()['results']
+            qualifiedPlaces = [x for x in nearestPlaces if any(y in self.acceptablePlaces for y in x['types'])]
+            nearestPlace = qualifiedPlaces[0]
+            nearestPlaceLocation = nearestPlace['geometry']['location']
+            npName = nearestPlace['name']
+            npPlaceTypes = nearestPlace['types']
+            # organize locations as lon, lat for bearing and haversine calls
+            loc1 = (float(nearestPlaceLocation['lng']), float(nearestPlaceLocation['lat']))
+            loc2 = (float(lon), float(lat))
+            npBearing = self.bearing(loc1, loc2)
+            npDist = self.haversine(*loc1, *loc2)
+
+            results = (npBearing, npDist, npName)
+        else:  # some error occured
+            status = str(status)
+
+        return results
+            
+    def haversine(self, lon1, lat1, lon2, lat2):
+        """
+        Calculate the great circle distance between two points 
+        on the earth (specified in decimal degrees)
+        see: https://stackoverflow.com/questions/29545704/fast-haversine-approximation-python-pandas
+        """
+        # convert decimal degrees to radians 
+        lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
+        # haversine formula 
+        dlon = lon2 - lon1 
+        dlat = lat2 - lat1 
+        a = (np.sin(dlat/2)**2 
+             + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2)
+        c = 2 * np.arcsin(np.sqrt(a)) 
+        km = 6367 * c
+        m = km * 1000
+        return m
+
+    def bearing(self, point1, point2):
+        '''
+            Calculating initial bearing between two points
+            (see http://www.movable-type.co.uk/scripts/latlong.html)
+        '''
+        lon1, lat1 = (radians(coord) for coord in point1)
+        lon2, lat2 = (radians(coord) for coord in point2)
+
+        dlat = (lat2 - lat1)
+        dlon = (lon2 - lon1)
+        numerator = sin(dlon) * cos(lat2)
+        denominator = (
+            cos(lat1) * sin(lat2) -
+            (sin(lat1) * cos(lat2) * cos(dlon))
+        )
+
+        theta = atan2(numerator, denominator)
+        theta_deg = (degrees(theta) + 360) % 360
+        return theta_deg
 
 #    def genLocalityNoAPI(self, currentRowArg):
 #        """ Attempts to improve the locality string using existing geography data.
