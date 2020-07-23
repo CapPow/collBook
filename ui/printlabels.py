@@ -185,7 +185,7 @@ class LabelPDF():
                 associatedTaxaItems = associatedTaxa.split(', ')
                 if len(associatedTaxaItems) > maxAssociated: #if it is too large, trunicate it, and append "..." to indicate trunication.
                     associatedTaxa =  ', '.join(associatedTaxaItems[:maxAssociated])+' ...'
-                if italicizeAssociated:
+                if italicizeAssociated and len(associatedTaxa.strip()) > 0:
                     associatedTaxa = f"<i>{associatedTaxa}</i>"
                 rowData['associatedTaxa'] = associatedTaxa
             else:

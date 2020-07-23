@@ -535,6 +535,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                     # if so, parse those cols.
                     df = self.convertColectoRFormat(df)
                     cols = df.columns
+                    print(cols)
                 # backwards compatability, following change in index field
                 if ('otherCatalogNumbers' in cols) & ('recordNumber' not in cols):
                     df['recordNumber'] = df['otherCatalogNumbers']
@@ -595,8 +596,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                         cols = df.columns
                 # after parsing the cols, round elevation values to reasonable floating point
                 if 'minimumElevationInMeters' in df.columns:
-                    df['minimumElevationInMeters'] = df['minimumElevationInMeters'].astype(float).round(1).astype(str)
-
+                    # complicated lambda deals with rounding values of unknown data types
+                    df['minimumElevationInMeters'] = df['minimumElevationInMeters'].apply(lambda x: round(x, 1) if isinstance(x, (int, float)) else x).astype(str)
                 self.update(df)  # this function updates the visible dataframe
                 self.parent.populateTreeWidget()
                 self.parent.form_view.fillFormFields()
@@ -796,8 +797,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         Expects the dataframe to have siteNumber and specimenNumber columns """
         # first try and organize 2 temporary "sort on" columns
         try:
-            df['sortSpecimen'] = df['specimenNumber'].str.replace('#','0').astype(int)
-            df['sortSite'] = df['siteNumber'].str.replace('','0').astype(int)
+            df['sortSpecimen'] = df['specimenNumber'].str.replace('#','0').astype('int64')
+            df['sortSite'] = df['siteNumber'].str.replace('','0').astype('int64')
             # fill any nans with 0s before sorting on these cols
             fillValues = {'sortSpecimen': 0, 'sortSite': 0}
             df = df.fillna(value=fillValues)            
@@ -809,7 +810,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         return df
 
     def inferrecordNumber(self, rowData):
-        """ assigns otherCatalogNumber based on siteNumber & specimenNumber """
+        """ assigns recordNumber based on siteNumber & specimenNumber """
         try:
             rowData['recordNumber'] = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
         except IndexError:
@@ -909,7 +910,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         occNotes = occNotes.where(occNotes.notnull(), '')
         df['occurrenceRemarks'] = occNotes
         # copy Number, so when choosing index names "Number" is still present.
-        df['recordNumber'] = df['Number']
+        numSeq = [f"-{x+1}" for x in range(len(df))]
+        df['recordNumber'] = df['Number'] + numSeq
         # nullify "Project" named if data appears to be a private variable
         df.loc[df["Project"] == "_toProyecto_", "Project"] = ""
         # assign rename map over directly translatable cols
