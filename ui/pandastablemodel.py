@@ -313,7 +313,11 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                     # trunicated to 13 symbols long requires approx 35,040,000,000 specimens for a 1% chance of collision
                     for _ in range(len(df.index)):
                         trunicated_uuid = uuid()[:13]
-                        newCatNums.append(uuid())
+                        newCatNums.append(trunicated_uuid)
+                    df['catalogNumber'] = newCatNums
+                    self.datatable.update(df)
+                    self.update(self.datatable)
+                    self.parent.updateTableView()
                 elif patCat: # otherwise use pattern
                     catStartingNum = int(self.parent.settings.get('value_catalogNumberStartingNum'))
                     catDigits = int(self.parent.settings.get('value_catalogNumberDigits'))
