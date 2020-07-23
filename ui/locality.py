@@ -103,11 +103,13 @@ class locality():
                     #TODO include a path inclusison uncertainty threshold
                     coordUncertainty = currentRowArg['coordinateUncertaintyInMeters']
                     try:
-                        coordUncertainty = int(coordUncertainty)
+                        coordUncertainty = float(coordUncertainty)
                         if coordUncertainty < 100:
-                            path = f"near {addressComponent['long_name']}"
-                            newLocality['path'] = path
-                            currentRowArg['path'] = path
+                            routeName = addressComponent['long_name']
+                            if "unnamed" not in routeName.lower():
+                                path = f"near {addressComponent['long_name']}"
+                                newLocality['path'] = path
+                                currentRowArg['path'] = path
                     except ValueError:
                         pass
                 #  TODO consider also using google's "natural_feature" type.

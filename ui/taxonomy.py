@@ -121,7 +121,7 @@ class taxonomicVerification():
             return rowData
 
         result = self.retrieveAlignment(querySciName)
-        if result is False:
+        if result == (False, False, False):
             # if the alignment failed to respond
             return rowData
         resultSciName, resultAuthor, resultFam = result
@@ -226,7 +226,6 @@ class taxonomicVerification():
             acceptedRow = df[df['tsn'] == tsn_accepted]
             
         if len(acceptedRow) > 0:
-            print(acceptedRow)
             try:
                 acceptedName = acceptedRow['complete_name'].values[0]
             except IndexError:
@@ -317,7 +316,6 @@ class taxonomicVerification():
                 data = response.json().get('results')
                 # restrict results to the best answer for the appropriate kingdom regardless of accepted_name status
                 # COL returns classifications for accepted names, otherwise it is nested under the key "accepted_name"
-                print(len(data))
                 data = [x for x in data if
                                x.get('classification', [{}])[0].get('name', '') == self.value_Kingdom or
                                x.get('accepted_name', {}).get('classification', [{}])[0].get('name', '') == self.value_Kingdom][0]
@@ -416,18 +414,24 @@ class taxonomicVerification():
                     # if seeking authorship of a potentially un-accepted query
                     target_record = entry
                     break
+                elif entry.get('accepted', False):
+                    # if entry is accepted
+                    target_record = entry
+                    break
                 else:
-                    if entry.get('accepted', False):
-                        # if entry is accepted
-                        target_record = entry
+                    # otherwise check the entry for a synonymOf entry
+                    syn_record = entry.get('synonymOf', False)
+                    # sadly synonymOf entries do not return the family name
+                    if isinstance(syn_record , dict) and syn_record.get('accepted', False):
+                        # search Powo again for the accepted synonym
+                        query = { powoName.full_name: syn_record['name'], powoName.kingdom: self.value_Kingdom }
+                        target_record_results = powo.search(query)
+                        for result in target_record_results:
+                            # if the query results are accepted, store it and break out
+                            if result.get('accepted', False):
+                                target_record = result
+                                break
                         break
-                    else:
-                        # otherwise check the entry for a synonymOf entry
-                        syn_record = entry.get('synonymOf', False)
-                        if isinstance(syn_record , dict) and syn_record.get('accepted', False):
-                            target_record = syn_record
-                            # if synonymOf entry looks complete
-                            break
         except AttributeError:
             # no results returned from the query
             pass
