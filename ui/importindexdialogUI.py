@@ -9,7 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_importIndexDialog(object):
-    def setupUi(self, importIndexDialog):
+    def setupUi(self, importIndexDialog, inat):
         importIndexDialog.setObjectName("importIndexDialog")
         importIndexDialog.resize(411, 396)
         font = QtGui.QFont()
@@ -36,9 +36,19 @@ class Ui_importIndexDialog(object):
         self.horizontalLayout_2.addWidget(self.value_Existing_Site_Numbers)
         self.formLayout.setLayout(0, QtWidgets.QFormLayout.SpanningRole, self.horizontalLayout_2)
         self.value_Gen_Site_Numbers = QtWidgets.QRadioButton(self.groupBox)
-        self.value_Gen_Site_Numbers.setChecked(True)
+        if inat:
+            self.value_Gen_Site_Numbers.setChecked(False)
+        else:
+            self.value_Gen_Site_Numbers.setChecked(True)
         self.value_Gen_Site_Numbers.setObjectName("value_Gen_Site_Numbers")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.value_Gen_Site_Numbers)
+        self.value_Use_One_Site = QtWidgets.QRadioButton(self.groupBox)
+        if inat:
+            self.value_Use_One_Site.setChecked(True)
+        else:
+            self.value_Use_One_Site.setChecked(False)
+        self.value_Use_One_Site.setObjectName("value_Use_One_Site")
+        self.formLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.value_Use_One_Site)
         self.gridLayout.addWidget(self.groupBox, 6, 0, 1, 1)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
@@ -80,20 +90,25 @@ class Ui_importIndexDialog(object):
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem2, 4, 0, 1, 1)
 
-        self.retranslateUi(importIndexDialog)
-        self.value_Use_Existing_Specimen_Numbers.toggled['bool'].connect(self.value_Existing_Specimen_Numbers.setEnabled)
+        self.retranslateUi(importIndexDialog, inat)
         self.value_Use_Existing_Site_Numbers.toggled['bool'].connect(self.value_Existing_Site_Numbers.setEnabled)
+        self.value_Use_Existing_Specimen_Numbers.toggled['bool'].connect(self.value_Existing_Specimen_Numbers.setEnabled)
         QtCore.QMetaObject.connectSlotsByName(importIndexDialog)
 
-    def retranslateUi(self, importIndexDialog):
+    def retranslateUi(self, importIndexDialog, inat):
         _translate = QtCore.QCoreApplication.translate
         importIndexDialog.setWindowTitle(_translate("importIndexDialog", "Form"))
         self.groupBox.setTitle(_translate("importIndexDialog", "Site Number"))
         self.value_Use_Existing_Site_Numbers.setText(_translate("importIndexDialog", "Pick from existing columns"))
         self.value_Gen_Site_Numbers.setText(_translate("importIndexDialog", "Generate unique site numbers"))
+        self.value_Use_One_Site.setText(_translate("importIndexDialog", "Treat all imported records as one site (recommended for iNaturalist-like files)"))
         self.pushButton_Cancel.setText(_translate("importIndexDialog", "Cancel"))
         self.pushButton_Assign.setText(_translate("importIndexDialog", "Assign"))
-        self.label.setText(_translate("importIndexDialog", "Could not locate indexing fields (ie: siteNumber, specimenNumber, or otherCatalogNumbers)."))
+        if inat:
+            self.label.setText(_translate("importIndexDialog", "Importing iNaturalist file."))
+        else:
+            self.label.setText(_translate("importIndexDialog",
+                                          "Could not locate indexing fields (ie: siteNumber, specimenNumber, or otherCatalogNumbers)."))
         self.label_2.setText(_translate("importIndexDialog", "Select how to assign index fields."))
         self.groupBox_2.setTitle(_translate("importIndexDialog", "Specimen Numbers"))
         self.value_Use_Existing_Specimen_Numbers.setText(_translate("importIndexDialog", "Pick from existing columns"))

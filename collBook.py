@@ -21,7 +21,7 @@ and format “born digital” field notes into database ready formats.
 
 """
 __author__ = "Caleb Powell, Jacob Motley"
-__credits__ = ["Caleb Powell, Jacob Motley, Joey Shaw"]
+__credits__ = ["Caleb Powell, Jacob Motley, Dax Ledesma, Joey Shaw"]
 __email__ = "calebadampowell@gmail.com"
 __status__ = "Alpha"
 __version__ = 'v0.1.8-alpha'

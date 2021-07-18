@@ -50,6 +50,7 @@ class locality():
 
     def reverseGeoCall(self, latitude, longitude):
         apiUrl = f'https://maps.googleapis.com/maps/api/geocode/json?latlng={str(latitude)},{str(longitude)}&key={self.gAPIkey}'
+        print(apiUrl)
         try:
             apiCall = requests.get(apiUrl)
         except ConnectionError:
@@ -132,8 +133,12 @@ class locality():
                     country = addressComponent['short_name']
                     newLocality['country'] = country
                     currentRowArg['country'] = country
+                if addressComponent['types'][0] == 'natural_feature':
+                    country = addressComponent['natural_feature']
+                    newLocality['natural_feature'] = country
+                    currentRowArg['natural_feature'] = country
             # construct the locality items with a controlled order        
-            localityList = ['country','stateProvince','county','municipality','park','path']
+            localityList = ['country','stateProvince','county','municipality','natural_feature','park','path']
             localityItemList = []
             for item in localityList:
                 newLocalityItem = newLocality.get(item, False)
