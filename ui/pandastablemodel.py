@@ -528,11 +528,16 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         _translate = QtCore.QCoreApplication.translate
         self.parent.setWindowTitle(_translate("MainWindow", f"collBook ({fileName})"))
         if fileName:  # if a csv was selected, start loading the data.
+            inat = False
+            col_num = False
             try:
                 df = pd.read_csv(fileName, encoding='utf-8', keep_default_na=False, dtype=str)
                 df = df.drop(df.columns[df.columns.str.contains('unnamed', case=False)],
                              axis=1)  # drop any "unnamed" cols
                 # check if input is an iNaturalist export
+                if "colNum" in df.columns:
+                    col_num = True
+
                 try:
                     # if so, parse those cols.
                     if df['url'].str.lower().str.contains('inaturalist.org').any():
@@ -541,6 +546,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 except KeyError:
                     # probably not an iNaturalist export.
                     pass
+
                 cols = df.columns
                 # a list of cols which indicates the data may be from CollectR
                 colectoRCols = ['Collector', 'Additional collectors',
@@ -831,10 +837,14 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def inferrecordNumber(self, rowData):
         """ assigns recordNumber based on siteNumber & specimenNumber """
         try:
-            rowData['recordNumber'] = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
-        except IndexError:
-            pass
-        return rowData
+            rowData['recordNumber'] = f"{rowData['colNum']}"
+            return rowData
+        except:
+            try:
+                rowData['recordNumber'] = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
+            except IndexError:
+                pass
+            return rowData
 
     def inferSiteSpecimenNumbers(self, df):
         """ attempts to infer a siteNumber and specimenNumber of an incoming df """

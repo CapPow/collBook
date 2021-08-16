@@ -270,8 +270,11 @@ class LabelPDF():
                 if (dfl(textfield1) and dfl(textfield2)):
                     # min([len(dfl(textfield1)),len(dfl(textfield2))]) testing length control.
                     gpsString.append('<b>GPS: </b>' + dfl(textfield1) + ', ' + dfl(textfield2))
-                if dfl(textfield3):
-                    gpsString.append(' ± ' + str(round(float(dfl(textfield3)),0)).split('.')[0] + 'm')
+                try:
+                    if dfl(textfield3):
+                        gpsString.append(' ± ' + str(round(float(dfl(textfield3)),0)).split('.')[0] + 'm')
+                except ValueError:
+                    pass
                 if dfl(textfield4):
                     gpsString.append(', <b>Elevation: </b>' + dfl(textfield4) + 'm')
     
@@ -435,7 +438,7 @@ class LabelPDF():
                           [row6_7],
                           [row7]]
     
-            #Testing if GPS String can fit on one row with the field number. If not, split them into two rows.
+            #Testing if GPS String can fit on one row with the Collection Number. If not, split them into two rows.
             gpsStrElement = gpsCoordStringer('decimalLatitude', 'decimalLongitude', 'coordinateUncertaintyInMeters', 'minimumElevationInMeters','rightSTYSmall')
             try:
                 gpsStrElement.wrap(self.xPaperSize * .98 , self.yPaperSize * .98)
@@ -447,7 +450,7 @@ class LabelPDF():
                 gpsParaWidth = 0
                 
             if gpsParaWidth > self.xPaperSize * .65:
-                row8 = Table([[Para('recordNumber','default','Field Number: ')]], style = tableSty)
+                row8 = Table([[Para('recordNumber','default','Collection Number: ')]], style = tableSty)
                 row9 = Table([[gpsStrElement]],style = tableSty)
                 tableList.append([row8])
     
@@ -458,7 +461,7 @@ class LabelPDF():
                 
             else:
                 row8 = Table([[
-                Para('recordNumber','default','Field Number: '),        
+                Para('recordNumber','default','Collection Number: '),        
                 gpsStrElement]],            
                 colWidths = (self.xPaperSize * .33, self.xPaperSize * .65), rowHeights = None,style=tableSty)
                 tableList.append([row8])

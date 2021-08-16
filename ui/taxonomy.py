@@ -102,93 +102,100 @@ class taxonomicVerification():
         """general method to align taxonomy and retrieve authority.
         accepts a df row argument, treats it as a dictionary and makes
         refinements. Returning a the modified argument."""
+        for col in rowData.keys():
+            rowData[col] = str(rowData[col])
 
         if rowData['scientificName'] in ['', None]:
             return rowData
-        # ensure the first word is capitalized regardless
-        rowData['scientificName'] = rowData['scientificName'].capitalize()
-        rowNum = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
-        scientificName = rowData['scientificName']
-        scientificNameAuthorship = rowData['scientificNameAuthorship'].strip()
-        querySciName = self.normalizeStrInput(scientificName)
-        #  check with the session results before moving on.
-        sessionResults =  self.sessionAlignments.get(querySciName, False)
-        if sessionResults:
-            sessionName, sessionAuth, sessionFamily = sessionResults
-            rowData['scientificName'] = sessionName
-            rowData['scientificNameAuthorship'] = sessionAuth
-            rowData['family'] = sessionFamily
-            return rowData
 
-        result = self.retrieveAlignment(querySciName)
-        if result == (False, False, False):
-            # if the alignment failed to respond
-            return rowData
-        resultSciName, resultAuthor, resultFam = result
-        # Decide how to handle resulting data
-        keptResult = False  # flag to det if the alignment result was kept
-        changeAuth = False  # flag to determine if the authority needs altered.
-        if resultSciName is None:  # if no scientificName was returned
-            message = f'No {self.value_Kingdom} results for "{scientificName}" (# {rowNum}) found using {self.TaxAlignSource}.\n This may be a typo, would you like to reenter the name?'
-            reply = self.parent.userSciNameInput(f'{rowNum}: Taxonomic alignment', message)
-            if reply:
-                rowData['scientificName'] = reply
-                rowData = self.verifyTaxonomy(rowData)
-            return rowData
-        # if the returned result is not the scientificName, check policies
-        if resultSciName.lower() != scientificName.lower():
-            if self.NameChangePolicy == 'Accept all suggestions':
-                rowData['scientificName'] = resultSciName
-                rowData['family'] = resultFam
-                changeAuth = True
-                keptResult = True
-            elif self.NameChangePolicy == 'Always ask':
-                message = f'Change {scientificName} to {resultSciName} at record {rowNum}?'
-                answer = self.parent.userAsk(message, 'Taxonomic alignment')
-                if answer:
+        try:
+            # ensure the first word is capitalized regardless
+            rowData['scientificName'] = rowData['scientificName'].capitalize()
+            rowNum = f"{rowData['siteNumber']}-{rowData['specimenNumber']}"
+            scientificName = rowData['scientificName']
+            scientificNameAuthorship = rowData['scientificNameAuthorship'].strip()
+            querySciName = self.normalizeStrInput(scientificName)
+            #  check with the session results before moving on.
+            sessionResults =  self.sessionAlignments.get(querySciName, False)
+            if sessionResults:
+                sessionName, sessionAuth, sessionFamily = sessionResults
+                rowData['scientificName'] = sessionName
+                rowData['scientificNameAuthorship'] = sessionAuth
+                rowData['family'] = sessionFamily
+                return rowData
+
+            result = self.retrieveAlignment(querySciName)
+            if result == (False, False, False):
+                # if the alignment failed to respond
+                return rowData
+            resultSciName, resultAuthor, resultFam = result
+            # Decide how to handle resulting data
+            keptResult = False  # flag to det if the alignment result was kept
+            changeAuth = False  # flag to determine if the authority needs altered.
+            if resultSciName is None:  # if no scientificName was returned
+                message = f'No {self.value_Kingdom} results for "{scientificName}" (# {rowNum}) found using {self.TaxAlignSource}.\n This may be a typo, would you like to reenter the name?'
+                reply = self.parent.userSciNameInput(f'{rowNum}: Taxonomic alignment', message)
+                if reply:
+                    rowData['scientificName'] = reply
+                    rowData = self.verifyTaxonomy(rowData)
+                return rowData
+            # if the returned result is not the scientificName, check policies
+            if resultSciName.lower() != scientificName.lower():
+                if self.NameChangePolicy == 'Accept all suggestions':
                     rowData['scientificName'] = resultSciName
                     rowData['family'] = resultFam
-                    keptResult = True
                     changeAuth = True
-        # the returned result is equal to the scientificName...
-        else:  # treat it as if we kept the returned result
-            keptResult = True
-            rowData['family'] = resultFam
-        if changeAuth:
-            # if the scientificName changed already, update the author
-            rowData['scientificNameAuthorship'] = resultAuthor
-        else:
-            if not keptResult:
-                # condition to retrieve authority for potentially non-accepted name
-                # in favor of simplicity, the family name will not be updated under this condition
-                resultAuthor = self.retrieveAlignment(querySciName, retrieveAuth=True)
-            if resultAuthor.lower() not in [scientificNameAuthorship.lower(), None]:
-                # if the authors don't match check user policies
-                # conditional actions based on AuthChangePolicy
-                if self.AuthChangePolicy == 'Accept all suggestions':
-                    rowData['scientificNameAuthorship'] = resultAuthor
-                elif self.AuthChangePolicy == 'Fill blanks':
-                    if scientificNameAuthorship == '':  # if it is blank fill it
+                    keptResult = True
+                elif self.NameChangePolicy == 'Always ask':
+                    message = f'Change {scientificName} to {resultSciName} at record {rowNum}?'
+                    answer = self.parent.userAsk(message, 'Taxonomic alignment')
+                    if answer:
+                        rowData['scientificName'] = resultSciName
+                        rowData['family'] = resultFam
+                        keptResult = True
+                        changeAuth = True
+            # the returned result is equal to the scientificName...
+            else:  # treat it as if we kept the returned result
+                keptResult = True
+                rowData['family'] = resultFam
+            if changeAuth:
+                # if the scientificName changed already, update the author
+                rowData['scientificNameAuthorship'] = resultAuthor
+            else:
+                if not keptResult:
+                    # condition to retrieve authority for potentially non-accepted name
+                    # in favor of simplicity, the family name will not be updated under this condition
+                    resultAuthor = self.retrieveAlignment(querySciName, retrieveAuth=True)
+
+                if resultAuthor.lower() not in [scientificNameAuthorship.lower(), None]:
+                    # if the authors don't match check user policies
+                    # conditional actions based on AuthChangePolicy
+                    if self.AuthChangePolicy == 'Accept all suggestions':
                         rowData['scientificNameAuthorship'] = resultAuthor
-                    else:  # if not blank, ask.
-                        message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
+                    elif self.AuthChangePolicy == 'Fill blanks':
+                        if scientificNameAuthorship == '':  # if it is blank fill it
+                            rowData['scientificNameAuthorship'] = resultAuthor
+                        else:  # if not blank, ask.
+                            message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
+                            answer = self.parent.userAsk(message, 'Authority alignment')
+                            if answer:
+                                rowData['scientificNameAuthorship'] = resultAuthor
+
+                    elif self.AuthChangePolicy == 'Always ask':
+                        if scientificNameAuthorship == '':  # custom dialog box if the field was empty. 'Always ask' may be annoying!
+                            message = f'Fill in blank author of {rowData["scientificName"]} to {resultAuthor} at record {rowNum}?'
+                        else:
+                            message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
                         answer = self.parent.userAsk(message, 'Authority alignment')
                         if answer:
                             rowData['scientificNameAuthorship'] = resultAuthor
-    
-                elif self.AuthChangePolicy == 'Always ask':
-                    if scientificNameAuthorship == '':  # custom dialog box if the field was empty. 'Always ask' may be annoying!
-                        message = f'Fill in blank author of {rowData["scientificName"]} to {resultAuthor} at record {rowNum}?'
-                    else:
-                        message = f'Update author of {rowData["scientificName"]} from:\n{scientificNameAuthorship} to {resultAuthor} at record {rowNum}?'
-                    answer = self.parent.userAsk(message, 'Authority alignment')
-                    if answer:
-                        rowData['scientificNameAuthorship'] = resultAuthor
-        # update sessionAlignments to remember these results for this session
-        results = (rowData['scientificName'],
-                   rowData['scientificNameAuthorship'],
-                   rowData['family'])
-        self.sessionAlignments[querySciName] = results
+            # update sessionAlignments to remember these results for this session
+            results = (rowData['scientificName'],
+                       rowData['scientificNameAuthorship'],
+                       rowData['family'])
+            self.sessionAlignments[querySciName] = results
+        except:
+            pass
         return rowData
 
     def normalizeStrInput(self, inputStr, retrieveAuth=False):
