@@ -11,7 +11,7 @@ PyQt5-sip==4.19.19
 python-dateutil==2.8.1
 pytz==2020.1
 QDarkStyle==2.6.5
-reportlab==3.5.13
+reportlab==3.5.55
 requests==2.21.0
 shortuuid==1.0.1
 six==1.15.0
